@@ -1,8 +1,11 @@
-import { useOutletContext, useSubmit, useTransition } from '@remix-run/react'
-import { Text } from '@proofzero/design-system'
+import {
+  Form,
+  useOutletContext,
+  useSubmit,
+  useTransition,
+} from '@remix-run/react'
+import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
-import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
-import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ActionFunction } from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
@@ -10,10 +13,10 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { requireJWT } from '~/utilities/session.server'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import classNames from 'classnames'
 import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
+import { HiOutlineShoppingCart, HiOutlineTrash } from 'react-icons/hi'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -92,32 +95,70 @@ export default () => {
             ></div>
           </div>
 
-          <InputToggle
-            id="toggle_storage"
-            checked={Boolean(appDetails.externalAppDataPackageDefinition)}
-            onToggle={() => {
-              submit(
-                {
-                  op: Boolean(appDetails.externalAppDataPackageDefinition)
-                    ? 'disable'
-                    : 'enable',
-                },
-                {
-                  method: 'post',
-                }
-              )
-            }}
-            disabled={trans.state !== 'idle'}
-          />
+          {!Boolean(appDetails.externalAppDataPackageDefinition) && (
+            <Form method="post">
+              <input type="hidden" name="op" value="enable" />
+              <Button
+                btnType="primary-alt"
+                className="flex flex-row items-center gap-3"
+                type="submit"
+              >
+                <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                <Text>Purchase Package</Text>
+              </Button>
+            </Form>
+          )}
+          {Boolean(appDetails.externalAppDataPackageDefinition) && (
+            <Form method="post">
+              <input type="hidden" name="op" value="disable" />
+              <Button
+                btnType="dangerous-alt"
+                className="flex flex-row items-center gap-3"
+                type="submit"
+              >
+                <HiOutlineTrash className="w-3.5 h-3.5" />
+                <Text>Cancel Service</Text>
+              </Button>
+            </Form>
+          )}
         </section>
 
         <section className="mt-2">
           <Text size="sm" className="text-gray-600">
             App Data Storage service provides a hassle-free way to store and
-            retrieve per-user data for your application. Once activated, the
-            service can be accessed through our Galaxy API and it supports
+            retrieve per-user data for your application. <br /> Once activated,
+            the service can be accessed through our Galaxy API and it supports
             storing data up to 128kb, per user.
           </Text>
+        </section>
+        <section className="mt-4">
+          <div className="w-full h-px bg-gray-200"></div>
+          <div className="flex flex-row justify-between items-center py-2">
+            <Text size="sm" className="text-gray-800">
+              Current Package:
+            </Text>
+            <Text size="sm" className="text-gray-500">
+              {appDetails.externalAppDataPackageDefinition?.title}
+            </Text>
+          </div>
+          <div className="w-full h-px bg-gray-200"></div>
+          <div className="flex flex-row justify-between items-center py-2">
+            <Text size="sm" className="text-gray-800">
+              Reads:
+            </Text>
+            <Text size="sm" className="text-gray-500">
+              {appDetails.externalAppDataPackageDefinition?.reads} / month
+            </Text>
+          </div>
+          <div className="w-full h-px bg-gray-200"></div>
+          <div className="flex flex-row justify-between items-center pt-2">
+            <Text size="sm" className="text-gray-800">
+              Writes:
+            </Text>
+            <Text size="sm" className="text-gray-500">
+              {appDetails.externalAppDataPackageDefinition?.writes} / month
+            </Text>
+          </div>
         </section>
       </section>
     </section>
