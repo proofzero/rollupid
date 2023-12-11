@@ -138,7 +138,8 @@ export default () => {
               Current Package:
             </Text>
             <Text size="sm" className="text-gray-500">
-              {appDetails.externalAppDataPackageDefinition?.title}
+              {appDetails.externalAppDataPackageDefinition?.title ??
+                'No active package'}
             </Text>
           </div>
           <div className="w-full h-px bg-gray-200"></div>
@@ -146,18 +147,30 @@ export default () => {
             <Text size="sm" className="text-gray-800">
               Reads:
             </Text>
-            <Text size="sm" className="text-gray-500">
-              {appDetails.externalAppDataPackageDefinition?.reads} / month
-            </Text>
+            {Boolean(appDetails.externalAppDataPackageDefinition) ? (
+              <Text size="sm" className="text-gray-500">
+                {appDetails.externalAppDataPackageDefinition?.reads} / month
+              </Text>
+            ) : (
+              <Text size="sm" className="text-gray-500">
+                -
+              </Text>
+            )}
           </div>
           <div className="w-full h-px bg-gray-200"></div>
           <div className="flex flex-row justify-between items-center pt-2">
             <Text size="sm" className="text-gray-800">
               Writes:
             </Text>
-            <Text size="sm" className="text-gray-500">
-              {appDetails.externalAppDataPackageDefinition?.writes} / month
-            </Text>
+            {Boolean(appDetails.externalAppDataPackageDefinition) ? (
+              <Text size="sm" className="text-gray-500">
+                {appDetails.externalAppDataPackageDefinition?.writes} / month
+              </Text>
+            ) : (
+              <Text size="sm" className="text-gray-500">
+                -
+              </Text>
+            )}
           </div>
         </section>
       </section>
