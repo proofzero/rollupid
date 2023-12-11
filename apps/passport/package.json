@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
-    "@cloudflare/workers-types": "4.20221111.1",
+    "@cloudflare/workers-types": "4.20231121.0",
     "@mdx-js/react": "^1.6.22",
     "@playwright/test": "1.35.1",
     "@remix-run/dev": "1.14.0",
@@ -106,7 +106,7 @@
     "tailwindcss": "3.3.3",
     "typescript": "5.0.4",
     "webpack": "5.75.0",
-    "wrangler": "3.2.0"
+    "wrangler": "3.18"
   },
   "engines": {
     "node": ">=16.13"

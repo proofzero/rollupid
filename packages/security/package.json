@@ -17,7 +17,7 @@
     "lint:check:src": "eslint *.ts"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20221111.1",
+    "@cloudflare/workers-types": "4.20231121.0",
     "@microsoft/api-extractor": "7.33.6",
     "@types/node": "18.15.3",
     "eslint": "8.28.0",
