@@ -489,7 +489,7 @@ async function connectedAccountsClaimsRetriever(
       ({ rc: { addr_type } }) => addr_type !== CryptoAccountType.Wallet
     )
 
-    if (personaData.email) {
+    if (scope.includes('email') && personaData.email) {
       const [emailProfile] =
         await coreClient.account.getAccountProfileBatch.query([
           personaData.email,
