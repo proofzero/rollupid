@@ -6,17 +6,6 @@ logpush = true
 node_compat = true
 workers_dev = false
 
-[[queues.producers]]
- queue = "AMAZING_QUEUE"
- binding = "MY_QUEUE"
-
-[[queues.consumers]]
- queue = "AMAZING_QUEUE"
- # Required: this should match the name of the queue you created in step 3.
- # If you misspell the name, you will receive an error when attempting to publish your Worker.
- max_batch_size = 10 # optional: defaults to 10
- max_batch_timeout = 5 # optional: defaults to 5 seconds
-
 kv_namespaces = [
   { binding = "UsageKV", id = "UsageKV", preview_id = "UsageKV" },
 ]

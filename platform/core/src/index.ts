@@ -21,16 +21,6 @@ export default {
     env: Environment,
     ctx: ExecutionContext
   ): Promise<Response> {
-    const batchQueueREQ = new Array(10).fill({
-      url: request.url,
-      method: request.method,
-      headers: Object.fromEntries(request.headers),
-    })
-    console.log('SENDING BATCH')
-    // @ts-ignore
-    await env.MY_QUEUE.sendBatch(batchQueueREQ)
-    console.log('SENT BATCH')
-
     return fetchRequestHandler({
       endpoint: '/trpc',
       req: request,
@@ -60,11 +50,7 @@ export default {
 
     return relay(content, env)
   },
-  async queue(batch: MessageBatch<any>, env: Environment): Promise<void> {
-    console.log('THISISBATCH', JSON.stringify(batch, null, 2))
-    let messages = JSON.stringify(batch.messages, null, 2)
-    console.log(`consumed from our queue: ${messages}`)
-  },
+  async queue() {},
 }
 
 export { router, type Context, type Environment }

@@ -1,7 +1,6 @@
 import { DeploymentMetadata } from '@proofzero/types'
 
 export interface Environment {
-  MY_QUEUE: Queue<any>
   UsageKV: KVNamespace
 
   Account: DurableObjectNamespace
