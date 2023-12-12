@@ -13,6 +13,12 @@ import {
 } from '@proofzero/urns/identity-group'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 import { getErrorCause } from '@proofzero/utils/errors'
+import {
+  DelQueueMessage,
+  DelQueueMessageType,
+} from '@proofzero/platform.core/src/types'
+import { EDGE_AUTHORIZES } from '@proofzero/platform.authorization/src/constants'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
 
 export const SetExternalAppDataPackageInputSchema =
   AppClientIdParamSchema.extend({
@@ -56,7 +62,7 @@ export const setExternalAppDataPackage = async ({
   }
 
   const appDO = await getApplicationNodeByClientId(
-    input.clientId,
+    clientId,
     ctx.env.StarbaseApp
   )
 
@@ -72,6 +78,47 @@ export const setExternalAppDataPackage = async ({
     packageType
   )
   if (error) throw getErrorCause(error)
+
+  if (!packageType) {
+    const { edges: authorizationEdges } = await caller.edges.getEdges({
+      query: {
+        tag: EDGE_AUTHORIZES,
+        dst: {
+          rc: {
+            client_id: clientId,
+          },
+        },
+      },
+    })
+
+    const delQueueMessages: MessageSendRequest<DelQueueMessage>[] =
+      authorizationEdges.map((edge) => ({
+        contentType: 'json',
+        body: {
+          type: DelQueueMessageType.DELREQ,
+          data: {
+            appID: clientId,
+            athID: IdentityURNSpace.decode(edge.src.baseUrn),
+          },
+        },
+      }))
+    delQueueMessages.push({
+      contentType: 'json',
+      body: {
+        type: DelQueueMessageType.SPECIALSAUCE,
+        data: {
+          appIDSet: [clientId],
+        },
+      },
+    })
+
+    const batchSize = 100
+    for (let i = 0; i < delQueueMessages.length; i += batchSize) {
+      await ctx.env.SYNC_QUEUE.sendBatch(
+        delQueueMessages.slice(i, i + batchSize)
+      )
+    }
+  }
 }
 
 // Use DO with enhanced externalAppDataPackage storage value to hold package + state (enabled, disabled, deleting)

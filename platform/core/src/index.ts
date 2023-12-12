@@ -8,7 +8,13 @@ import { serverOnError as onError } from '@proofzero/utils/trpc'
 import { createContext, type Context } from './context'
 import router from './router'
 import relay, { type CloudflareEmailMessage } from './relay'
-import type { Environment } from './types'
+import {
+  DelQueueMessageType,
+  type DelQueueMessage,
+  type Environment,
+} from './types'
+import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
+import { initAuthorizationNodeByName } from '@proofzero/platform.authorization/src/nodes'
 
 export { Account } from '@proofzero/platform.account'
 export { Identity, IdentityGroup } from '@proofzero/platform.identity'
@@ -49,6 +55,73 @@ export default {
     }
 
     return relay(content, env)
+  },
+  async queue(
+    batch: MessageBatch<DelQueueMessage>,
+    env: Environment,
+    ctx: ExecutionContext
+  ): Promise<void> {
+    const asyncFn = async () => {
+      if (
+        batch.messages.length === 1 &&
+        batch.messages[0].body.type === DelQueueMessageType.SPECIALSAUCE
+      ) {
+        batch.messages[0].ack()
+
+        console.info(
+          'HDU marked for status reset',
+          JSON.stringify(
+            {
+              appIds: batch.messages[0].body.data.appIDSet.join(', '),
+            },
+            null,
+            2
+          )
+        )
+        return
+      }
+
+      let appIDSet = new Set<string>()
+      for (const msg of batch.messages) {
+        if (msg.body.type === DelQueueMessageType.SPECIALSAUCE) {
+          appIDSet = new Set([...appIDSet, ...msg.body.data.appIDSet])
+        }
+      }
+
+      if (appIDSet.size > 0) {
+        const msgToSet: DelQueueMessage = {
+          type: DelQueueMessageType.SPECIALSAUCE,
+          data: {
+            appIDSet: Array.from(appIDSet),
+          },
+        }
+        await env.SYNC_QUEUE.send(msgToSet)
+      }
+
+      for (const msg of batch.messages) {
+        if (msg.body.type === DelQueueMessageType.SPECIALSAUCE) {
+          msg.ack()
+          continue
+        }
+
+        try {
+          const { appID, athID } = msg.body.data
+
+          const nss = `${appID}@${athID}`
+          const urn = AuthorizationURNSpace.componentizedUrn(nss)
+          const node = initAuthorizationNodeByName(urn, env.Authorization)
+          await node.storage.delete('externalAppData')
+
+          console.log('Deleted app data')
+
+          msg.ack()
+        } catch (ex) {
+          msg.retry()
+        }
+      }
+    }
+
+    ctx.waitUntil(asyncFn())
   },
 }
 
