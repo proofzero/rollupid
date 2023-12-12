@@ -19,6 +19,7 @@ import {
 } from '@proofzero/platform.core/src/types'
 import { EDGE_AUTHORIZES } from '@proofzero/platform.authorization/src/constants'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
+import { ExternalAppDataPackageStatus } from '../validators/externalAppDataPackageDefinition'
 
 export const SetExternalAppDataPackageInputSchema =
   AppClientIdParamSchema.extend({
@@ -67,7 +68,10 @@ export const setExternalAppDataPackage = async ({
   )
 
   const { externalAppDataPackageDefinition } = await appDO.class.getDetails()
-  if (externalAppDataPackageDefinition?.status === 'deleting') {
+  if (
+    externalAppDataPackageDefinition?.status ===
+    ExternalAppDataPackageStatus.Deleting
+  ) {
     throw new InternalServerError({
       message: 'External app data is being deleted',
     })

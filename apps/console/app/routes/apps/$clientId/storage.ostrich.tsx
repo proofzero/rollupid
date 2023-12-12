@@ -12,6 +12,7 @@ import classNames from 'classnames'
 import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 import { HiOutlineShoppingCart, HiOutlineTrash } from 'react-icons/hi'
+import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -88,7 +89,7 @@ export default () => {
           </div>
 
           {appDetails.externalAppDataPackageDefinition?.status ===
-          'deleting' ? (
+          ExternalAppDataPackageStatus.Deleting ? (
             <>
               <Text>IM DELETING</Text>
             </>

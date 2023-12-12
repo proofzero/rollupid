@@ -17,6 +17,7 @@ import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { initAuthorizationNodeByName } from '@proofzero/platform.authorization/src/nodes'
 import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/nodes/application'
 import { InternalServerError } from '@proofzero/errors'
+import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 
 export { Account } from '@proofzero/platform.account'
 export { Identity, IdentityGroup } from '@proofzero/platform.identity'
@@ -78,7 +79,10 @@ export default {
             await appDO.class.getDetails()
           if (!externalAppDataPackageDefinition) {
             console.warn('External app data package definition not found')
-          } else if (externalAppDataPackageDefinition.status !== 'deleting') {
+          } else if (
+            externalAppDataPackageDefinition.status !==
+            ExternalAppDataPackageStatus.Deleting
+          ) {
             console.warn(
               'External app data package definition not marked for deletion'
             )

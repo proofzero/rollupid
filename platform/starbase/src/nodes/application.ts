@@ -24,6 +24,7 @@ import type {
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
+  ExternalAppDataPackageDetails,
 } from '../types'
 import {
   AppTheme,
@@ -48,6 +49,7 @@ import {
   ExternalStorageAlreadyDisabledError,
   ExternalStorageAlreadyEnabledError,
 } from '../errors'
+import { ExternalAppDataPackageStatus } from '../jsonrpc/validators/externalAppDataPackageDefinition'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -359,12 +361,13 @@ export default class StarbaseApplication extends DOProxy {
       externalStorageUsageReadKey
     )
 
-    const packageDetails = packageType
-      ? {
-          packageType,
-          ...ExternalAppDataPackages[packageType],
-        }
-      : undefined
+    const packageDetails: ExternalAppDataPackageDetails | undefined =
+      packageType
+        ? {
+            packageType,
+            ...ExternalAppDataPackages[packageType],
+          }
+        : undefined
 
     if (packageDetails) {
       if (externalStorageWrites && externalStorageReads) {
@@ -403,20 +406,18 @@ export default class StarbaseApplication extends DOProxy {
     }
 
     if (packageDetails) {
-      await this.state.storage.put('externalAppDataPackageDefinition', {
-        packageDetails,
-        status: 'enabled',
-      })
-    } else {
-      const currentPackageDefinition = await this.state.storage.get<{
-        packageDetails: {
-          title: string
-          reads: number
-          writes: number
-          packageType: ExternalAppDataPackageType
+      await this.state.storage.put<ExternalAppDataPackageDefinition>(
+        'externalAppDataPackageDefinition',
+        {
+          packageDetails,
+          status: ExternalAppDataPackageStatus.Enabled,
         }
-        status: string
-      }>('externalAppDataPackageDefinition')
+      )
+    } else {
+      const currentPackageDefinition =
+        await this.state.storage.get<ExternalAppDataPackageDefinition>(
+          'externalAppDataPackageDefinition'
+        )
       if (!currentPackageDefinition) {
         throw new InternalServerError({
           message:
@@ -424,10 +425,13 @@ export default class StarbaseApplication extends DOProxy {
         })
       }
 
-      await this.state.storage.put('externalAppDataPackageDefinition', {
-        packageDetails: currentPackageDefinition.packageDetails,
-        status: 'deleting',
-      })
+      await this.state.storage.put<ExternalAppDataPackageDefinition>(
+        'externalAppDataPackageDefinition',
+        {
+          packageDetails: currentPackageDefinition.packageDetails,
+          status: ExternalAppDataPackageStatus.Deleting,
+        }
+      )
     }
 
     return { value: true }
