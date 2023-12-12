@@ -241,6 +241,7 @@ export type ClaimData = {
 }
 
 export type ScopeClaimRetrieverFunction = (
+  scope: string[],
   scopeEntry: ScopeValueName,
   identityURN: IdentityURN,
   clientId: string,
@@ -285,6 +286,7 @@ class InvalidPersonaDataError extends RollupError {
 
 //These retriever functions will be moved elsewhere as part of ticket #2013
 async function emailClaimRetriever(
+  scope: string[],
   scopeEntry: ScopeValueName,
   identityURN: IdentityURN,
   clientId: string,
@@ -344,6 +346,7 @@ async function emailClaimRetriever(
 }
 
 async function profileClaimsRetriever(
+  scope: string[],
   scopeEntry: ScopeValueName,
   identityURN: IdentityURN,
   clientId: string,
@@ -376,6 +379,7 @@ async function profileClaimsRetriever(
 }
 
 async function erc4337ClaimsRetriever(
+  scope: string[],
   scopeEntry: ScopeValueName,
   identityURN: IdentityURN,
   clientId: string,
@@ -447,6 +451,7 @@ type ConnectedAccount = {
 }
 
 async function connectedAccountsClaimsRetriever(
+  scope: string[],
   scopeEntry: ScopeValueName,
   identityURN: IdentityURN,
   clientId: string,
@@ -484,7 +489,7 @@ async function connectedAccountsClaimsRetriever(
       ({ rc: { addr_type } }) => addr_type !== CryptoAccountType.Wallet
     )
 
-    if (personaData.email) {
+    if (scope.includes('email') && personaData.email) {
       const [emailProfile] =
         await coreClient.account.getAccountProfileBatch.query([
           personaData.email,
@@ -584,6 +589,7 @@ export async function getClaimValues(
     if (!retrieverFunction) return
     else
       return retrieverFunction(
+        scope,
         scopeValue,
         identityURN,
         clientId,
