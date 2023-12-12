@@ -403,18 +403,32 @@ export default class StarbaseApplication extends DOProxy {
     }
 
     if (packageDetails) {
-      await this.state.storage.put(
-        'externalAppDataPackageDefinition',
-        packageDetails
-      )
+      await this.state.storage.put('externalAppDataPackageDefinition', {
+        packageDetails,
+        status: 'enabled',
+      })
     } else {
-      await this.state.storage.delete('externalAppDataPackageDefinition')
-    }
+      const currentPackageDefinition = await this.state.storage.get<{
+        packageDetails: {
+          title: string
+          reads: number
+          writes: number
+          packageType: ExternalAppDataPackageType
+        }
+        status: string
+      }>('externalAppDataPackageDefinition')
+      if (!currentPackageDefinition) {
+        throw new InternalServerError({
+          message:
+            'No existing package definition found when attempting cancellation',
+        })
+      }
 
-    // if (cancelFlag) {
-    //   // Add to externalAppData:deletion:clientId@identityURN
-    //   // Set up alarms
-    // }
+      await this.state.storage.put('externalAppDataPackageDefinition', {
+        packageDetails: currentPackageDefinition.packageDetails,
+        status: 'deleting',
+      })
+    }
 
     return { value: true }
   }

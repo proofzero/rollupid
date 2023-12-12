@@ -1,9 +1,4 @@
-import {
-  Form,
-  useOutletContext,
-  useSubmit,
-  useTransition,
-} from '@remix-run/react'
+import { Form, useOutletContext } from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -62,9 +57,6 @@ export default () => {
     appDetails: appDetailsProps
   }>()
 
-  const trans = useTransition()
-  const submit = useSubmit()
-
   return (
     <section className="flex flex-col space-y-5">
       <div className="flex flex-row items-center space-x-3">
@@ -95,31 +87,40 @@ export default () => {
             ></div>
           </div>
 
-          {!Boolean(appDetails.externalAppDataPackageDefinition) && (
-            <Form method="post">
-              <input type="hidden" name="op" value="enable" />
-              <Button
-                btnType="primary-alt"
-                className="flex flex-row items-center gap-3"
-                type="submit"
-              >
-                <HiOutlineShoppingCart className="w-3.5 h-3.5" />
-                <Text>Purchase Package</Text>
-              </Button>
-            </Form>
-          )}
-          {Boolean(appDetails.externalAppDataPackageDefinition) && (
-            <Form method="post">
-              <input type="hidden" name="op" value="disable" />
-              <Button
-                btnType="dangerous-alt"
-                className="flex flex-row items-center gap-3"
-                type="submit"
-              >
-                <HiOutlineTrash className="w-3.5 h-3.5" />
-                <Text>Cancel Service</Text>
-              </Button>
-            </Form>
+          {appDetails.externalAppDataPackageDefinition?.status ===
+          'deleting' ? (
+            <>
+              <Text>IM DELETING</Text>
+            </>
+          ) : (
+            <>
+              {!Boolean(appDetails.externalAppDataPackageDefinition) && (
+                <Form method="post">
+                  <input type="hidden" name="op" value="enable" />
+                  <Button
+                    btnType="primary-alt"
+                    className="flex flex-row items-center gap-3"
+                    type="submit"
+                  >
+                    <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                    <Text>Purchase Package</Text>
+                  </Button>
+                </Form>
+              )}
+              {Boolean(appDetails.externalAppDataPackageDefinition) && (
+                <Form method="post">
+                  <input type="hidden" name="op" value="disable" />
+                  <Button
+                    btnType="dangerous-alt"
+                    className="flex flex-row items-center gap-3"
+                    type="submit"
+                  >
+                    <HiOutlineTrash className="w-3.5 h-3.5" />
+                    <Text>Cancel Service</Text>
+                  </Button>
+                </Form>
+              )}
+            </>
           )}
         </section>
 
@@ -138,8 +139,8 @@ export default () => {
               Current Package:
             </Text>
             <Text size="sm" className="text-gray-500">
-              {appDetails.externalAppDataPackageDefinition?.title ??
-                'No active package'}
+              {appDetails.externalAppDataPackageDefinition?.packageDetails
+                .title ?? 'No active package'}
             </Text>
           </div>
           <div className="w-full h-px bg-gray-200"></div>
@@ -149,7 +150,11 @@ export default () => {
             </Text>
             {Boolean(appDetails.externalAppDataPackageDefinition) ? (
               <Text size="sm" className="text-gray-500">
-                {appDetails.externalAppDataPackageDefinition?.reads} / month
+                {
+                  appDetails.externalAppDataPackageDefinition?.packageDetails
+                    .reads
+                }{' '}
+                / month
               </Text>
             ) : (
               <Text size="sm" className="text-gray-500">
@@ -164,7 +169,11 @@ export default () => {
             </Text>
             {Boolean(appDetails.externalAppDataPackageDefinition) ? (
               <Text size="sm" className="text-gray-500">
-                {appDetails.externalAppDataPackageDefinition?.writes} / month
+                {
+                  appDetails.externalAppDataPackageDefinition?.packageDetails
+                    .writes
+                }{' '}
+                / month
               </Text>
             ) : (
               <Text size="sm" className="text-gray-500">

@@ -15,6 +15,8 @@ import {
 } from './types'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { initAuthorizationNodeByName } from '@proofzero/platform.authorization/src/nodes'
+import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/nodes/application'
+import { InternalServerError } from '@proofzero/errors'
 
 export { Account } from '@proofzero/platform.account'
 export { Identity, IdentityGroup } from '@proofzero/platform.identity'
@@ -66,6 +68,24 @@ export default {
         batch.messages.length === 1 &&
         batch.messages[0].body.type === DelQueueMessageType.SPECIALSAUCE
       ) {
+        for (const clientID of batch.messages[0].body.data.appIDSet) {
+          const appDO = await getApplicationNodeByClientId(
+            clientID,
+            env.StarbaseApp
+          )
+
+          const { externalAppDataPackageDefinition } =
+            await appDO.class.getDetails()
+          if (!externalAppDataPackageDefinition) {
+            console.warn('External app data package definition not found')
+          } else if (externalAppDataPackageDefinition.status !== 'deleting') {
+            console.warn(
+              'External app data package definition not marked for deletion'
+            )
+          }
+
+          await appDO.storage.delete('externalAppDataPackageDefinition')
+        }
         batch.messages[0].ack()
 
         console.info(
