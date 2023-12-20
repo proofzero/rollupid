@@ -189,7 +189,7 @@ export default ({
                     ) : (
                       <>
                         {scope === 'email' &&
-                        isAppleEmail(selectedEmail?.value) ? (
+                        isAppleEmail(selectedEmail?.title) ? (
                           <Info
                             name={scopeMeta.scopes[scope].name}
                             description={
