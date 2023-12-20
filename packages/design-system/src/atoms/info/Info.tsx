@@ -14,7 +14,7 @@ export default function Info({
   warning = false,
 }: {
   name: string
-  description: string
+  description: string | JSX.Element
   placement?: 'top' | 'bottom' | 'left' | 'right'
   editable?: boolean
   warning?: boolean

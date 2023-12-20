@@ -180,10 +180,33 @@ export default ({
                         warning={true}
                       />
                     ) : (
-                      <Info
-                        name={scopeMeta.scopes[scope].name}
-                        description={scopeMeta.scopes[scope].description}
-                      />
+                      <>
+                        {scope === 'email' &&
+                        connectedEmails
+                          .find((email) => email.value === selectedEmail.value)
+                          ?.address.toLowerCase()
+                          .endsWith('@icloud.com') ? (
+                          <Info
+                            name={scopeMeta.scopes[scope].name}
+                            description={
+                              <span>
+                                If you have enabled Apple's Hide My Email the
+                                application being authorised will not be able to
+                                send emails to it, due to restrictions on
+                                Apple's services. <br /> <br /> Consider using
+                                Rollup's email masking instead by toggling it in
+                                the Email dropdown.
+                              </span>
+                            }
+                            warning={true}
+                          />
+                        ) : (
+                          <Info
+                            name={scopeMeta.scopes[scope].name}
+                            description={scopeMeta.scopes[scope].description}
+                          />
+                        )}
+                      </>
                     )}
 
                     <div
