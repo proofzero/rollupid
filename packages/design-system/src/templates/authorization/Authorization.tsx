@@ -78,6 +78,13 @@ type AuthorizationProps = {
   radius?: string
 }
 
+const isAppleEmail = (email: string | undefined) => {
+  if (!email) return false
+  return ['icloud.com', 'privaterelay.appleid.com'].some((tld) =>
+    email.endsWith(`@${tld}`)
+  )
+}
+
 //eslint-disable-next-line react/display-name
 export default ({
   userProfile,
@@ -182,10 +189,7 @@ export default ({
                     ) : (
                       <>
                         {scope === 'email' &&
-                        connectedEmails
-                          .find((email) => email.value === selectedEmail.value)
-                          ?.address.toLowerCase()
-                          .endsWith('@icloud.com') ? (
+                        isAppleEmail(selectedEmail?.value) ? (
                           <Info
                             name={scopeMeta.scopes[scope].name}
                             description={
