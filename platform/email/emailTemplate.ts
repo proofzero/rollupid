@@ -370,7 +370,7 @@ export const EmailTemplateFailedPayment = (
   const content = `<div class="heading">Payment Issue Detected</div>
 
   <p>
-    Your payment for the Rollup ID has failed.
+    Your payment for Rollup ID has failed.
   </p>
 
   <p>
@@ -398,7 +398,7 @@ export const EmailTemplateSuccessfulPayment = ({
 }): EmailContent => {
   const content = `<div class="heading">Payment Successful</div>
   <p>
-    Your payment for the <b>Rollup ID</b> has been processed successfully.
+    Your payment for <b>Rollup ID</b> has been processed successfully.
   </p>
 
   <p>
