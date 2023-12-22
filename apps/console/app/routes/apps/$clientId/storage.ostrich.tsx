@@ -2,7 +2,7 @@ import { Form, useOutletContext } from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction } from '@remix-run/cloudflare'
+import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -13,6 +13,31 @@ import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 import { HiOutlineShoppingCart, HiOutlineTrash } from 'react-icons/hi'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
+
+// export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+//   async ({ request, context, params }) => {
+//     const traceHeader = generateTraceContextHeaders(context.traceSpan)
+//     const jwt = await requireJWT(request, context.env)
+//     const coreClient = createCoreClient(context.env.Core, {
+//       ...getAuthzHeaderConditionallyFromToken(jwt),
+//       ...traceHeader,
+//     })
+
+//     const { clientId } = params
+//     if (!clientId) {
+//       throw new InternalServerError({
+//         message: 'Client id not found',
+//       })
+//     }
+
+//     await coreClient.starbase.setExternalAppDataPackage.mutate({
+//       clientId,
+//       packageType: ExternalAppDataPackageType.STARTER,
+//     })
+
+//     return null
+//   }
+// )
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {

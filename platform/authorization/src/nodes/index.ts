@@ -5,9 +5,14 @@ export const initAuthorizationNodeByName = (
   name: string,
   durableObject: DurableObjectNamespace
 ) => {
-  const MY_DO_BINDING = Authorization.wrap(durableObject)
-  const node = MY_DO_BINDING.getByName(name)
-  return node
+  try {
+    const MY_DO_BINDING = Authorization.wrap(durableObject)
+    const node = MY_DO_BINDING.getByName(name)
+    return node
+  } catch (e) {
+    console.log('INSIDERERROR')
+    throw e
+  }
 }
 
 export const initExchangeCodeNodeByName = (

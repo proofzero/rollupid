@@ -5,7 +5,7 @@ import {
 
 import { serverOnError as onError } from '@proofzero/utils/trpc'
 
-import { createContext, type Context } from './context'
+import { createContext, type Context, createContextInner } from './context'
 import router from './router'
 import relay, { type CloudflareEmailMessage } from './relay'
 import {
@@ -16,13 +16,22 @@ import {
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { initAuthorizationNodeByName } from '@proofzero/platform.authorization/src/nodes'
 import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/nodes/application'
-import { InternalServerError } from '@proofzero/errors'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
+import { EDGE_AUTHORIZES } from '@proofzero/platform.authorization/src/constants'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
+import { error } from 'console'
+import { getErrorCause } from '@proofzero/utils/errors'
 
 export { Account } from '@proofzero/platform.account'
 export { Identity, IdentityGroup } from '@proofzero/platform.identity'
 export { Authorization, ExchangeCode } from '@proofzero/platform.authorization'
 export { StarbaseApplication } from '@proofzero/platform.starbase'
+
+let ops = 0
+let success = 0
+let fail = 0
+
+const errorMap = new Map()
 
 export default {
   async fetch(
@@ -64,16 +73,114 @@ export default {
     env: Environment,
     ctx: ExecutionContext
   ): Promise<void> {
+    console.log({
+      first:
+        batch.messages[0]?.body.type === DelQueueMessageType.SPECIALSAUCE
+          ? 'SS'
+          : batch.messages[0]?.body?.data?.athID,
+      lastt:
+        batch.messages[batch.messages.length - 1]?.body.type ===
+        DelQueueMessageType.DELREQ
+          ? // @ts-ignore
+            batch.messages[batch.messages.length - 1]?.body?.data?.athID
+          : batch.messages[batch.messages.length - 1]?.body.type ===
+            DelQueueMessageType.SPECIALSAUCE
+          ? 'SS'
+          : undefined,
+      batchLen: batch.messages.length,
+    })
+
     const asyncFn = async () => {
+      let appIDSet = new Set<string>()
+      for (const msg of batch.messages) {
+        if (msg.body.type === DelQueueMessageType.SPECIALSAUCE) {
+          appIDSet = new Set([...appIDSet, ...msg.body.data.appIDSet])
+        }
+      }
+
       if (
         batch.messages.length === 1 &&
         batch.messages[0].body.type === DelQueueMessageType.SPECIALSAUCE
       ) {
-        for (const clientID of batch.messages[0].body.data.appIDSet) {
-          const appDO = await getApplicationNodeByClientId(
-            clientID,
-            env.StarbaseApp
+        console.log(
+          JSON.stringify(
+            {
+              ops,
+              success,
+              fail,
+              errorMap,
+            },
+            null,
+            2
           )
+        )
+        const limit = 75000
+
+        const clientIDSet = batch.messages[0].body.data.appIDSet
+        const clientID = clientIDSet[0]
+
+        const appDO = await getApplicationNodeByClientId(
+          clientID,
+          env.StarbaseApp
+        )
+
+        let queueQuery = await appDO.class.getQueueLimitAndOffset()
+        if (!queueQuery) {
+          queueQuery = {
+            limit,
+            offset: 0,
+          }
+          await appDO.class.setQueueLimitAndOffset(queueQuery)
+        }
+
+        const callerCTX = await createContextInner({
+          env,
+          waitUntil: ctx.waitUntil.bind(ctx),
+        })
+        const caller = router.createCaller(callerCTX)
+        const { edges } = await caller.edges.getEdges({
+          query: {
+            tag: EDGE_AUTHORIZES,
+            dst: {
+              rc: {
+                client_id: clientID,
+              },
+            },
+          },
+          opt: {
+            limit: queueQuery.limit,
+            offset: queueQuery.offset,
+          },
+        })
+
+        if (edges && edges.length > 0) {
+          console.log('Got edges')
+          const queueMessages: MessageSendRequest<DelQueueMessage>[] =
+            edges.map((edge) => ({
+              contentType: 'json',
+              body: {
+                type: DelQueueMessageType.DELREQ,
+                data: {
+                  appID: clientID,
+                  athID: IdentityURNSpace.decode(edge.src.baseUrn),
+                },
+              },
+            }))
+
+          const queueMessageBatches = []
+          while (queueMessages.length > 0) {
+            queueMessageBatches.push(queueMessages.splice(0, 100))
+          }
+
+          for (const queueMessageBatch of queueMessageBatches) {
+            await env.SYNC_QUEUE.sendBatch(queueMessageBatch)
+          }
+
+          queueQuery.offset += queueQuery.limit
+          await appDO.class.setQueueLimitAndOffset(queueQuery)
+        } else {
+          console.log("Didn't get edges")
+          await appDO.class.setQueueLimitAndOffset(undefined)
 
           const { externalAppDataPackageDefinition } =
             await appDO.class.getDetails()
@@ -89,26 +196,9 @@ export default {
           }
 
           await appDO.storage.delete('externalAppDataPackageDefinition')
-        }
-        batch.messages[0].ack()
+          appIDSet.delete(clientID)
 
-        console.info(
-          'HDU marked for status reset',
-          JSON.stringify(
-            {
-              appIds: batch.messages[0].body.data.appIDSet.join(', '),
-            },
-            null,
-            2
-          )
-        )
-        return
-      }
-
-      let appIDSet = new Set<string>()
-      for (const msg of batch.messages) {
-        if (msg.body.type === DelQueueMessageType.SPECIALSAUCE) {
-          appIDSet = new Set([...appIDSet, ...msg.body.data.appIDSet])
+          console.log(`Finished processing ${clientID}`)
         }
       }
 
@@ -131,16 +221,36 @@ export default {
         try {
           const { appID, athID } = msg.body.data
 
-          const nss = `${appID}@${athID}`
-          const urn = AuthorizationURNSpace.componentizedUrn(nss)
-          const node = initAuthorizationNodeByName(urn, env.Authorization)
-          await node.storage.delete('externalAppData')
+          try {
+            const nss = `${appID}@${athID}`
+            const urn = AuthorizationURNSpace.componentizedUrn(nss)
 
-          console.log('Deleted app data')
+            const node = initAuthorizationNodeByName(urn, env.Authorization)
+            await node.storage.delete('externalAppData')
+            // await new Promise((ok) => setTimeout(ok, 5))
+          } catch (ex) {
+            console.log('FIRSTSTEPS')
+            throw ex
+          }
 
           msg.ack()
+          success++
         } catch (ex) {
+          fail++
+
+          console.log(ex.name)
+          console.log(ex.message)
+          console.log(ex.cause)
+          console.log(ex.stack)
+
+          if (!errorMap.has((ex as Error).name)) {
+            errorMap.set((ex as Error).name, new Set())
+          }
+          errorMap.get((ex as Error).name).add((ex as Error).message)
+
           msg.retry()
+        } finally {
+          ops++
         }
       }
     }

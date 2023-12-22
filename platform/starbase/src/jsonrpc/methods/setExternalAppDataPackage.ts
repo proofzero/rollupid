@@ -13,13 +13,13 @@ import {
 } from '@proofzero/urns/identity-group'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 import { getErrorCause } from '@proofzero/utils/errors'
-import {
-  DelQueueMessage,
-  DelQueueMessageType,
-} from '@proofzero/platform.core/src/types'
-import { EDGE_AUTHORIZES } from '@proofzero/platform.authorization/src/constants'
-import { IdentityURNSpace } from '@proofzero/urns/identity'
+import { DelQueueMessageType } from '@proofzero/platform.core/src/types'
 import { ExternalAppDataPackageStatus } from '../validators/externalAppDataPackageDefinition'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
+import generateRandomString from '@proofzero/utils/generateRandomString'
+import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
+import { EDGE_AUTHORIZES } from '@proofzero/platform.authorization/src/constants'
+import { edges } from '@proofzero/platform.edges/src/db'
 
 export const SetExternalAppDataPackageInputSchema =
   AppClientIdParamSchema.extend({
@@ -72,9 +72,10 @@ export const setExternalAppDataPackage = async ({
     externalAppDataPackageDefinition?.status ===
     ExternalAppDataPackageStatus.Deleting
   ) {
-    throw new InternalServerError({
-      message: 'External app data is being deleted',
-    })
+    // Leave this commented out while doing the testing
+    // throw new InternalServerError({
+    //   message: 'External app data is being deleted',
+    // })
   }
 
   const { error } = await appDO.class.setExternalAppDataPackage(
@@ -84,43 +85,30 @@ export const setExternalAppDataPackage = async ({
   if (error) throw getErrorCause(error)
 
   if (!packageType) {
-    const { edges: authorizationEdges } = await caller.edges.getEdges({
-      query: {
-        tag: EDGE_AUTHORIZES,
-        dst: {
-          rc: {
-            client_id: clientId,
-          },
-        },
-      },
-    })
-
-    const delQueueMessages: MessageSendRequest<DelQueueMessage>[] =
-      authorizationEdges.map((edge) => ({
-        contentType: 'json',
-        body: {
-          type: DelQueueMessageType.DELREQ,
-          data: {
-            appID: clientId,
-            athID: IdentityURNSpace.decode(edge.src.baseUrn),
-          },
-        },
-      }))
-    delQueueMessages.push({
-      contentType: 'json',
-      body: {
+    await ctx.env.SYNC_QUEUE.send(
+      {
         type: DelQueueMessageType.SPECIALSAUCE,
         data: {
           appIDSet: [clientId],
         },
       },
-    })
-
-    const batchSize = 100
-    for (let i = 0; i < delQueueMessages.length; i += batchSize) {
-      await ctx.env.SYNC_QUEUE.sendBatch(
-        delQueueMessages.slice(i, i + batchSize)
-      )
-    }
+      {
+        contentType: 'json',
+      }
+    )
   }
+  // else {
+  //   for (let i = 0; i < 50000; i++) {
+  //     const identity = IdentityURNSpace.urn(('' + i).padStart(50, '0'))
+  //     const nss = `${IdentityURNSpace.decode(identity)}@${clientId}`
+  //     const fullAuthzURN = AuthorizationURNSpace.componentizedUrn(nss, {
+  //       client_id: clientId,
+  //     })
+  //     await caller.edges.makeEdge({
+  //       src: identity,
+  //       dst: fullAuthzURN,
+  //       tag: EDGE_AUTHORIZES,
+  //     })
+  //   }
+  // }
 }

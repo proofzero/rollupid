@@ -437,6 +437,31 @@ export default class StarbaseApplication extends DOProxy {
     return { value: true }
   }
 
+  async setQueueLimitAndOffset(
+    input:
+      | {
+          limit: number
+          offset: number
+        }
+      | undefined
+  ): Promise<void> {
+    if (!input) {
+      await this.state.storage.delete('deletionQuery')
+    } else {
+      await this.state.storage.put('deletionQuery', input)
+    }
+  }
+
+  async getQueueLimitAndOffset(): Promise<
+    | {
+        limit: number
+        offset: number
+      }
+    | undefined
+  > {
+    return this.state.storage.get('deletionQuery')
+  }
+
   async deleteAppPlan(): Promise<boolean> {
     return this.state.storage.delete('appPlan')
   }
