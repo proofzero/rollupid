@@ -32,7 +32,12 @@ import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/j
 
 //     await coreClient.starbase.setExternalAppDataPackage.mutate({
 //       clientId,
-//       packageType: ExternalAppDataPackageType.STARTER,
+//       // Package STARTER should be used imediately after a queue run that didn't complete processing
+//       // Once the package is set on the app, it needs to be commented out and another request made
+//       // So that the UsageKVs get deleted and you don't get errors
+//       // Once that is done, the entire block should be commented out
+//       // Make sure you run the loader just once for each scenario (so don't have a tab open)
+//       // packageType: ExternalAppDataPackageType.STARTER,
 //     })
 
 //     return null
