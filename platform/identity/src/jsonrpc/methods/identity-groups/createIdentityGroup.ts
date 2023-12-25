@@ -1,7 +1,7 @@
 import { z } from 'zod'
+import { toHex } from 'viem'
+
 import { router } from '@proofzero/platform.core'
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
 import { IDENTITY_GROUP_OPTIONS } from '../../../constants'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
@@ -27,7 +27,9 @@ export const createIdentityGroup = async ({
   input: CreateIdentityGroupInput
   ctx: Context
 }): Promise<CreateIdentityGroupOutput> => {
-  const name = hexlify(randomBytes(IDENTITY_GROUP_OPTIONS.length))
+  const buffer = new Uint8Array(IDENTITY_GROUP_OPTIONS.length)
+  const name = toHex(crypto.getRandomValues(buffer))
+
   const groupURN = IdentityGroupURNSpace.componentizedUrn(name, undefined, {
     name: input.name,
   })

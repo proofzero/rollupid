@@ -1,6 +1,5 @@
 import { z } from 'zod'
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
+import { toHex } from 'viem'
 
 import { router } from '@proofzero/platform.core'
 import { IdentityURNInput } from '@proofzero/platform-middleware/inputValidators'
@@ -54,7 +53,8 @@ export const resolveIdentityMethod = async ({
       const decodedJwt = jose.decodeJwt(input.jwt)
       urn = decodedJwt.sub as IdentityURN
     } else {
-      const name = hexlify(randomBytes(IDENTITY_OPTIONS.length))
+      const buffer = new Uint8Array(IDENTITY_OPTIONS.length)
+      const name = toHex(crypto.getRandomValues(buffer))
       urn = IdentityURNSpace.componentizedUrn(name)
       eventName = 'account_created_identity'
     }

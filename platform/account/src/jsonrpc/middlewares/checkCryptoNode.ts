@@ -1,5 +1,6 @@
+import { isAddress as isEthAddress } from 'viem'
+
 import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
-import { isAddress as isEthAddress } from '@ethersproject/address'
 
 import { NodeType } from '@proofzero/types/account'
 

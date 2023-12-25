@@ -27,12 +27,6 @@
     "typescript": "5.0.4"
   },
   "dependencies": {
-    "@ethersproject/address": "5.7.0",
-    "@ethersproject/bytes": "5.7.0",
-    "@ethersproject/keccak256": "5.7.0",
-    "@ethersproject/random": "5.7.0",
-    "@ethersproject/signing-key": "5.7.0",
-    "@ethersproject/transactions": "5.7.0",
     "@ethersproject/wallet": "5.7.0",
     "@proofzero/platform-clients": "workspace:*",
     "@proofzero/platform.core": "workspace:*",
@@ -46,6 +40,7 @@
     "jose": "4.11.0",
     "random-words": "2.0.0",
     "remix-auth-google": "1.2.0",
+    "viem": "1.20.0",
     "zod": "3.22.4"
   }
 }
