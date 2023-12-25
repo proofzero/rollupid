@@ -37,7 +37,7 @@
     "@typeform/embed-react": "2.27.0",
     "bcryptjs": "2.4.3",
     "classnames": "2.3.2",
-    "connectkit": "1.4.0",
+    "connectkit": "1.5.3",
     "cross-env": "7.0.3",
     "ethers": "5.7.2",
     "flowbite": "1.6.5",
