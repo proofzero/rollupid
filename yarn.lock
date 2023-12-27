@@ -6053,7 +6053,7 @@ __metadata:
     bcryptjs: 2.4.3
     chromatic: 6.13.1
     classnames: 2.3.2
-    connectkit: 1.4.0
+    connectkit: 1.5.3
     cross-env: 7.0.3
     env-cmd: 10.1.0
     eslint: 8.28.0
@@ -6119,7 +6119,7 @@ __metadata:
     babel-plugin-named-exports-order: 0.0.2
     chromatic: 6.11.4
     concurrently: 7.3.0
-    connectkit: 1.4.0
+    connectkit: 1.5.3
     cross-env: 7.0.3
     csp-header: 5.1.0
     css-loader: 6.7.1
@@ -18270,9 +18270,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"connectkit@npm:1.4.0":
-  version: 1.4.0
-  resolution: "connectkit@npm:1.4.0"
+"connectkit@npm:1.5.3":
+  version: 1.5.3
+  resolution: "connectkit@npm:1.5.3"
   dependencies:
     buffer: ^6.0.3
     detect-browser: ^5.3.0
@@ -18285,9 +18285,9 @@ __metadata:
   peerDependencies:
     react: 17.x || 18.x
     react-dom: 17.x || 18.x
-    viem: ~0.3.19
-    wagmi: ^1.0.0
-  checksum: ce034bd41cdd581fc48d5859b6759325777da3d658302ff051b4d7490c04187b342857d10984238681dbb6bce65871cf7d366e4a0c2ea5e92df3108c20875fdb
+    viem: ^1.0.0
+    wagmi: ^1.1.1
+  checksum: 1d18a3fb8fa15d4406b020403639a9aa0ee7431adffc764851ce29f9515ce5e7a9ac4ed5f1f2e7578616f6db12d084ec270c669aab58e6356ae4d8b1bd936932
   languageName: node
   linkType: hard
 
