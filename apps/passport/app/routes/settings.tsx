@@ -30,6 +30,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
 import { InternalServerError } from '@proofzero/errors'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 
 export type AuthorizedAppsModel = {
   clientId: string
@@ -174,6 +175,22 @@ export default function SettingsLayout() {
   }, [isIdentified])
 
   const editProfileFetcher = useFetcher()
+  useEffect(() => {
+    if (
+      editProfileFetcher.state === 'idle' &&
+      editProfileFetcher.type === 'done'
+    ) {
+      if (!editProfileFetcher.data?.error) {
+        toast(ToastType.Success, {
+          message: editProfileFetcher.data.message,
+        })
+      } else if (editProfileFetcher.data?.error) {
+        toast(ToastType.Error, {
+          message: editProfileFetcher.data.message,
+        })
+      }
+    }
+  }, [editProfileFetcher])
 
   return (
     <Popover className="bg-white lg:bg-gray-50 min-h-[100dvh] relative">
@@ -212,6 +229,10 @@ export default function SettingsLayout() {
                     connectedProfiles,
                     primaryAccountURN,
                     CONSOLE_URL,
+                    pfpUrl,
+                    displayName,
+                    isProfileCustomized,
+                    editProfileFetcher,
                   }}
                 />
               </div>
