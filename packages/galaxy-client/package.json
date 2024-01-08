@@ -1,11 +1,11 @@
 {
   "name": "@proofzero/galaxy-client",
   "version": "1.0.0",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "private": true,
   "description": "Kubelt Platform Clients",
   "keywords": [],
-  "license": "ISC",
-  "author": "Kubelt, Inc.",
+  "license": "UNLICENSED",
   "main": "index.ts",
   "scripts": {
     "gql:gen": "graphql-codegen --config graphql.config.js --aggregate-output -n -l",
