@@ -1,9 +1,7 @@
 import { DOProxy } from 'do-proxy'
 
 import * as jose from 'jose'
-
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
+import { toHex } from 'viem'
 
 import { InternalServerError, RollupError } from '@proofzero/errors'
 import { NodeMethodReturnValue } from '@proofzero/types/node'
@@ -89,7 +87,10 @@ export default class Authorization extends DOProxy {
       options
     const { alg, kid } = jwk
     if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
-    const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
+
+    const buffer = new Uint8Array(JWT_OPTIONS.jti.length)
+    const jti = toHex(crypto.getRandomValues(buffer))
+
     //Need to convert scope array to space-delimited string, per spec
     return new jose.SignJWT({ scope: scope.join(' ') })
       .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
@@ -106,7 +107,10 @@ export default class Authorization extends DOProxy {
     const { jku, jwk, identity, clientId, issuer, scope } = options
     const { alg, kid } = jwk
     if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
-    const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
+
+    const buffer = new Uint8Array(JWT_OPTIONS.jti.length)
+    const jti = toHex(crypto.getRandomValues(buffer))
+
     const jwt = await new jose.SignJWT({ scope: scope.join(' ') })
       .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
       .setAudience([clientId])

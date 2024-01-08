@@ -1,6 +1,6 @@
 import { z } from 'zod'
+import { toBytes } from 'viem'
 
-import { arrayify } from '@ethersproject/bytes'
 import { BadRequestError } from '@proofzero/errors'
 
 import { AccountURNSpace, type AccountURN } from '@proofzero/urns/account'
@@ -92,7 +92,7 @@ const revokeWalletSessionKey = async ({
 }) => {
   const owner = (await smartContractWalletNode.storage.get(
     'privateKey'
-  )) as string
+  )) as '0x${string}'
 
   if (!owner) {
     throw new BadRequestError({ message: 'missing private key for the user' })
@@ -100,14 +100,12 @@ const revokeWalletSessionKey = async ({
 
   const signer = new Wallet(owner)
 
-  const address = await signer.getAddress()
-
   const createRevokeSessionKeyUserOpResponse = await fetch(
     'https://zerodev-api.zobeir.workers.dev/create-revoke-session-key-user-op',
     {
       ...requestInit,
       body: JSON.stringify({
-        address,
+        address: await signer.getAddress(),
         projectId,
         publicSessionKey,
       }),
@@ -120,7 +118,7 @@ const revokeWalletSessionKey = async ({
       userOpHash: string
     }
 
-  const signedMessage = await signer.signMessage(arrayify(userOpHash))
+  const signedMessage = await signer.signMessage(toBytes(userOpHash))
 
   await fetch('https://zerodev-api.zobeir.workers.dev/send-userop', {
     ...requestInit,

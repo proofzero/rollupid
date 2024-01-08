@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { keccak256 } from '@ethersproject/keccak256'
+import { keccak256 } from 'viem'
+
 import colors from '../../assets/colors.json'
 //@ts-ignore
 import wasm from '../../assets/svg2png_wasm_bg.wasm'

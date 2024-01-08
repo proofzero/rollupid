@@ -1,12 +1,11 @@
 import { z } from 'zod'
+import { toHex } from 'viem'
 
 import { IdentityURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 import { Context } from '../../context'
 import { CODE_OPTIONS } from '../../constants'
 import { initExchangeCodeNodeByName } from '../../nodes'
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
 import { PersonaData } from '@proofzero/types/application'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
@@ -44,7 +43,8 @@ export const authorizeMethod = async ({
     state,
   } = input
 
-  const code = hexlify(randomBytes(CODE_OPTIONS.length))
+  const buffer = new Uint8Array(CODE_OPTIONS.length)
+  const code = toHex(crypto.getRandomValues(buffer))
 
   // TODO: validate the scopes are legitmate here or when we ask for it back in exchangeToken
 

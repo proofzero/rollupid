@@ -1,5 +1,5 @@
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
+import { toHex } from 'viem'
+
 import { ApplicationURN } from '@proofzero/urns/application'
 import { DOProxy } from 'do-proxy'
 import {
@@ -180,11 +180,14 @@ export default class StarbaseApplication extends DOProxy {
   async generateAndStore(appURN: ApplicationURN): Promise<string> {
     const { privateKey: key } = await this.getJWTSigningKeyPair()
 
+    const buffer = new Uint8Array(JWT_OPTIONS.jti.length)
+    const jti = toHex(crypto.getRandomValues(buffer))
+
     const apiKey = await new SignJWT({})
       .setProtectedHeader(JWT_OPTIONS)
       .setIssuedAt()
       .setIssuer(STARBASE_API_KEY_ISSUER)
-      .setJti(hexlify(randomBytes(JWT_OPTIONS.jti.length)))
+      .setJti(jti)
       .setSubject(appURN)
       .sign(key)
 

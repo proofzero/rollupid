@@ -27,9 +27,6 @@
     "typescript": "5.0.4"
   },
   "dependencies": {
-    "@ethersproject/address": "5.7.0",
-    "@ethersproject/bytes": "5.7.0",
-    "@ethersproject/random": "5.7.0",
     "@proofzero/platform-middleware": "workspace:*",
     "@proofzero/platform.core": "workspace:*",
     "@proofzero/types": "workspace:*",

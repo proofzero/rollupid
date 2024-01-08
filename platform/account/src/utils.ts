@@ -1,6 +1,4 @@
-import { keccak256 } from '@ethersproject/keccak256'
-import { recoverPublicKey } from '@ethersproject/signing-key'
-import { computeAddress } from '@ethersproject/transactions'
+import { keccak256, recoverAddress } from 'viem'
 
 import {
   CryptoAccountType,
@@ -89,13 +87,13 @@ export const isValidAccountType = (type: string) => {
 
 export const recoverEthereumAddress = (
   message: string,
-  signature: string
-): string => {
+  signature: '0x${string}'
+): Promise<string> => {
   const prefix = `\u0019Ethereum Signed Message:\n${message.length}`
   const encoder = new TextEncoder()
   const bytes = encoder.encode(`${prefix}${message}`)
-  const digest = keccak256(bytes)
-  return computeAddress(recoverPublicKey(digest, signature))
+  const hash = keccak256(bytes)
+  return recoverAddress({ hash, signature })
 }
 
 export const generateSmartWalletAccountUrn = (

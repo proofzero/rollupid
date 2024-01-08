@@ -1,5 +1,4 @@
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
+import { toHex } from 'viem'
 
 import type { Scope } from '@proofzero/types/authorization'
 import { CryptoAccountType } from '@proofzero/types/account'
@@ -28,7 +27,8 @@ export default class CryptoAccount {
     scope: Scope,
     state: string
   ): Promise<string> {
-    const nonce = hexlify(randomBytes(NONCE_OPTIONS.length))
+    const buffer = new Uint8Array(NONCE_OPTIONS.length)
+    const nonce = toHex(crypto.getRandomValues(buffer))
     const timestamp = Date.now()
 
     const challenges =
@@ -50,7 +50,10 @@ export default class CryptoAccount {
     return nonce
   }
 
-  async verifyNonce(nonce: string, signature: string): Promise<Challenge> {
+  async verifyNonce(
+    nonce: string,
+    signature: '0x${string}'
+  ): Promise<Challenge> {
     const challenges: Record<string, Challenge> =
       (await this.node.storage.get<Record<string, Challenge>>('challenges')) ||
       {}
@@ -61,7 +64,7 @@ export default class CryptoAccount {
     }
 
     const message = challenge.template.slice().replace(/{{nonce}}/, nonce)
-    const address = recoverEthereumAddress(message, signature)
+    const address = await recoverEthereumAddress(message, signature)
 
     if (address != challenge.address) {
       throw new Error('not matching address')

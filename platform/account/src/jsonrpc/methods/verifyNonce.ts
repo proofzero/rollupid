@@ -7,7 +7,7 @@ import { CryptoAccount, type AccountNode } from '../../nodes'
 
 export const VerifyNonceInput = z.object({
   nonce: z.string(),
-  signature: z.string(),
+  signature: z.string().startsWith('0x'),
   jwt: z.string().optional(),
   forceAccountCreation: z.boolean().optional(),
 })
@@ -31,7 +31,7 @@ export const verifyNonceMethod = async ({
 
   const nodeClient = new CryptoAccount(ctx.account as AccountNode)
 
-  await nodeClient.verifyNonce(nonce, signature)
+  await nodeClient.verifyNonce(nonce, signature as '0x${string}')
 
   const caller = router.createCaller(ctx)
   const { existing } = await caller.account.resolveIdentity({
