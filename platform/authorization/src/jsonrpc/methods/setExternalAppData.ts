@@ -83,6 +83,3 @@ export const setExternalAppDataMethod = async ({
     ),
   ])
 }
-
-// const ae = Get authorization edges from graph
-// const limit = (t = 20) / sec

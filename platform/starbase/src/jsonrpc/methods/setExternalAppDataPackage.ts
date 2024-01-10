@@ -72,10 +72,9 @@ export const setExternalAppDataPackage = async ({
     externalAppDataPackageDefinition?.status ===
     ExternalAppDataPackageStatus.Deleting
   ) {
-    // Leave this commented out while doing the testing
-    // throw new InternalServerError({
-    //   message: 'External app data is being deleted',
-    // })
+    throw new InternalServerError({
+      message: 'External app data is being deleted',
+    })
   }
 
   const { error } = await appDO.class.setExternalAppDataPackage(
@@ -97,18 +96,4 @@ export const setExternalAppDataPackage = async ({
       }
     )
   }
-  // else {
-  //   for (let i = 0; i < 50000; i++) {
-  //     const identity = IdentityURNSpace.urn(('' + i).padStart(50, '0'))
-  //     const nss = `${IdentityURNSpace.decode(identity)}@${clientId}`
-  //     const fullAuthzURN = AuthorizationURNSpace.componentizedUrn(nss, {
-  //       client_id: clientId,
-  //     })
-  //     await caller.edges.makeEdge({
-  //       src: identity,
-  //       dst: fullAuthzURN,
-  //       tag: EDGE_AUTHORIZES,
-  //     })
-  //   }
-  // }
 }

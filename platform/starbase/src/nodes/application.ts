@@ -467,14 +467,6 @@ export default class StarbaseApplication extends DOProxy {
   }
 }
 
-// Alarm
-// get externalAppData:deletion:* / limit of m = 50
-// foreach key
-// check if error >= 3 ?
-// if not, try delete, catch and increase / initialize error
-// if yes, remove key
-// if no keys left, remove deleting state from externalAppDataPackageDefinition
-
 export const getApplicationNodeByClientId = async (
   clientId: string,
   durableObject: DurableObjectNamespace

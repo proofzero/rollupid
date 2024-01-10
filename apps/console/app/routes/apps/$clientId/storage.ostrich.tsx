@@ -2,7 +2,7 @@ import { Form, useOutletContext } from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { ActionFunction } from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -13,36 +13,6 @@ import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 import { HiOutlineShoppingCart, HiOutlineTrash } from 'react-icons/hi'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
-
-// export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-//   async ({ request, context, params }) => {
-//     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-//     const jwt = await requireJWT(request, context.env)
-//     const coreClient = createCoreClient(context.env.Core, {
-//       ...getAuthzHeaderConditionallyFromToken(jwt),
-//       ...traceHeader,
-//     })
-
-//     const { clientId } = params
-//     if (!clientId) {
-//       throw new InternalServerError({
-//         message: 'Client id not found',
-//       })
-//     }
-
-//     await coreClient.starbase.setExternalAppDataPackage.mutate({
-//       clientId,
-//       // Package STARTER should be used imediately after a queue run that didn't complete processing
-//       // Once the package is set on the app, it needs to be commented out and another request made
-//       // So that the UsageKVs get deleted and you don't get errors
-//       // Once that is done, the entire block should be commented out
-//       // Make sure you run the loader just once for each scenario (so don't have a tab open)
-//       // packageType: ExternalAppDataPackageType.STARTER,
-//     })
-
-//     return null
-//   }
-// )
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
