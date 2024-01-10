@@ -1,4 +1,4 @@
-import { Form, useOutletContext } from '@remix-run/react'
+import { Form, useOutletContext, useTransition } from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -11,9 +11,18 @@ import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import classNames from 'classnames'
 import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
-import { HiOutlineShoppingCart, HiOutlineTrash } from 'react-icons/hi'
+import {
+  HiOutlineShoppingCart,
+  HiOutlineTrash,
+  HiOutlineX,
+} from 'react-icons/hi'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
+import { useState } from 'react'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { HiOutlineExclamationTriangle } from 'react-icons/hi2'
+import dangerVector from '~/images/danger.svg'
+import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -54,149 +63,246 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
+export const ConfirmCancelModal = ({
+  isOpen,
+  setIsOpen,
+}: {
+  isOpen: boolean
+  setIsOpen: (val: boolean) => void
+}) => {
+  const [confirmationText, setConfirmationText] = useState('')
+  const transition = useTransition()
+
+  return (
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex items-start space-x-4 max-w-[512px]`}
+      >
+        <img src={dangerVector} alt="danger" />
+
+        <div className="flex-1">
+          <div className="flex flex-row items-center justify-between w-full mb-2">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Cancel Service
+            </Text>
+            <button
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                setIsOpen(false)
+              }}
+            >
+              <HiOutlineX />
+            </button>
+          </div>
+
+          <Form
+            method="post"
+            onSubmit={() => {
+              setConfirmationText('')
+              setIsOpen(false)
+            }}
+          >
+            <input type="hidden" name="op" value="disable" />
+            <section className="mb-4">
+              <Text size="sm" weight="normal" className="text-gray-500 my-3">
+                Are you sure you want to stop{' '}
+                <Text type="span" weight="semibold" size="sm">
+                  App Data Storage?
+                </Text>
+                <br /> This action will permanently delete all data from the
+                service and any paid package used by the service will not be
+                renewed in next billing cycle.
+              </Text>
+
+              <Text size="sm" weight="normal" className="text-gray-500 my-3">
+                * Type CANCEL to confirm
+              </Text>
+
+              <Input
+                id="confirm_text"
+                placeholder="CANCEL"
+                value={confirmationText}
+                required
+                className="mb-12"
+                onChange={(e) => {
+                  setConfirmationText(e.target.value)
+                }}
+              />
+            </section>
+
+            <div className="flex justify-end items-center space-x-3">
+              <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                disabled={
+                  confirmationText !== 'CANCEL' || transition.state !== 'idle'
+                }
+                type="submit"
+                btnType="dangerous"
+              >
+                Delete
+              </Button>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
 export default () => {
   const { appDetails } = useOutletContext<{
     appDetails: appDetailsProps
   }>()
 
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   return (
-    <section className="flex flex-col space-y-5">
-      <div className="flex flex-row items-center space-x-3">
-        <Text size="2xl" weight="semibold" className="text-gray-900">
-          Storage
-        </Text>
-        <DocumentationBadge
-          url={'https://docs.rollup.id/platform/console/storage'}
-        />
-      </div>
-
-      {appDetails.externalAppDataPackageDefinition?.status ===
-        ExternalAppDataPackageStatus.Deleting && (
-        <section className="my-4 p-4 flex flex-row items-center gap-3 bg-orange-50">
-          <Spinner color="#F97316" size={20} margin="unset" weight="slim" />
-          <Text size="sm" weight="medium" className="text-orange-600">
-            Service cancellation in progress. Existing application data being
-            deleted...{' '}
-          </Text>
-        </section>
+    <>
+      {isModalOpen && (
+        <ConfirmCancelModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
       )}
+      <section className="flex flex-col space-y-5">
+        <div className="flex flex-row items-center space-x-3">
+          <Text size="2xl" weight="semibold" className="text-gray-900">
+            Storage
+          </Text>
+          <DocumentationBadge
+            url={'https://docs.rollup.id/platform/console/storage'}
+          />
+        </div>
 
-      <section className="flex-1 bg-white border rounded-lg px-4 pt-3 pb-6">
-        <section className="flex flex-row justify-between items-center">
-          <div className="flex flex-row gap-2 items-center">
-            <Text size="lg" weight="semibold">
-              App Data Storage
+        {appDetails.externalAppDataPackageDefinition?.status ===
+          ExternalAppDataPackageStatus.Deleting && (
+          <section className="my-4 p-4 flex flex-row items-center gap-3 bg-orange-50">
+            <Spinner color="#F97316" size={20} margin="unset" weight="slim" />
+            <Text size="sm" weight="medium" className="text-orange-600">
+              Service cancellation in progress. Existing application data being
+              deleted...{' '}
             </Text>
+          </section>
+        )}
 
-            {appDetails.externalAppDataPackageDefinition?.status ===
-            ExternalAppDataPackageStatus.Deleting ? (
-              <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-            ) : (
-              <div
-                className={classNames('w-2 h-2 rounded-full', {
-                  'bg-green-500': Boolean(
-                    appDetails.externalAppDataPackageDefinition
-                  ),
-                  'bg-gray-300': !Boolean(
-                    appDetails.externalAppDataPackageDefinition
-                  ),
-                })}
-              ></div>
-            )}
-          </div>
+        <section className="flex-1 bg-white border rounded-lg px-4 pt-3 pb-6">
+          <section className="flex flex-row justify-between items-center">
+            <div className="flex flex-row gap-2 items-center">
+              <Text size="lg" weight="semibold">
+                App Data Storage
+              </Text>
 
-          {appDetails.externalAppDataPackageDefinition?.status !==
-            ExternalAppDataPackageStatus.Deleting && (
-            <>
-              {!Boolean(appDetails.externalAppDataPackageDefinition) && (
-                <Form method="post">
-                  <input type="hidden" name="op" value="enable" />
-                  <Button
-                    btnType="primary-alt"
-                    className="flex flex-row items-center gap-3"
-                    type="submit"
-                  >
-                    <HiOutlineShoppingCart className="w-3.5 h-3.5" />
-                    <Text>Purchase Package</Text>
-                  </Button>
-                </Form>
+              {appDetails.externalAppDataPackageDefinition?.status ===
+              ExternalAppDataPackageStatus.Deleting ? (
+                <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+              ) : (
+                <div
+                  className={classNames('w-2 h-2 rounded-full', {
+                    'bg-green-500': Boolean(
+                      appDetails.externalAppDataPackageDefinition
+                    ),
+                    'bg-gray-300': !Boolean(
+                      appDetails.externalAppDataPackageDefinition
+                    ),
+                  })}
+                ></div>
               )}
-              {Boolean(appDetails.externalAppDataPackageDefinition) && (
-                <Form method="post">
-                  <input type="hidden" name="op" value="disable" />
+            </div>
+
+            {appDetails.externalAppDataPackageDefinition?.status !==
+              ExternalAppDataPackageStatus.Deleting && (
+              <>
+                {!Boolean(appDetails.externalAppDataPackageDefinition) && (
+                  <Form method="post">
+                    <input type="hidden" name="op" value="enable" />
+                    <Button
+                      btnType="primary-alt"
+                      className="flex flex-row items-center gap-3"
+                      type="submit"
+                    >
+                      <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                      <Text>Purchase Package</Text>
+                    </Button>
+                  </Form>
+                )}
+                {Boolean(appDetails.externalAppDataPackageDefinition) && (
                   <Button
                     btnType="dangerous-alt"
                     className="flex flex-row items-center gap-3"
                     type="submit"
+                    onClick={() => {
+                      setIsModalOpen(true)
+                    }}
                   >
                     <HiOutlineTrash className="w-3.5 h-3.5" />
                     <Text>Cancel Service</Text>
                   </Button>
-                </Form>
-              )}
-            </>
-          )}
-        </section>
+                )}
+              </>
+            )}
+          </section>
 
-        <section className="mt-2">
-          <Text size="sm" className="text-gray-600">
-            App Data Storage service provides a hassle-free way to store and
-            retrieve per-user data for your application. <br /> Once activated,
-            the service can be accessed through our Galaxy API and it supports
-            storing data up to 128kb, per user.
-          </Text>
-        </section>
-        <section className="mt-4">
-          <div className="w-full h-px bg-gray-200"></div>
-          <div className="flex flex-row justify-between items-center py-2">
-            <Text size="sm" className="text-gray-800">
-              Current Package:
+          <section className="mt-2">
+            <Text size="sm" className="text-gray-600">
+              App Data Storage service provides a hassle-free way to store and
+              retrieve per-user data for your application. <br /> Once
+              activated, the service can be accessed through our Galaxy API and
+              it supports storing data up to 128kb, per user.
             </Text>
-            <Text size="sm" className="text-gray-500">
-              {appDetails.externalAppDataPackageDefinition?.packageDetails
-                .title ?? 'No active package'}
-            </Text>
-          </div>
-          <div className="w-full h-px bg-gray-200"></div>
-          <div className="flex flex-row justify-between items-center py-2">
-            <Text size="sm" className="text-gray-800">
-              Reads:
-            </Text>
-            {Boolean(appDetails.externalAppDataPackageDefinition) ? (
-              <Text size="sm" className="text-gray-500">
-                {
-                  appDetails.externalAppDataPackageDefinition?.packageDetails
-                    .reads
-                }{' '}
-                / month
+          </section>
+          <section className="mt-4">
+            <div className="w-full h-px bg-gray-200"></div>
+            <div className="flex flex-row justify-between items-center py-2">
+              <Text size="sm" className="text-gray-800">
+                Current Package:
               </Text>
-            ) : (
               <Text size="sm" className="text-gray-500">
-                -
+                {appDetails.externalAppDataPackageDefinition?.packageDetails
+                  .title ?? 'No active package'}
               </Text>
-            )}
-          </div>
-          <div className="w-full h-px bg-gray-200"></div>
-          <div className="flex flex-row justify-between items-center pt-2">
-            <Text size="sm" className="text-gray-800">
-              Writes:
-            </Text>
-            {Boolean(appDetails.externalAppDataPackageDefinition) ? (
-              <Text size="sm" className="text-gray-500">
-                {
-                  appDetails.externalAppDataPackageDefinition?.packageDetails
-                    .writes
-                }{' '}
-                / month
+            </div>
+            <div className="w-full h-px bg-gray-200"></div>
+            <div className="flex flex-row justify-between items-center py-2">
+              <Text size="sm" className="text-gray-800">
+                Reads:
               </Text>
-            ) : (
-              <Text size="sm" className="text-gray-500">
-                -
+              {Boolean(appDetails.externalAppDataPackageDefinition) ? (
+                <Text size="sm" className="text-gray-500">
+                  {
+                    appDetails.externalAppDataPackageDefinition?.packageDetails
+                      .reads
+                  }{' '}
+                  / month
+                </Text>
+              ) : (
+                <Text size="sm" className="text-gray-500">
+                  -
+                </Text>
+              )}
+            </div>
+            <div className="w-full h-px bg-gray-200"></div>
+            <div className="flex flex-row justify-between items-center pt-2">
+              <Text size="sm" className="text-gray-800">
+                Writes:
               </Text>
-            )}
-          </div>
+              {Boolean(appDetails.externalAppDataPackageDefinition) ? (
+                <Text size="sm" className="text-gray-500">
+                  {
+                    appDetails.externalAppDataPackageDefinition?.packageDetails
+                      .writes
+                  }{' '}
+                  / month
+                </Text>
+              ) : (
+                <Text size="sm" className="text-gray-500">
+                  -
+                </Text>
+              )}
+            </div>
+          </section>
         </section>
       </section>
-    </section>
+    </>
   )
 }
