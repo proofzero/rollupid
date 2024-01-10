@@ -13,6 +13,7 @@ import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 import { HiOutlineShoppingCart, HiOutlineTrash } from 'react-icons/hi'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -69,6 +70,17 @@ export default () => {
         />
       </div>
 
+      {appDetails.externalAppDataPackageDefinition?.status ===
+        ExternalAppDataPackageStatus.Deleting && (
+        <section className="my-4 p-4 flex flex-row items-center gap-3 bg-orange-50">
+          <Spinner color="#F97316" size={20} margin="unset" weight="slim" />
+          <Text size="sm" weight="medium" className="text-orange-600">
+            Service cancellation in progress. Existing application data being
+            deleted...{' '}
+          </Text>
+        </section>
+      )}
+
       <section className="flex-1 bg-white border rounded-lg px-4 pt-3 pb-6">
         <section className="flex flex-row justify-between items-center">
           <div className="flex flex-row gap-2 items-center">
@@ -76,24 +88,25 @@ export default () => {
               App Data Storage
             </Text>
 
-            <div
-              className={classNames('w-2 h-2 rounded-full', {
-                'bg-green-500': Boolean(
-                  appDetails.externalAppDataPackageDefinition
-                ),
-                'bg-gray-300': !Boolean(
-                  appDetails.externalAppDataPackageDefinition
-                ),
-              })}
-            ></div>
+            {appDetails.externalAppDataPackageDefinition?.status ===
+            ExternalAppDataPackageStatus.Deleting ? (
+              <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+            ) : (
+              <div
+                className={classNames('w-2 h-2 rounded-full', {
+                  'bg-green-500': Boolean(
+                    appDetails.externalAppDataPackageDefinition
+                  ),
+                  'bg-gray-300': !Boolean(
+                    appDetails.externalAppDataPackageDefinition
+                  ),
+                })}
+              ></div>
+            )}
           </div>
 
-          {appDetails.externalAppDataPackageDefinition?.status ===
-          ExternalAppDataPackageStatus.Deleting ? (
-            <>
-              <Text>IM DELETING</Text>
-            </>
-          ) : (
+          {appDetails.externalAppDataPackageDefinition?.status !==
+            ExternalAppDataPackageStatus.Deleting && (
             <>
               {!Boolean(appDetails.externalAppDataPackageDefinition) && (
                 <Form method="post">
