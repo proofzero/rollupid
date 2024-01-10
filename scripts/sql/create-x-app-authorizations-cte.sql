@@ -1,4 +1,6 @@
 -- This script is used to generate a large number of nodes and edges for testing purposes.
+-- This can be used in an individual manner by running the query for a specific table.
+
 -- Make sure to replace 100000 with the number of nodes/edges you want to generate.
 -- Make sure to replace TEST with the name of the test you are running.
 -- Make sure to replace 8861be514cda870274b57d4123a75ca9 with the client_id you are using.
