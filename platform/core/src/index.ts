@@ -114,7 +114,7 @@ export default {
             2
           )
         )
-        const limit = 75000
+        const limit = 2000
 
         const clientIDSet = batch.messages[0].body.data.appIDSet
         const clientID = clientIDSet[0]
