@@ -25,12 +25,6 @@ export { Identity, IdentityGroup } from '@proofzero/platform.identity'
 export { Authorization, ExchangeCode } from '@proofzero/platform.authorization'
 export { StarbaseApplication } from '@proofzero/platform.starbase'
 
-let ops = 0
-let success = 0
-let fail = 0
-
-const errorMap = new Map()
-
 export default {
   async fetch(
     request: Request,
@@ -71,24 +65,6 @@ export default {
     env: Environment,
     ctx: ExecutionContext
   ): Promise<void> {
-    console.log({
-      first:
-        batch.messages[0]?.body.type ===
-        CoreQueueMessageType.ExternalAppDataDelSignal
-          ? 'SS'
-          : batch.messages[0]?.body?.data?.athID,
-      lastt:
-        batch.messages[batch.messages.length - 1]?.body.type ===
-        CoreQueueMessageType.ExternalAppDataDelReq
-          ? // @ts-ignore
-            batch.messages[batch.messages.length - 1]?.body?.data?.athID
-          : batch.messages[batch.messages.length - 1]?.body.type ===
-            CoreQueueMessageType.ExternalAppDataDelSignal
-          ? 'SS'
-          : undefined,
-      batchLen: batch.messages.length,
-    })
-
     const asyncFn = async () => {
       let appIDSet = new Set<string>()
       for (const msg of batch.messages) {
@@ -102,18 +78,6 @@ export default {
         batch.messages[0].body.type ===
           CoreQueueMessageType.ExternalAppDataDelSignal
       ) {
-        console.log(
-          JSON.stringify(
-            {
-              ops,
-              success,
-              fail,
-              errorMap,
-            },
-            null,
-            2
-          )
-        )
         const limit = 2000
 
         const clientIDSet = batch.messages[0].body.data.appIDSet
@@ -154,7 +118,6 @@ export default {
         })
 
         if (edges && edges.length > 0) {
-          console.log('Got edges')
           const queueMessages: MessageSendRequest<CoreQueueMessage>[] =
             edges.map((edge) => ({
               contentType: 'json',
@@ -179,7 +142,6 @@ export default {
           queueQuery.offset += queueQuery.limit
           await appDO.class.setQueueLimitAndOffset(queueQuery)
         } else {
-          console.log("Didn't get edges")
           await appDO.class.setQueueLimitAndOffset(undefined)
 
           const { externalAppDataPackageDefinition } =
@@ -197,8 +159,6 @@ export default {
 
           await appDO.storage.delete('externalAppDataPackageDefinition')
           appIDSet.delete(clientID)
-
-          console.log(`Finished processing ${clientID}`)
         }
       }
 
@@ -227,30 +187,13 @@ export default {
 
             const node = initAuthorizationNodeByName(urn, env.Authorization)
             await node.storage.delete('externalAppData')
-            // await new Promise((ok) => setTimeout(ok, 5))
           } catch (ex) {
-            console.log('FIRSTSTEPS')
             throw ex
           }
 
           msg.ack()
-          success++
         } catch (ex) {
-          fail++
-
-          console.log(ex.name)
-          console.log(ex.message)
-          console.log(ex.cause)
-          console.log(ex.stack)
-
-          if (!errorMap.has((ex as Error).name)) {
-            errorMap.set((ex as Error).name, new Set())
-          }
-          errorMap.get((ex as Error).name).add((ex as Error).message)
-
           msg.retry()
-        } finally {
-          ops++
         }
       }
     }
