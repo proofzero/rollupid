@@ -1,19 +1,19 @@
 import { DeploymentMetadata } from '@proofzero/types'
 
-export enum DelQueueMessageType {
-  DELREQ = 'delreq',
-  SPECIALSAUCE = 'specialsauce',
+export enum CoreQueueMessageType {
+  ExternalAppDataDelReq = 'external_app_data_del_req',
+  ExternalAppDataDelSignal = 'external_app_data_del_signal',
 }
-export type DelQueueMessage =
+export type CoreQueueMessage =
   | {
-      type: DelQueueMessageType.DELREQ
+      type: CoreQueueMessageType.ExternalAppDataDelReq
       data: {
         appID: string
         athID: string
       }
     }
   | {
-      type: DelQueueMessageType.SPECIALSAUCE
+      type: CoreQueueMessageType.ExternalAppDataDelSignal
       data: {
         appIDSet: string[]
       }
@@ -30,7 +30,8 @@ export interface Environment {
   StarbaseApp: DurableObjectNamespace
 
   EDGES: D1Database
-  SYNC_QUEUE: Queue<DelQueueMessage>
+
+  COREQUEUE: Queue<CoreQueueMessage>
 
   Core: Fetcher
   Email: Fetcher

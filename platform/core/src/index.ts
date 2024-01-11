@@ -9,8 +9,8 @@ import { createContext, type Context, createContextInner } from './context'
 import router from './router'
 import relay, { type CloudflareEmailMessage } from './relay'
 import {
-  DelQueueMessageType,
-  type DelQueueMessage,
+  CoreQueueMessage,
+  CoreQueueMessageType,
   type Environment,
 } from './types'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
@@ -19,8 +19,6 @@ import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/n
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 import { EDGE_AUTHORIZES } from '@proofzero/platform.authorization/src/constants'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
-import { error } from 'console'
-import { getErrorCause } from '@proofzero/utils/errors'
 
 export { Account } from '@proofzero/platform.account'
 export { Identity, IdentityGroup } from '@proofzero/platform.identity'
@@ -69,22 +67,23 @@ export default {
     return relay(content, env)
   },
   async queue(
-    batch: MessageBatch<DelQueueMessage>,
+    batch: MessageBatch<CoreQueueMessage>,
     env: Environment,
     ctx: ExecutionContext
   ): Promise<void> {
     console.log({
       first:
-        batch.messages[0]?.body.type === DelQueueMessageType.SPECIALSAUCE
+        batch.messages[0]?.body.type ===
+        CoreQueueMessageType.ExternalAppDataDelSignal
           ? 'SS'
           : batch.messages[0]?.body?.data?.athID,
       lastt:
         batch.messages[batch.messages.length - 1]?.body.type ===
-        DelQueueMessageType.DELREQ
+        CoreQueueMessageType.ExternalAppDataDelReq
           ? // @ts-ignore
             batch.messages[batch.messages.length - 1]?.body?.data?.athID
           : batch.messages[batch.messages.length - 1]?.body.type ===
-            DelQueueMessageType.SPECIALSAUCE
+            CoreQueueMessageType.ExternalAppDataDelSignal
           ? 'SS'
           : undefined,
       batchLen: batch.messages.length,
@@ -93,14 +92,15 @@ export default {
     const asyncFn = async () => {
       let appIDSet = new Set<string>()
       for (const msg of batch.messages) {
-        if (msg.body.type === DelQueueMessageType.SPECIALSAUCE) {
+        if (msg.body.type === CoreQueueMessageType.ExternalAppDataDelSignal) {
           appIDSet = new Set([...appIDSet, ...msg.body.data.appIDSet])
         }
       }
 
       if (
         batch.messages.length === 1 &&
-        batch.messages[0].body.type === DelQueueMessageType.SPECIALSAUCE
+        batch.messages[0].body.type ===
+          CoreQueueMessageType.ExternalAppDataDelSignal
       ) {
         console.log(
           JSON.stringify(
@@ -155,11 +155,11 @@ export default {
 
         if (edges && edges.length > 0) {
           console.log('Got edges')
-          const queueMessages: MessageSendRequest<DelQueueMessage>[] =
+          const queueMessages: MessageSendRequest<CoreQueueMessage>[] =
             edges.map((edge) => ({
               contentType: 'json',
               body: {
-                type: DelQueueMessageType.DELREQ,
+                type: CoreQueueMessageType.ExternalAppDataDelReq,
                 data: {
                   appID: clientID,
                   athID: IdentityURNSpace.decode(edge.src.baseUrn),
@@ -173,7 +173,7 @@ export default {
           }
 
           for (const queueMessageBatch of queueMessageBatches) {
-            await env.SYNC_QUEUE.sendBatch(queueMessageBatch)
+            await env.COREQUEUE.sendBatch(queueMessageBatch)
           }
 
           queueQuery.offset += queueQuery.limit
@@ -203,17 +203,17 @@ export default {
       }
 
       if (appIDSet.size > 0) {
-        const msgToSet: DelQueueMessage = {
-          type: DelQueueMessageType.SPECIALSAUCE,
+        const msgToSet: CoreQueueMessage = {
+          type: CoreQueueMessageType.ExternalAppDataDelSignal,
           data: {
             appIDSet: Array.from(appIDSet),
           },
         }
-        await env.SYNC_QUEUE.send(msgToSet)
+        await env.COREQUEUE.send(msgToSet)
       }
 
       for (const msg of batch.messages) {
-        if (msg.body.type === DelQueueMessageType.SPECIALSAUCE) {
+        if (msg.body.type === CoreQueueMessageType.ExternalAppDataDelSignal) {
           msg.ack()
           continue
         }

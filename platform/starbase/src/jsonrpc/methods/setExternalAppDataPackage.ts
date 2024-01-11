@@ -13,13 +13,8 @@ import {
 } from '@proofzero/urns/identity-group'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 import { getErrorCause } from '@proofzero/utils/errors'
-import { DelQueueMessageType } from '@proofzero/platform.core/src/types'
 import { ExternalAppDataPackageStatus } from '../validators/externalAppDataPackageDefinition'
-import { IdentityURNSpace } from '@proofzero/urns/identity'
-import generateRandomString from '@proofzero/utils/generateRandomString'
-import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
-import { EDGE_AUTHORIZES } from '@proofzero/platform.authorization/src/constants'
-import { edges } from '@proofzero/platform.edges/src/db'
+import { CoreQueueMessageType } from '@proofzero/platform.core/src/types'
 
 export const SetExternalAppDataPackageInputSchema =
   AppClientIdParamSchema.extend({
@@ -84,9 +79,9 @@ export const setExternalAppDataPackage = async ({
   if (error) throw getErrorCause(error)
 
   if (!packageType) {
-    await ctx.env.SYNC_QUEUE.send(
+    await ctx.env.COREQUEUE.send(
       {
-        type: DelQueueMessageType.SPECIALSAUCE,
+        type: CoreQueueMessageType.ExternalAppDataDelSignal,
         data: {
           appIDSet: [clientId],
         },

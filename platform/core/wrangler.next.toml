@@ -6,11 +6,11 @@ logpush = true
 node_compat = true
 workers_dev = false
 
+[env.next]
 kv_namespaces = [
   { binding = "UsageKV", id = "56f1544de4704f538a01e84393d3d5c7" },
 ]
 
-[env.next]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },
   { name = "Authorization", class_name = "Authorization" },
@@ -37,6 +37,16 @@ binding = "EDGES"
 database_name = "edges-v2-next"
 database_id = "058ddc84-7734-47ca-a84b-7f325c5336f7"
 migrations_dir = "../edges/migrations"
+
+[[env.next.queues.producers]]
+  queue = "core-queue-next"
+  binding = "COREQUEUE"
+
+[[env.next.queues.consumers]]
+  queue = "core-queue-next"
+  max_batch_size = 100
+  max_concurrency = 1
+  dead_letter_queue = "core-queue-next-dlq"
 
 [env.next.vars]
 ENVIRONMENT = "next"

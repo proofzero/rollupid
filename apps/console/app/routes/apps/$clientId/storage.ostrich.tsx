@@ -20,7 +20,6 @@ import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/j
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { useState } from 'react'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
-import { HiOutlineExclamationTriangle } from 'react-icons/hi2'
 import dangerVector from '~/images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 

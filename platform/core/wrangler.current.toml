@@ -38,6 +38,16 @@ database_name = "edges-v2-current"
 database_id = "825ee9f1-8de8-4f73-a0e0-1998feea3d7f"
 migrations_dir = "../edges/migrations"
 
+[[env.next.queues.producers]]
+  queue = "core-queue-current"
+  binding = "COREQUEUE"
+
+[[env.next.queues.consumers]]
+  queue = "core-queue-current"
+  max_batch_size = 100
+  max_concurrency = 1
+  dead_letter_queue = "core-queue-current-dlq"
+
 [env.current.vars]
 ENVIRONMENT = "current"
 

@@ -39,13 +39,14 @@ database_id = "bd11ba92-bfcf-4d37-8224-d57467cced48"
 migrations_dir = "../edges/migrations"
 
 [[env.dev.queues.producers]]
-  queue = "sync-queue-dev"
-  binding = "SYNC_QUEUE"
+  queue = "core-queue-dev"
+  binding = "COREQUEUE"
 
 [[env.dev.queues.consumers]]
-  queue = "sync-queue-dev"
+  queue = "core-queue-dev"
   max_batch_size = 100
   max_concurrency = 1
+  dead_letter_queue = "core-queue-dev-dlq"
 
 [env.dev.vars]
 ENVIRONMENT = "dev"

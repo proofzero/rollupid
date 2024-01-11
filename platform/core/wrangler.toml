@@ -37,13 +37,14 @@ database_id = "local"
 migrations_dir = "../edges/migrations"
 
 [[queues.producers]]
-  queue = "sync-queue-local"
-  binding = "SYNC_QUEUE"
+  queue = "core-queue"
+  binding = "COREQUEUE"
 
 [[queues.consumers]]
-  queue = "sync-queue-local"
+  queue = "core-queue"
   max_batch_size = 100
   max_concurrency = 1
+  dead_letter_queue = "core-queue-dlq"
 
 [vars]
 ENVIRONMENT = "local"
