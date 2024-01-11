@@ -6,11 +6,12 @@ logpush = true
 node_compat = true
 workers_dev = false
 
+
+[env.current]
 kv_namespaces = [
   { binding = "UsageKV", id = "fe34c321db564d299ef7c78753f6c1fd" },
 ]
 
-[env.current]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },
   { name = "Authorization", class_name = "Authorization" },
