@@ -1,4 +1,9 @@
-import { Form, useOutletContext, useTransition } from '@remix-run/react'
+import {
+  Form,
+  useFetcher,
+  useOutletContext,
+  useTransition,
+} from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -22,6 +27,7 @@ import { useState } from 'react'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import dangerVector from '~/images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import AppDataStorageModal from '~/components/AppDataStorageModal/AppDataStorageModal'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -157,13 +163,28 @@ export default () => {
     appDetails: appDetailsProps
   }>()
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
+
+  const fetcher = useFetcher()
 
   return (
     <>
-      {isModalOpen && (
-        <ConfirmCancelModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+      {isCancelModalOpen && (
+        <ConfirmCancelModal
+          isOpen={isCancelModalOpen}
+          setIsOpen={setIsCancelModalOpen}
+        />
       )}
+      {isSubscriptionModalOpen && (
+        <AppDataStorageModal
+          isOpen={isSubscriptionModalOpen}
+          onClose={() => setIsSubscriptionModalOpen(false)}
+          subscriptionFetcher={fetcher}
+          clientID={appDetails.clientId!}
+        />
+      )}
+
       <section className="flex flex-col space-y-5">
         <div className="flex flex-row items-center space-x-3">
           <Text size="2xl" weight="semibold" className="text-gray-900">
@@ -213,17 +234,17 @@ export default () => {
               ExternalAppDataPackageStatus.Deleting && (
               <>
                 {!Boolean(appDetails.externalAppDataPackageDefinition) && (
-                  <Form method="post">
-                    <input type="hidden" name="op" value="enable" />
-                    <Button
-                      btnType="primary-alt"
-                      className="flex flex-row items-center gap-3"
-                      type="submit"
-                    >
-                      <HiOutlineShoppingCart className="w-3.5 h-3.5" />
-                      <Text>Purchase Package</Text>
-                    </Button>
-                  </Form>
+                  <Button
+                    btnType="primary-alt"
+                    className="flex flex-row items-center gap-3"
+                    type="submit"
+                    onClick={() => {
+                      setIsSubscriptionModalOpen(true)
+                    }}
+                  >
+                    <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                    <Text>Purchase Package</Text>
+                  </Button>
                 )}
                 {Boolean(appDetails.externalAppDataPackageDefinition) && (
                   <Button
@@ -231,7 +252,7 @@ export default () => {
                     className="flex flex-row items-center gap-3"
                     type="submit"
                     onClick={() => {
-                      setIsModalOpen(true)
+                      setIsCancelModalOpen(true)
                     }}
                   >
                     <HiOutlineTrash className="w-3.5 h-3.5" />

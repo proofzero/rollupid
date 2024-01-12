@@ -43,7 +43,7 @@ import {
 } from '@proofzero/types/billing'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
 import { generateUsageKey, UsageCategory } from '@proofzero/utils/usage'
-import ExternalAppDataPackages from '../utils/externalAppDataPackages'
+import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
 import { NodeMethodReturnValue } from '@proofzero/types/node'
 import {
   ExternalStorageAlreadyDisabledError,
