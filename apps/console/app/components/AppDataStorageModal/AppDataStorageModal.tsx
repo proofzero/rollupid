@@ -31,17 +31,9 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
       setSelectedPackage(currentPackage)
     }
   }, [currentPackage])
-  useEffect(() => {
-    if (
-      subscriptionFetcher.state === 'idle' &&
-      subscriptionFetcher.type === 'done'
-    ) {
-      onClose()
-    }
-  }, [subscriptionFetcher])
   return (
     <>
-      <Modal isOpen={isOpen} handleClose={onClose}>
+      <Modal isOpen={isOpen} handleClose={() => onClose()}>
         <subscriptionFetcher.Form
           method="post"
           action={`/apps/${clientID}/storage/ostrich`}
@@ -61,7 +53,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
             </Text>
             <button
               className="bg-white p-2 rounded-lg text-xl cursor-pointer hover:bg-[#F3F4F6]"
-              onClick={onClose}
+              onClick={() => onClose()}
             >
               <HiOutlineX />
             </button>
@@ -128,7 +120,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
           </section>
 
           <footer className="flex flex-row items-center justify-end gap-2">
-            <Button btnType="secondary-alt" onClick={onClose}>
+            <Button btnType="secondary-alt" onClick={() => onClose()}>
               Close
             </Button>
             <Button btnType="primary-alt" type="submit">

@@ -17,17 +17,20 @@ import classNames from 'classnames'
 import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 import {
+  HiDotsVertical,
+  HiOutlinePencilAlt,
   HiOutlineShoppingCart,
   HiOutlineTrash,
   HiOutlineX,
 } from 'react-icons/hi'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
-import { useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import dangerVector from '~/images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import AppDataStorageModal from '~/components/AppDataStorageModal/AppDataStorageModal'
+import { Menu, Transition } from '@headlessui/react'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -168,6 +171,12 @@ export default () => {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
 
   const fetcher = useFetcher()
+  useEffect(() => {
+    console.log(fetcher)
+    if (fetcher.state === 'idle' && fetcher.type === 'done') {
+      setIsSubscriptionModalOpen(false)
+    }
+  }, [fetcher])
 
   return (
     <>
@@ -183,6 +192,10 @@ export default () => {
           onClose={() => setIsSubscriptionModalOpen(false)}
           subscriptionFetcher={fetcher}
           clientID={appDetails.clientId!}
+          currentPackage={
+            appDetails.externalAppDataPackageDefinition?.packageDetails
+              .packageType
+          }
         />
       )}
 
@@ -248,17 +261,77 @@ export default () => {
                   </Button>
                 )}
                 {Boolean(appDetails.externalAppDataPackageDefinition) && (
-                  <Button
-                    btnType="dangerous-alt"
-                    className="flex flex-row items-center gap-3"
-                    type="submit"
-                    onClick={() => {
-                      setIsCancelModalOpen(true)
-                    }}
-                  >
-                    <HiOutlineTrash className="w-3.5 h-3.5" />
-                    <Text>Cancel Service</Text>
-                  </Button>
+                  <Menu>
+                    <Menu.Button>
+                      <div
+                        className="w-8 h-8 flex justify-center items-center cursor-pointer
+          hover:bg-gray-100 hover:rounded-[6px]"
+                      >
+                        <HiDotsVertical className="text-lg text-gray-400" />
+                      </div>
+                    </Menu.Button>
+
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items
+                        className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100
+          rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y
+           divide-gray-100"
+                      >
+                        <div className="p-1 ">
+                          <div
+                            onClick={() => {
+                              setIsSubscriptionModalOpen(true)
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <Menu.Item
+                              as="div"
+                              className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                  hover:rounded-[6px] hover:bg-gray-100"
+                            >
+                              <HiOutlinePencilAlt className="text-xl font-normal text-gray-400" />
+                              <Text
+                                size="sm"
+                                weight="normal"
+                                className="text-gray-700"
+                              >
+                                Edit Package
+                              </Text>
+                            </Menu.Item>
+                          </div>
+                        </div>
+
+                        <div className="p-1">
+                          <Menu.Item
+                            as="div"
+                            className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                hover:rounded-[6px] hover:bg-gray-100 "
+                            onClick={() => {
+                              setIsCancelModalOpen(true)
+                            }}
+                          >
+                            <HiOutlineTrash className="text-xl font-normal text-red-500" />
+
+                            <Text
+                              size="sm"
+                              weight="normal"
+                              className="text-red-500"
+                            >
+                              Cancel Service
+                            </Text>
+                          </Menu.Item>
+                        </div>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
                 )}
               </>
             )}

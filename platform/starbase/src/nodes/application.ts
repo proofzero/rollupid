@@ -370,9 +370,7 @@ export default class StarbaseApplication extends DOProxy {
         : undefined
 
     if (packageDetails) {
-      if (externalStorageWrites && externalStorageReads) {
-        return { error: ExternalStorageAlreadyEnabledError }
-      } else if (!externalStorageWrites || !externalStorageReads) {
+      if (!externalStorageWrites || !externalStorageReads) {
         console.warn(
           `external storage reads or writes for ${clientId} in a bad state; ${externalStorageWrites} writes and ${externalStorageReads} reads.`
         )
