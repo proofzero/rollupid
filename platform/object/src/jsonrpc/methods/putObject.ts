@@ -5,6 +5,7 @@ import { initObjectNodeByName } from '../../nodes'
 import { Visibility } from '../../types'
 
 import { getBaseKey, getObjectKey } from '../../utils'
+import { InternalServerError } from '@proofzero/errors'
 
 export const PutObjectInput = z.object({
   namespace: z.string(),
@@ -50,6 +51,11 @@ export const putObjectMethod = async ({
       JSON.stringify(value)
     )
     await node.class.set(index.version, index.visibility)
+    if (!metadata) {
+      throw new InternalServerError({
+        message: 'Metadata is null',
+      })
+    }
     return {
       size: metadata.size,
       version: index.version,
