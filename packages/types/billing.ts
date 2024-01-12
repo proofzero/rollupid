@@ -7,6 +7,7 @@ export enum ServicePlanType {
 
 export enum ExternalAppDataPackageType {
   STARTER = 'STARTER',
+  SCALE = 'SCALE',
 }
 
 export type ServicePlans = {

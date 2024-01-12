@@ -48,9 +48,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const fd = await request.formData()
     switch (fd.get('op')) {
       case 'enable':
+        const packageType = fd.get('package') as ExternalAppDataPackageType
         await coreClient.starbase.setExternalAppDataPackage.mutate({
           clientId,
-          packageType: ExternalAppDataPackageType.STARTER,
+          packageType,
         })
         break
       case 'disable':

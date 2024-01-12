@@ -46,6 +46,9 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
           action={`/apps/${clientID}/storage/ostrich`}
         >
           {selectedPackage && <input type="hidden" name="op" value="enable" />}
+          {selectedPackage && (
+            <input type="hidden" name="package" value={selectedPackage} />
+          )}
           <header>
             <Text>App Data Storage</Text>
           </header>
@@ -59,9 +62,21 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
                     setSelectedPackage(ExternalAppDataPackageType.STARTER)
                   }}
                 >
-                  Starter
+                  {
+                    ExternalAppDataPackages[ExternalAppDataPackageType.STARTER]
+                      .title
+                  }
                 </Button>
-                {/* <Button>Scale</Button> */}
+                <Button
+                  onClick={() => {
+                    setSelectedPackage(ExternalAppDataPackageType.SCALE)
+                  }}
+                >
+                  {
+                    ExternalAppDataPackages[ExternalAppDataPackageType.SCALE]
+                      .title
+                  }
+                </Button>
               </div>
             </div>
 
