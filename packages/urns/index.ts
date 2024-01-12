@@ -72,7 +72,7 @@ class TypedComponentsURNSpace<
   RCompType extends CompType = CompType,
   QCompType extends CompType = CompType,
   URNType extends BaseURN<NID, NSS> = BaseURN<NID, NSS>
-> extends URNSpace<string, string, string> {
+> extends URNSpace<NID, NSS, string> {
   constructor(nid: NID, options?: Partial<SpaceOptions<NSS, string>>) {
     super(nid, options)
   }
@@ -100,7 +100,7 @@ class TypedComponentsURNSpace<
   }
 
   componentizedParse(
-    urn: `urn:${string}:${string}${string}`
+    urn: `urn:${NID}:${NSS}${string}`
   ): ParsedComponentizedURN<string, string, RCompType, QCompType> {
     const s = super.parse(urn)
     let rcomps = null
@@ -128,7 +128,7 @@ class TypedComponentsURNSpace<
     return result
   }
 
-  getBaseURN(urn: `urn:${string}:${string}${string}`): URNType {
+  getBaseURN(urn: `urn:${NID}:${NSS}${string}`): URNType {
     const s = super.parse(urn)
     return `urn:${s.nid}:${s.nss}` as URNType
   }
