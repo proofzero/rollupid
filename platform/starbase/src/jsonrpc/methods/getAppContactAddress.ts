@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { router } from '@proofzero/platform.core'
+import { InternalServerError } from '@proofzero/errors'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import {
@@ -47,6 +48,11 @@ export const getAppContactAddress = async ({
   if (edges.length === 0) {
     return undefined
   }
+
+  if (!AccountURNSpace.is(edges[0].dst.baseUrn))
+    throw new InternalServerError({
+      message: 'invalid account URN',
+    })
 
   const accountURN = AccountURNSpace.componentizedUrn(
     AccountURNSpace.parse(edges[0].dst.baseUrn).decoded,

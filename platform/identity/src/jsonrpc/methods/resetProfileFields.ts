@@ -34,6 +34,12 @@ export const resetProfileFieldsMethod = async ({
     })
   }
 
+  if (!IdentityURNSpace.is(identityGraphNode.baseUrn)) {
+    throw new InternalServerError({
+      message: 'Identity graph node URN is invalid',
+    })
+  }
+
   if (!profile.primaryAccountURN) {
     throw new InternalServerError({
       message: 'Primary account URN not found',

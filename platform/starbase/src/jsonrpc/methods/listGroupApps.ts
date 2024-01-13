@@ -1,7 +1,10 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { ApplicationURNSpace } from '@proofzero/urns/application'
+import {
+  type ApplicationURN,
+  ApplicationURNSpace,
+} from '@proofzero/urns/application'
 import {
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
@@ -56,7 +59,7 @@ export const listGroupApps = async ({
       })
 
       return appEdges.map((edge) => ({
-        urn: edge.dst.baseUrn,
+        urn: edge.dst.baseUrn as ApplicationURN,
         groupName: igm.name,
         groupURN: igm.urn as IdentityGroupURN,
       }))
