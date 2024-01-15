@@ -12,4 +12,4 @@ export * as Email from './email'
 export * as Graph from './graph'
 export * as Node from './node'
 
-export type { default as BaseContext, DeploymentMetadata } from './context'
+export type { default as BaseContext } from './context'
