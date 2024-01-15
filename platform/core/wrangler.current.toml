@@ -26,12 +26,6 @@ services = [
   { binding = "Images", service = "images-current" },
 ]
 
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
-]
-
-unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
-
 [[env.current.d1_databases]]
 binding = "EDGES"
 database_name = "edges-v2-current"

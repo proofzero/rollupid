@@ -9,12 +9,6 @@ services = [
   { binding = "Core", service = "core" },
 ]
 
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics" },
-]
-
-unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
-
 [dev]
 port = 10401
 inspector_port = 11401

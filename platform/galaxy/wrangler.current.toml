@@ -12,8 +12,3 @@ services = [
   { binding = "Core", service = "core-current" },
 ]
 
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics" },
-]
-
-unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
