@@ -31,18 +31,14 @@ const t = initTRPC.context<Context>().create({
   },
 })
 
-import { Analytics } from '@proofzero/platform-middleware/analytics'
-
 export const appRouter = t.router({
   getProfile: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetObjectInput)
     .output(GetObjectOutput)
     .query(getObjectMethod),
   setProfile: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(PutObjectInput)
     .output(PutObjectOutput)
     .mutation(putObjectMethod),

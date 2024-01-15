@@ -54,7 +54,6 @@ import {
 import { getScopes } from './methods/getScopes'
 import { NoInput } from '@proofzero/platform-middleware/inputValidators'
 
-import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { OwnAppsMiddleware } from './ownAppsMiddleware'
 import {
   getAppPublicProps,
@@ -153,7 +152,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(CreateAppInputSchema)
     .output(CreateAppOutputSchema)
     .mutation(createApp),
@@ -161,7 +159,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(DeleteAppInput)
     .mutation(deleteApp),
@@ -169,7 +166,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(UpdateAppInput)
     .mutation(updateApp),
@@ -177,7 +173,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(SetPaymasterInput)
     .mutation(setPaymaster),
@@ -185,7 +180,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(ApiKeyExtractMiddleware)
     .use(OwnAppsMiddleware)
     .input(GetPaymasterInput)
@@ -195,7 +189,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(GetAppDetailsInput)
     .output(GetAppDetailsOutput)
@@ -204,7 +197,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(GetAppProfileInput)
     .output(GetAppProfileOutput)
@@ -213,7 +205,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(GetAuthorizedIdentitiesMethodInput)
     .output(GetAuthorizedIdentitiesMethodOutput)
@@ -222,7 +213,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(NoInput)
     .output(ListAppsOutput)
@@ -231,7 +221,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(RotateClientSecretInput)
     .output(RotateClientSecretOutput)
@@ -240,26 +229,22 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(RotateApiKeyInput)
     .output(RotateApiKeyOutput)
     .mutation(rotateApiKey),
   checkAppAuth: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(CheckAppAuthInput)
     .output(CheckAppAuthOutput)
     .query(checkAppAuth),
   getAppPublicProps: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAppPublicPropsInput)
     .output(GetAppPublicPropsOutput)
     .query(getAppPublicProps),
   getAppPublicPropsBatch: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAppPublicPropsBatchInput)
     .output(GetAppPublicPropsBatchOutput)
     .query(getAppPublicPropsBatch),
@@ -267,7 +252,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(PublishAppInput)
     .output(PublishAppOutput)
@@ -275,20 +259,17 @@ export const appRouter = t.router({
   checkApiKey: t.procedure
     //This endpoint doesn't require a JWT
     .use(LogUsage)
-    .use(Analytics)
     .input(CheckApiKeyInput)
     .output(CheckApiKeyOutput)
     .query(checkApiKey),
   getScopes: t.procedure
     //TODO: Revisit when implementing scopes
-    .use(Analytics)
     .input(NoInput)
     .query(getScopes),
   getAppContactAddress: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(GetAppContactAddressInput)
     .output(GetAppContactAddressOutput)
@@ -297,12 +278,10 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(UpsertAppContactAddressInput)
     .mutation(upsertAppContactAddress),
   getAppTheme: t.procedure
-    .use(Analytics)
     .input(AppClientIdParamSchema)
     .output(GetAppThemeOutput)
     .query(getAppTheme),
@@ -310,7 +289,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(SetAppThemeInput)
     .mutation(setAppTheme),
@@ -318,7 +296,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(CreateCustomDomainInput)
     .output(CreateCustomDomainOutput)
     .mutation(createCustomDomain),
@@ -326,7 +303,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(DeleteCustomDomainInput)
     .output(DeleteCustomDomainOutput)
     .mutation(deleteCustomDomain),
@@ -334,12 +310,10 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(GetCustomDomainInput)
     .output(GetCustomDomainOutput)
     .query(getCustomDomain),
   getEmailOTPTheme: t.procedure
-    .use(Analytics)
     .input(AppClientIdParamSchema)
     .output(GetEmailOTPThemeOutput)
     .query(getEmailOTPTheme),
@@ -347,7 +321,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(SetEmailOTPThemeInput)
     .mutation(setEmailOTPTheme),
@@ -355,13 +328,11 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(SetAppPlanInput)
     .mutation(setAppPlan),
   getAppPlan: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAppPlanInputSchema)
     .output(GetAppPlanOutputSchema)
     .query(getAppPlan),
@@ -369,35 +340,29 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(SetOgThemeInput)
     .mutation(setOgTheme),
   getOgTheme: t.procedure
-    .use(Analytics)
     .input(AppClientIdParamSchema)
     .output(GetOgThemeOutput)
     .query(getOgTheme),
   deleteSubscriptionPlans: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(DeleteSubscriptionPlansInput)
     .mutation(deleteSubscriptionPlans),
   reconcileAppSubscriptions: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(ReconcileAppSubscriptionsInputSchema)
     .mutation(reconcileAppSubscriptions),
   listGroupApps: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .output(ListGroupAppsOutput)
     .query(listGroupApps),
   transferAppToGroup: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(OwnAppsMiddleware)
@@ -405,7 +370,6 @@ export const appRouter = t.router({
     .mutation(transferAppToGroup),
   getAppNameBatch: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAppNameBatchInput)
     .output(GetAppNameBatchOutput)
     .query(getAppNameBatch),
@@ -413,7 +377,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(SetExternalAppDataPackageInputSchema)
     .mutation(setExternalAppDataPackage),

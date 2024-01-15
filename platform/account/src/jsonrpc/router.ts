@@ -58,7 +58,6 @@ import {
 } from './methods/initSmartContractWallet'
 import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
-import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { setAccountNodeClient } from './middlewares/setAccountNodeClient'
 import {
   SetAccountNicknameInput,
@@ -158,8 +157,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    // .use(injectCustomAnalytics)
-    .use(Analytics)
     .input(ResolveIdentityInput)
     .output(ResolveIdentityOutput)
     .query(resolveIdentityMethod),
@@ -170,19 +167,16 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(GetIdentityInput)
     .output(GetIdentityOutput)
     .query(getIdentityMethod),
   getIdentityByAlias: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetIdentityByAliasInput)
     .output(GetIdentityByAliasOutput)
     .query(getIdentityByAliasMethod),
   registerSessionKey: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(RegisterSessionKeyInput)
     .output(RegisterSessionKeyOutput)
     .mutation(registerSessionKeyMethod),
@@ -193,7 +187,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(SetIdentityInput)
     .output(SetIdentityOutput)
     .mutation(setIdentityMethod),
@@ -204,7 +197,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .output(GetAccountAvatarOutput)
     .query(getAccountAvatarMethod),
   getAccountProfile: t.procedure
@@ -214,7 +206,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .output(GetAccountProfileOutput)
     .query(getAccountProfileMethod),
   getAccountProfileBatch: t.procedure
@@ -224,7 +215,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(GetAccountProfileBatchInput)
     .output(GetAccountProfileBatchOutput)
     .query(getAccountProfileBatchMethod),
@@ -234,14 +224,12 @@ export const appRouter = t.router({
     .use(checkCryptoNodes)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(SetAccountNicknameInput)
     .query(setAccountNicknameMethod),
   generateEmailOTP: t.procedure
     .use(LogUsage)
     .use(parse3RN)
     .use(setAccountNodeClient)
-    .use(Analytics)
     .input(GenerateEmailOTPInput)
     .output(GenerateEmailOTPOutput)
     .mutation(generateEmailOTPMethod),
@@ -249,7 +237,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(setAccountNodeClient)
-    .use(Analytics)
     .input(VerifyEmailOTPInput)
     .output(VerifyEmailOTPOutput)
     .mutation(verifyEmailOTPMethod),
@@ -258,7 +245,6 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(checkCryptoNodes)
     .use(setAccountNodeClient)
-    .use(Analytics)
     .input(GetNonceInput)
     .output(GetNonceOutput)
     .query(getNonceMethod),
@@ -267,7 +253,6 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(checkCryptoNodes)
     .use(setAccountNodeClient)
-    .use(Analytics)
     .input(VerifyNonceInput)
     .output(VerifyNonceOutput)
     .mutation(verifyNonceMethod),
@@ -277,7 +262,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .output(GetOAuthDataOutput)
     .query(getOAuthDataMethod),
   setOAuthData: t.procedure
@@ -286,7 +270,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(SetOAuthDataInput)
     .mutation(setOAuthDataMethod),
   getWebAuthNData: t.procedure
@@ -295,7 +278,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .output(GetWebAuthNDataOutput)
     .query(getWebAuthNDataMethod),
   setWebAuthNData: t.procedure
@@ -304,7 +286,6 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(SetWebAuthNInput)
     .mutation(setWebAuthNDataMethod),
   initSmartContractWallet: t.procedure
@@ -320,55 +301,45 @@ export const appRouter = t.router({
     .use(checkCryptoNodes)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
   getAccountLinks: t.procedure
     .use(LogUsage)
     .use(parse3RN)
-    .use(Analytics)
     .output(GetAccountLinksOutput)
     .query(getAccountLinks),
   revokeWalletSessionKey: t.procedure
     .use(LogUsage)
     .use(parse3RN)
-    .use(Analytics)
     .input(RevokeWalletSessionKeyInput)
     .mutation(revokeWalletSessionKeyMethod),
   revokeWalletSessionKeyBatch: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(RevokeWalletSessionKeyBatchInput)
     .mutation(revokeWalletSessionKeyBatchMethod),
   sendBillingNotification: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(SendBillingNotificationInput)
     .mutation(sendBillingNotificationMethod),
   sendReconciliationNotification: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(SendReconciliationNotificationInput)
     .query(sendReconciliationNotificationMethod),
   sendFailedPaymentNotification: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(SendFailedPaymentNotificationInput)
     .mutation(sendFailedPaymentNotificationMethod),
   sendSuccessfulPaymentNotification: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(SendSuccessfulPaymentNotificationInput)
     .mutation(sendSuccessfulPaymentNotificationMethod),
   getAccountURNForEmail: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAccountURNForEmailInputSchema)
     .output(GetAccountURNForEmailOutputSchema)
     .query(getAccountURNForEmailMethod),
   connectIdentityGroupEmail: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(parse3RN)
@@ -381,7 +352,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(setAccountNodeClient)
-    .use(Analytics)
     .input(GetMaskedAddressInput)
     .output(GetMaskedAddressOutput)
     .query(getMaskedAddressMethod),
@@ -390,7 +360,6 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(GetSourceAccountInput)
     .output(GetSourceAccountOutput)
     .query(getSourceAccountMethod),
@@ -399,7 +368,6 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(setAccountNodeClient)
     .use(initAccountNode)
-    .use(Analytics)
     .input(SetSourceAccountInput)
     .output(SetSourceAccountOutput)
     .mutation(setSourceAccountMethod),

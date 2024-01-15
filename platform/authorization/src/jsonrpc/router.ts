@@ -37,7 +37,6 @@ import { getJWKSMethod, GetJWKSMethodOutput } from './methods/getJWKS'
 
 import { LogUsage } from '@proofzero/platform-middleware/log'
 
-import { Analytics } from '@proofzero/platform-middleware/analytics'
 import {
   GetUserInfoInput,
   getUserInfoMethod,
@@ -86,45 +85,21 @@ const t = initTRPC.context<Context>().create({ errorFormatter })
 export const appRouter = t.router({
   authorize: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(AuthorizeMethodInput)
     .output(AuthorizeMethodOutput)
     .mutation(authorizeMethod),
   preauthorize: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(PreAuthorizeMethodInput)
     .output(PreAuthorizeMethodOutput)
     .mutation(preauthorizeMethod),
   exchangeToken: t.procedure
     .use(LogUsage)
-    .use(({ ctx, path, type, next, input, rawInput, meta }) => {
-      const typedInput = rawInput as { clientId: string; grantType: string }
-      const newCtx = {
-        ...ctx,
-        CustomAnalyticsFunction: () => {
-          return {
-            indexes: [typedInput['clientId']],
-            blobs: [typedInput['grantType']],
-          }
-        },
-      }
-      return Analytics({
-        ctx: newCtx,
-        path,
-        type,
-        next,
-        input,
-        rawInput,
-        meta,
-      })
-    })
     .input(ExchangeTokenMethodInput)
     .output(ExchangeTokenMethodOutput)
     .mutation(exchangeTokenMethod),
   verifyToken: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(VerifyTokenMethodInput)
     .output(VerifyTokenMethodOutput)
     .query(verifyTokenMethod),
@@ -134,7 +109,6 @@ export const appRouter = t.router({
     .use(RequireIdentity)
     .use(setAuthorizationNode)
     .use(LogUsage)
-    .use(Analytics)
     .input(RevokeTokenMethodInput)
     .output(RevokeTokenMethodOutput)
     .mutation(revokeTokenMethod),
@@ -142,39 +116,33 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(RevokeAppAuthorizationMethodInput)
     .output(RevokeAppAuthorizationMethodOutput)
     .mutation(revokeAppAuthorizationMethod),
   getUserInfo: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetUserInfoInput)
     .output(GetUserInfoOutput)
     .query(getUserInfoMethod),
   getPersonaData: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetPersonaDataInput)
     .output(GetPersonaDataOutput)
     .query(getPersonaDataMethod),
   getAuthorizedAppScopes: t.procedure
     .use(LogUsage)
     .use(ValidateJWT)
-    .use(Analytics)
     .input(GetAuthorizedAppScopesMethodInput)
     .output(GetAuthorizedAppScopesMethodOutput)
     .query(getAuthorizedAppScopesMethod),
   getJWKS: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .output(GetJWKSMethodOutput)
     .query(getJWKSMethod),
   getAppData: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAppDataInput)
     .output(GetAppDataOutput)
     .query(getAppDataMethod),
@@ -182,21 +150,18 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(SetAppDataInput)
     .mutation(setAppDataMethod),
   setExternalAppData: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(SetExternalAppDataInputSchema)
     .mutation(setExternalAppDataMethod),
   getExternalAppData: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(GetExternalAppDataInputSchema)
     .output(GetExternalAppDataOutputSchema)
     .query(getExternalAppDataMethod),

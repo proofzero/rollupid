@@ -30,7 +30,6 @@ import {
 
 import { LogUsage } from '@proofzero/platform-middleware/log'
 
-import { Analytics } from '@proofzero/platform-middleware/analytics'
 import {
   updateNodeCompsMethod,
   UpdateNodeCompsMethodInput,
@@ -47,43 +46,36 @@ const t = initTRPC.context<Context>().create({ errorFormatter })
 export const appRouter = t.router({
   findNode: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(FindNodeMethodInput)
     .output(FindNodeMethodOutput)
     .query(findNodeMethod),
   findNodeBatch: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(FindNodeBatchMethodInput)
     .output(FindNodeBatchMethodOutput)
     .query(findNodeBatchMethod),
   deleteNode: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(DeleteNodeMethodInput)
     .output(DeleteNodeMethodOutput)
     .mutation(deleteNodeMethod),
   updateNode: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(UpdateNodeCompsMethodInput)
     .output(UpdateNodeCompsMethodOutput)
     .mutation(updateNodeCompsMethod),
   getEdges: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetEdgesMethodInput)
     .output(GetEdgesMethodOutput)
     .query(getEdgesMethod),
   makeEdge: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(MakeEdgeMethodInput)
     .output(MakeEdgeMethodOutput)
     .mutation(makeEdgeMethod),
   removeEdge: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(RemoveEdgeMethodInput)
     .output(RemoveEdgeMethodOutput)
     .mutation(removeEdgeMethod),

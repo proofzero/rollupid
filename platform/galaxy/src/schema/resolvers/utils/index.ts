@@ -12,8 +12,6 @@ import {
   isFromCFBinding,
 } from '@proofzero/utils'
 
-import { WriteAnalyticsDataPoint } from '@proofzero/packages/platform-clients/analytics'
-
 import {
   generateTraceContextHeaders,
   TraceSpan,
@@ -253,20 +251,6 @@ export async function getRPCResult(response: Response) {
   }
   return json.result?.value
 }
-
-export const logAnalytics =
-  () => (next) => async (root, args, context, info) => {
-    const method = info?.operation?.name?.value || 'unknown'
-    const type = [info?.operation?.operation || 'unknown', 'gql'].join(':')
-
-    const datapoint: AnalyticsEngineDataPoint = {
-      blobs: [method, type, context.apiKey],
-    }
-
-    WriteAnalyticsDataPoint(context, datapoint)
-
-    return next(root, args, context, info)
-  }
 
 export const getConnectedAccounts = async ({
   identityURN,

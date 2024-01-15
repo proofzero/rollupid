@@ -1,5 +1,3 @@
-import { DeploymentMetadata } from '@proofzero/types'
-
 export interface Environment {
   UsageKV: KVNamespace
 
@@ -15,9 +13,6 @@ export interface Environment {
   Core: Fetcher
   Email: Fetcher
   Images: Fetcher
-
-  Analytics?: AnalyticsEngineDataset
-  ServiceDeploymentMetadata?: DeploymentMetadata
 
   PASSPORT_URL: string
   INTERNAL_PASSPORT_SERVICE_NAME: string

@@ -1,9 +1,4 @@
-import { DeploymentMetadata } from '@proofzero/types'
-
 export interface Environment {
-  Analytics?: AnalyticsEngineDataset
-  ServiceDeploymentMetadata?: DeploymentMetadata
-
   NotificationFromName: string
   NotificationFromUser: string
   KEY_DKIM_PRIVATEKEY: string

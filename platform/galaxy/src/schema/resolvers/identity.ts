@@ -6,7 +6,6 @@ import {
   setupContext,
   isAuthorized,
   validateApiKey,
-  logAnalytics,
   getConnectedAccounts,
   temporaryConvertToPublic,
   requestLogging,
@@ -155,19 +154,16 @@ const ProfileResolverComposition = {
     requestLogging(),
     setupContext(),
     validateApiKey(),
-    logAnalytics(),
   ],
   'Query.authorizedApps': [
     requestLogging(),
     setupContext(),
     validateApiKey(),
-    logAnalytics(),
   ],
   'Query.connectedAccounts': [
     requestLogging(),
     setupContext(),
     validateApiKey(),
-    logAnalytics(),
     temporaryConvertToPublic(),
   ],
 
@@ -176,7 +172,6 @@ const ProfileResolverComposition = {
     setupContext(),
     validateApiKey(),
     isAuthorized(),
-    logAnalytics(),
   ],
 }
 

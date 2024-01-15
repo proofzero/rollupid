@@ -3,7 +3,6 @@ import type { Resolvers } from './typedefs'
 import {
   validateApiKey,
   isAuthorized,
-  logAnalytics,
   requestLogging,
   setupContext,
   validateJWTAndAPIKeyPresence,
@@ -58,7 +57,6 @@ const AuthorizationResolverComposition = {
     validateJWTAndAPIKeyPresence(),
     validateApiKey(),
     isAuthorized(),
-    logAnalytics(),
   ],
   'Mutation.setExternalAppData': [
     requestLogging(),
@@ -66,7 +64,6 @@ const AuthorizationResolverComposition = {
     validateJWTAndAPIKeyPresence(),
     validateApiKey(),
     isAuthorized(),
-    logAnalytics(),
   ],
 }
 

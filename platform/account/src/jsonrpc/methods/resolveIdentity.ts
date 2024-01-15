@@ -8,7 +8,6 @@ import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
 import type { Context } from '../../context'
 import { IDENTITY_OPTIONS } from '../../constants'
 
-import { WriteAnalyticsDataPoint } from '@proofzero/platform-clients/analytics'
 import { createAnalyticsEvent } from '@proofzero/packages/utils/analytics'
 
 import * as jose from 'jose'
@@ -63,11 +62,6 @@ export const resolveIdentityMethod = async ({
 
     resultURN = urn
   }
-
-  // TODO: use "caller" for create so we don't need these special cases
-  WriteAnalyticsDataPoint(ctx, {
-    blobs: [ctx.alias, resultURN, eventName],
-  } as AnalyticsEngineDataPoint)
 
   ctx.waitUntil?.(
     createAnalyticsEvent({

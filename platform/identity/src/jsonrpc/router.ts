@@ -34,7 +34,6 @@ import { LogUsage } from '@proofzero/platform-middleware/log'
 import { Scopes } from '@proofzero/platform-middleware/scopes'
 
 import { initIdentityNodeByName } from '../nodes'
-import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { getPublicAccountsMethod } from './methods/getPublicAccounts'
 import {
   GetAuthorizedAppsMethodInput,
@@ -125,7 +124,6 @@ export const appRouter = t.router({
   getProfile: t.procedure
     .use(Scopes)
     .use(LogUsage)
-    .use(Analytics)
     .input(GetProfileInput)
     .output(GetProfileOutput)
     .query(getProfileMethod),
@@ -135,7 +133,6 @@ export const appRouter = t.router({
     .use(Scopes)
     .use(injectIdentityNode)
     .use(LogUsage)
-    .use(Analytics)
     .input(SetProfileInput)
     .mutation(setProfileMethod),
   isValid: t.procedure
@@ -143,7 +140,6 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(injectIdentityNode)
     .use(LogUsage)
-    .use(Analytics)
     .output(IsValidOutput)
     .query(isValidMethod),
   getAccounts: t.procedure
@@ -151,7 +147,6 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAccountsInput)
     // .output(AccountListSchema)
     .query(getAccountsMethod),
@@ -160,13 +155,11 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAccountsInput)
     // .output(AccountListSchema)
     .query(getOwnAccountsMethod),
   getPublicAccounts: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetAccountsInput)
     // .output(AccountListSchema)
     .query(getPublicAccountsMethod),
@@ -175,7 +168,6 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
-    .use(Analytics)
     .input(HasAccountsInput)
     .output(HasAccountsOutput)
     .mutation(hasAccountsMethod),
@@ -198,7 +190,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(CreateIdentityGroupInputSchema)
     .output(CreateIdentityGroupOutputSchema)
     .mutation(createIdentityGroup),
@@ -206,40 +197,34 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .output(ListIdentityGroupsOutputSchema)
     .query(listIdentityGroups),
   listPaymentFailedIdentityGroups: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .output(ListPaymentFailedIdentityGroupsOutputSchema)
     .query(listPaymentFailedIdentityGroups),
   inviteIdentityGroupMember: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(InviteIdentityGroupMemberInputSchema)
     .mutation(inviteIdentityGroupMember),
   getIdentityGroupMemberInvitations: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .use(Analytics)
     .input(GetIdentityGroupMemberInvitationsInputSchema)
     .output(GetIdentityGroupMemberInvitationsOutputSchema)
     .query(getIdentityGroupMemberInvitations),
   getIdentityGroupMemberInvitationDetails: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetIdentityGroupMemberInvitationDetailsInputSchema)
     .output(GetIdentityGroupMemberInvitationDetailsOutputSchema)
     .query(getIdentityGroupMemberInvitationDetails),
   acceptIdentityGroupMemberInvitation: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireIdentity)
@@ -248,13 +233,11 @@ export const appRouter = t.router({
   getProfileBatch: t.procedure
     .use(Scopes)
     .use(LogUsage)
-    .use(Analytics)
     .input(GetProfileBatchInput)
     .output(GetProfileBatchOutput)
     .query(getProfileBatchMethod),
   deleteIdentityGroup: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireIdentity)
@@ -262,7 +245,6 @@ export const appRouter = t.router({
     .mutation(deleteIdentityGroup),
   deleteIdentityGroupMembership: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireIdentity)
@@ -270,20 +252,17 @@ export const appRouter = t.router({
     .mutation(deleteIdentityGroupMembership),
   purgeIdentityGroupMemberships: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireIdentity)
     .mutation(purgeIdentityGroupMemberships),
   hasIdentityGroupPermissions: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(HasIdentityGroupPermissionsInputSchema)
     .output(HasIdentityGroupPermissionsOutputSchema)
     .query(hasIdentityGroupPermissions),
   deleteIdentityGroupInvitation: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireIdentity)
@@ -291,7 +270,6 @@ export const appRouter = t.router({
     .mutation(deleteIdentityGroupInvitation),
   patchProfileFields: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireIdentity)
@@ -300,7 +278,6 @@ export const appRouter = t.router({
     .mutation(patchProfileFieldsMethod),
   resetProfileFields: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireIdentity)

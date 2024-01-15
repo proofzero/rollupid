@@ -27,15 +27,6 @@ import type { Environment } from './types'
 
 export const GeoContext = 'com.kubelt.geo/location'
 
-export type DeploymentMetadata = {
-  name: string
-  deployment: {
-    id: string
-    number: number
-    timestamp: string
-  }
-}
-
 /**
  * Defines your inner context shape.
  * Add fields here that the inner context brings.
