@@ -3,7 +3,6 @@ import { initTRPC } from '@trpc/server'
 import { errorFormatter } from '@proofzero/utils/trpc'
 
 import type { Context } from '../context'
-import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { LogUsage } from '@proofzero/platform-middleware/log'
 import {
   CancelServicePlansInput,
@@ -49,51 +48,42 @@ const t = initTRPC.context<Context>().create({ errorFormatter })
 export const appRouter = t.router({
   getEntitlements: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetEntitlementsInputSchema)
     .output(GetEntitlementsOutputSchema)
     .query(getEntitlements),
   updateEntitlements: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(UpdateEntitlementsInputSchema)
     .mutation(updateEntitlements),
   getStripePaymentData: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetStripPaymentDataInputSchema)
     .output(GetStripePaymentDataOutputSchema)
     .query(getStripePaymentData),
   setStripePaymentData: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(SetStripePaymentDataInputSchema)
     .mutation(setStripePaymentData),
   cancelServicePlans: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(CancelServicePlansInput)
     .mutation(cancelServicePlans),
   getUsedIdentityGroupSeats: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetUsedIdentityGroupSeatsInputSchema)
     .output(GetUsedIdentityGroupSeatsOutputSchema)
     .query(getUsedIdentityGroupSeats),
   getIdentityGroupSeats: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(GetIdentityGroupSeatsInputSchema)
     .output(GetIdentityGroupSeatsOutputSchema)
     .query(getIdentityGroupSeats),
   updateIdentityGroupSeats: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(UpdateIdentityGroupSeatsInputSchema)
     .mutation(updateIdentityGroupSeats),
   setPaymentFailed: t.procedure
     .use(LogUsage)
-    .use(Analytics)
     .input(SetPaymentFailedInput)
     .mutation(setPaymentFailed),
 })
