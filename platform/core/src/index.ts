@@ -7,7 +7,6 @@ import { serverOnError as onError } from '@proofzero/utils/trpc'
 
 import { createContext, type Context, createContextInner } from './context'
 import router from './router'
-import relay, { type CloudflareEmailMessage } from './relay'
 import {
   CoreQueueMessage,
   CoreQueueMessageType,
@@ -46,19 +45,6 @@ export default {
         return createContext(opts, env)
       },
     })
-  },
-  async email(message: CloudflareEmailMessage, env: Environment) {
-    const decoder = new TextDecoder()
-    const reader = message.raw.getReader()
-
-    let content = ''
-    let { done, value } = await reader.read()
-    while (!done) {
-      content += decoder.decode(value)
-      ;({ done, value } = await reader.read())
-    }
-
-    return relay(content, env)
   },
   async queue(
     batch: MessageBatch<CoreQueueMessage>,

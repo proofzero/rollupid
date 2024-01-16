@@ -1,0 +1,11 @@
+# This is a singleton service and doesn't require per-env configs
+name = "relaydistributor"
+main = "src/index.ts"
+compatibility_date = "2022-10-05"
+logpush = true
+workers_dev = false
+
+[dev]
+port = 10145
+inspector_port = 11145
+local_protocol = "http"
