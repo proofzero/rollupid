@@ -180,6 +180,55 @@ export const updateSubscription = async (
   return subscription
 }
 
+export const changePriceID = async ({
+  subscriptionID,
+  oldPriceID,
+  newPriceID,
+  stripeClient,
+}: {
+  subscriptionID: string
+  oldPriceID: string
+  newPriceID: string
+  stripeClient: Stripe
+}) => {
+  let subscription = await stripeClient.subscriptions.retrieve(subscriptionID)
+  const oldPriceItem = subscription.items.data.find(
+    (i) => i.price.id === oldPriceID
+  )
+  if (!oldPriceItem)
+    throw new InternalServerError({
+      message: 'Old price not found',
+    })
+
+  subscription = await stripeClient.subscriptions.update(subscription.id, {
+    proration_behavior: 'always_invoice',
+    items: [
+      {
+        id: oldPriceItem.id,
+        price: newPriceID,
+      },
+    ],
+    payment_behavior: 'pending_if_incomplete',
+    expand: ['latest_invoice.payment_intent'],
+  })
+
+  return subscription
+}
+
+export const cancelSubscription = async ({
+  subscriptionID,
+  stripeClient,
+}: {
+  subscriptionID: string
+  stripeClient: Stripe
+}) => {
+  const subscription = await stripeClient.subscriptions.cancel(subscriptionID, {
+    prorate: true,
+  })
+
+  return subscription
+}
+
 export const updateSubscriptionMetadata = async (
   {
     id,

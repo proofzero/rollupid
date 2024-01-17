@@ -11,6 +11,7 @@ export const ExternalAppDataPackageDetailsSchema = z.object({
   title: z.string(),
   reads: z.number(),
   writes: z.number(),
+  subscriptionID: z.string(),
 })
 
 export const ExternalAppDataPackageDefinitionSchema = z.object({
