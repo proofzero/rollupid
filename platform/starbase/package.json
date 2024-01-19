@@ -17,7 +17,7 @@
     "types:check": "tsc --project tsconfig.json --noEmit"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20221111.1",
+    "@cloudflare/workers-types": "4.20231121.0",
     "@types/lodash": "4.14.189",
     "@types/node": "18.15.3",
     "esbuild": "0.15.15",

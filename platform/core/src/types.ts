@@ -1,5 +1,24 @@
 import { DeploymentMetadata } from '@proofzero/types'
 
+export enum CoreQueueMessageType {
+  ExternalAppDataDelReq = 'external_app_data_del_req',
+  ExternalAppDataDelSignal = 'external_app_data_del_signal',
+}
+export type CoreQueueMessage =
+  | {
+      type: CoreQueueMessageType.ExternalAppDataDelReq
+      data: {
+        appID: string
+        athID: string
+      }
+    }
+  | {
+      type: CoreQueueMessageType.ExternalAppDataDelSignal
+      data: {
+        appIDSet: string[]
+      }
+    }
+
 export interface Environment {
   UsageKV: KVNamespace
 
@@ -11,6 +30,8 @@ export interface Environment {
   StarbaseApp: DurableObjectNamespace
 
   EDGES: D1Database
+
+  COREQUEUE: Queue<CoreQueueMessage>
 
   Core: Fetcher
   Email: Fetcher

@@ -16,7 +16,7 @@
     "test": "run-s check"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20221111.1",
+    "@cloudflare/workers-types": "4.20231121.0",
     "@types/node": "18.15.3",
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",

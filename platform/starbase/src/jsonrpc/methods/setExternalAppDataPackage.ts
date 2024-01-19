@@ -13,6 +13,8 @@ import {
 } from '@proofzero/urns/identity-group'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 import { getErrorCause } from '@proofzero/utils/errors'
+import { ExternalAppDataPackageStatus } from '../validators/externalAppDataPackageDefinition'
+import { CoreQueueMessageType } from '@proofzero/platform.core/src/types'
 
 export const SetExternalAppDataPackageInputSchema =
   AppClientIdParamSchema.extend({
@@ -56,13 +58,37 @@ export const setExternalAppDataPackage = async ({
   }
 
   const appDO = await getApplicationNodeByClientId(
-    input.clientId,
+    clientId,
     ctx.env.StarbaseApp
   )
+
+  const { externalAppDataPackageDefinition } = await appDO.class.getDetails()
+  if (
+    externalAppDataPackageDefinition?.status ===
+    ExternalAppDataPackageStatus.Deleting
+  ) {
+    throw new InternalServerError({
+      message: 'External app data is being deleted',
+    })
+  }
 
   const { error } = await appDO.class.setExternalAppDataPackage(
     clientId,
     packageType
   )
   if (error) throw getErrorCause(error)
+
+  if (!packageType) {
+    await ctx.env.COREQUEUE.send(
+      {
+        type: CoreQueueMessageType.ExternalAppDataDelSignal,
+        data: {
+          appIDSet: [clientId],
+        },
+      },
+      {
+        contentType: 'json',
+      }
+    )
+  }
 }

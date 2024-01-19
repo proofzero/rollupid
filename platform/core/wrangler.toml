@@ -36,6 +36,16 @@ database_name = "edges-v2"
 database_id = "local"
 migrations_dir = "../edges/migrations"
 
+[[queues.producers]]
+  queue = "core-queue"
+  binding = "COREQUEUE"
+
+[[queues.consumers]]
+  queue = "core-queue"
+  max_batch_size = 100
+  max_concurrency = 1
+  dead_letter_queue = "core-queue-dlq"
+
 [vars]
 ENVIRONMENT = "local"
 

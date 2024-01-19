@@ -24,6 +24,7 @@ import type {
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
+  ExternalAppDataPackageDetails,
 } from '../types'
 import {
   AppTheme,
@@ -48,6 +49,7 @@ import {
   ExternalStorageAlreadyDisabledError,
   ExternalStorageAlreadyEnabledError,
 } from '../errors'
+import { ExternalAppDataPackageStatus } from '../jsonrpc/validators/externalAppDataPackageDefinition'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -359,12 +361,13 @@ export default class StarbaseApplication extends DOProxy {
       externalStorageUsageReadKey
     )
 
-    const packageDetails = packageType
-      ? {
-          packageType,
-          ...ExternalAppDataPackages[packageType],
-        }
-      : undefined
+    const packageDetails: ExternalAppDataPackageDetails | undefined =
+      packageType
+        ? {
+            packageType,
+            ...ExternalAppDataPackages[packageType],
+          }
+        : undefined
 
     if (packageDetails) {
       if (externalStorageWrites && externalStorageReads) {
@@ -403,15 +406,60 @@ export default class StarbaseApplication extends DOProxy {
     }
 
     if (packageDetails) {
-      await this.state.storage.put(
+      await this.state.storage.put<ExternalAppDataPackageDefinition>(
         'externalAppDataPackageDefinition',
-        packageDetails
+        {
+          packageDetails,
+          status: ExternalAppDataPackageStatus.Enabled,
+        }
       )
     } else {
-      await this.state.storage.delete('externalAppDataPackageDefinition')
+      const currentPackageDefinition =
+        await this.state.storage.get<ExternalAppDataPackageDefinition>(
+          'externalAppDataPackageDefinition'
+        )
+      if (!currentPackageDefinition) {
+        throw new InternalServerError({
+          message:
+            'No existing package definition found when attempting cancellation',
+        })
+      }
+
+      await this.state.storage.put<ExternalAppDataPackageDefinition>(
+        'externalAppDataPackageDefinition',
+        {
+          packageDetails: currentPackageDefinition.packageDetails,
+          status: ExternalAppDataPackageStatus.Deleting,
+        }
+      )
     }
 
     return { value: true }
+  }
+
+  async setQueueLimitAndOffset(
+    input:
+      | {
+          limit: number
+          offset: number
+        }
+      | undefined
+  ): Promise<void> {
+    if (!input) {
+      await this.state.storage.delete('deletionQuery')
+    } else {
+      await this.state.storage.put('deletionQuery', input)
+    }
+  }
+
+  async getQueueLimitAndOffset(): Promise<
+    | {
+        limit: number
+        offset: number
+      }
+    | undefined
+  > {
+    return this.state.storage.get('deletionQuery')
   }
 
   async deleteAppPlan(): Promise<boolean> {

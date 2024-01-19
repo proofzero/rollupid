@@ -6,11 +6,11 @@ logpush = true
 node_compat = true
 workers_dev = false
 
+[env.dev]
 kv_namespaces = [
   { binding = "UsageKV", id = "aa6e9a9c024c4ff495524e0d227b7c63" },
 ]
 
-[env.dev]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },
   { name = "Authorization", class_name = "Authorization" },
@@ -37,6 +37,16 @@ binding = "EDGES"
 database_name = "edges-v2-dev"
 database_id = "bd11ba92-bfcf-4d37-8224-d57467cced48"
 migrations_dir = "../edges/migrations"
+
+[[env.dev.queues.producers]]
+  queue = "core-queue-dev"
+  binding = "COREQUEUE"
+
+[[env.dev.queues.consumers]]
+  queue = "core-queue-dev"
+  max_batch_size = 100
+  max_concurrency = 1
+  dead_letter_queue = "core-queue-dev-dlq"
 
 [env.dev.vars]
 ENVIRONMENT = "dev"
