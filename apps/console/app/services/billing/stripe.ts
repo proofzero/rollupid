@@ -305,6 +305,33 @@ export const voidInvoice = async (
   await stripeClient.invoices.voidInvoice(invoiceId)
 }
 
+export const createInvoice = async (
+  stripeClient: Stripe,
+  customerID: string,
+  subscriptionID: string,
+  priceID: string,
+  autopay: boolean = false
+) => {
+  let invoice = await stripeClient.invoices.create({
+    customer: customerID,
+    subscription: subscriptionID,
+  })
+
+  await stripeClient.invoiceItems.create({
+    customer: customerID,
+    price: priceID,
+    invoice: invoice.id,
+  })
+
+  if (autopay) {
+    await stripeClient.invoices.pay(invoice.id)
+  }
+
+  invoice = await stripeClient.invoices.retrieve(invoice.id)
+
+  return invoice
+}
+
 export const reconcileSubscriptions = async (
   {
     subscriptionID,
