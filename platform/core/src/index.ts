@@ -181,15 +181,11 @@ export default {
         try {
           const { appID, athID } = msg.body.data
 
-          try {
-            const nss = `${appID}@${athID}`
-            const urn = AuthorizationURNSpace.componentizedUrn(nss)
+          const nss = `${appID}@${athID}`
+          const urn = AuthorizationURNSpace.componentizedUrn(nss)
 
-            const node = initAuthorizationNodeByName(urn, env.Authorization)
-            await node.storage.delete('externalAppData')
-          } catch (ex) {
-            throw ex
-          }
+          const node = initAuthorizationNodeByName(urn, env.Authorization)
+          await node.storage.delete('externalAppData')
 
           msg.ack()
         } catch (ex) {
