@@ -1,0 +1,55 @@
+name: Next Relay Processor
+
+on:
+  push:
+    tags:
+      - '*'
+
+defaults:
+  run:
+    working-directory: platform/relayprocessor
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: next
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build ../platform.nix
+
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Test
+        run: yarn run test
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          wranglerVersion: '3.19.0'
+          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: platform/relayprocessor
+          command: publish --config wrangler.next.toml --env next
+          environment: 'next'
+          secrets: |
+            SECRET_RELAY_DISTRIBUTION_MAP
+            INTERNAL_RELAY_DISTRIBUTION_KEY
+
+        env:
+          SECRET_RELAY_DISTRIBUTION_MAP: ${{ secrets.SECRET_RELAY_DISTRIBUTION_MAP }}
+          INTERNAL_RELAY_DISTRIBUTION_KEY: ${{secrets.INTERNAL_RELAY_DISTRIBUTION_KEY_TEST }}

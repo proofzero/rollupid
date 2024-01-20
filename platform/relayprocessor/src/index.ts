@@ -23,18 +23,6 @@ export default {
   },
 }
 
-const getSourceEmailAddress = async (
-  alias: string,
-  env: Environment
-): Promise<string> => {
-  const coreClient = getCoreClient(env)
-  const sourceAccountFromMaskedEmail =
-    await coreClient.account.getSourceFromMaskedAddress.query({
-      maskedEmail: alias,
-    })
-  return sourceAccountFromMaskedEmail.sourceEmail
-}
-
 const getCoreClient = (env: Environment) => {
   //New trace as entrypoint is the email trigger and not an HTTP request
   const headers = generateTraceContextHeaders(generateTraceSpan())

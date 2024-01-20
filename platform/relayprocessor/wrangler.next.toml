@@ -5,13 +5,13 @@ compatibility_date = "2022-10-05"
 logpush = true
 workers_dev = false
 
-[env.dev]
+[env.next]
 port = 10146
 inspector_port = 11146
 local_protocol = "http"
 
 services = [{ binding = "Core", service = "core-next" }]
 
-[env.dev.vars]
+[env.next.vars]
 INTERNAL_RELAY_DKIM_DOMAIN = "rollup.email"
 INTERNAL_RELAY_DKIM_SELECTOR = "mailchannels"

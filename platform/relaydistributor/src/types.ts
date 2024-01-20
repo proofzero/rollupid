@@ -1,5 +1,5 @@
 export interface Environment {
-  SECRET_RELAY_DISTRIBUTION_MAP: { [addressEnvSuffix: string]: string }
+  SECRET_RELAY_DISTRIBUTION_MAP: string //containing JSON
 }
 
 /** CF EmailMessage type; not provided in CF types lib */
