@@ -1,5 +1,5 @@
 # This is a singleton service and doesn't require per-env configs
-name = "relaydistributor"
+name = "emaildistributor"
 main = "src/index.ts"
 compatibility_date = "2022-10-05"
 logpush = true

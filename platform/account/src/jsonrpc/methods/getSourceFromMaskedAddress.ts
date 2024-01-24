@@ -4,9 +4,13 @@ import { EDGE_ACCOUNT } from '@proofzero/platform.account/src/constants'
 import { Context } from '../../context'
 import { EmailAccountType } from '@proofzero/types/account'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+} from '@proofzero/errors'
 import { generateHashedIDRef } from '@proofzero/packages/urns/idref'
-import { initAccountNodeByName } from '../../nodes'
+import { EmailAccount, initAccountNodeByName } from '../../nodes'
 
 export const GetSourceByMaskedAddressInput = z.object({
   maskedEmail: z.string(),
@@ -35,9 +39,10 @@ export const getSourceFromMaskedAddressMethod = async ({
   const urn = AccountURNSpace.componentizedUrn(nss)
   const node = initAccountNodeByName(urn, ctx.env.Account)
 
-  const sourceAccountURN = await node.storage.get<AccountURN>('source-account')
+  const emailNode = new EmailAccount(node, ctx.env)
+  const sourceAccountURN = await emailNode.getSourceAccount()
   if (!sourceAccountURN)
-    throw new BadRequestError({
+    throw new NotFoundError({
       message: `Could not find hidden address ${input.maskedEmail}`,
     })
 

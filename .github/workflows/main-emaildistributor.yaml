@@ -1,4 +1,4 @@
-name: Relay processor
+name: Relay distributor
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: platform/relayprocessor
+    working-directory: platform/emaildistributor
 
 jobs:
   deploy:
@@ -43,11 +43,9 @@ jobs:
           wranglerVersion: '3.19.0'
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: platform/relayprocessor
+          workingDirectory: platform/emaildistributor
           command: publish
           secrets: |
             SECRET_RELAY_DISTRIBUTION_MAP
-            INTERNAL_RELAY_DISTRIBUTION_KEY
         env:
           SECRET_RELAY_DISTRIBUTION_MAP: ${{ secrets.SECRET_RELAY_DISTRIBUTION_MAP }}
-          INTERNAL_RELAY_DISTRIBUTION_KEY: ${{secrets.INTERNAL_RELAY_DISTRIBUTION_KEY_DEV }}

@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: platform/relayprocessor
+    working-directory: platform/emailinbounder
 
 jobs:
   deploy:
@@ -43,7 +43,7 @@ jobs:
           wranglerVersion: '3.19.0'
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: platform/relayprocessor
+          workingDirectory: platform/emailinbounder
           command: publish --config wrangler.next.toml --env next
           environment: 'next'
           secrets: |
