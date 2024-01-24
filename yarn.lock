@@ -7050,6 +7050,32 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@proofzero/services.emaildistributor@workspace:platform/emaildistributor":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/services.emaildistributor@workspace:platform/emaildistributor"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@proofzero/utils": "workspace:*"
+    "@types/node": 18.15.3
+    npm-run-all: 4.1.5
+    typescript: 5.0.4
+    wrangler: 3.18
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/services.emailinbounder@workspace:platform/emailinbounder":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/services.emailinbounder@workspace:platform/emailinbounder"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@proofzero/utils": "workspace:*"
+    "@types/node": 18.15.3
+    npm-run-all: 4.1.5
+    typescript: 5.0.4
+    wrangler: 3.18
+  languageName: unknown
+  linkType: soft
+
 "@proofzero/services.images@workspace:platform/images":
   version: 0.0.0-use.local
   resolution: "@proofzero/services.images@workspace:platform/images"
@@ -7082,32 +7108,6 @@ __metadata:
     eslint-config-prettier: 8.5.0
     npm-run-all: 4.1.5
     prettier: 2.7.1
-    typescript: 5.0.4
-    wrangler: 3.18
-  languageName: unknown
-  linkType: soft
-
-"@proofzero/services.relaydistributor@workspace:platform/relaydistributor":
-  version: 0.0.0-use.local
-  resolution: "@proofzero/services.relaydistributor@workspace:platform/relaydistributor"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@proofzero/utils": "workspace:*"
-    "@types/node": 18.15.3
-    npm-run-all: 4.1.5
-    typescript: 5.0.4
-    wrangler: 3.18
-  languageName: unknown
-  linkType: soft
-
-"@proofzero/services.relayprocessor@workspace:platform/relayprocessor":
-  version: 0.0.0-use.local
-  resolution: "@proofzero/services.relayprocessor@workspace:platform/relayprocessor"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@proofzero/utils": "workspace:*"
-    "@types/node": 18.15.3
-    npm-run-all: 4.1.5
     typescript: 5.0.4
     wrangler: 3.18
   languageName: unknown
