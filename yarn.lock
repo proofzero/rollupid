@@ -7055,7 +7055,6 @@ __metadata:
   resolution: "@proofzero/services.emaildistributor@workspace:platform/emaildistributor"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
-    "@proofzero/types": "workspace:*"
     "@proofzero/utils": "workspace:*"
     "@types/node": 18.15.3
     eslint-config-prettier: 8.8.0
