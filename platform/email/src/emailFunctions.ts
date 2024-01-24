@@ -1,4 +1,3 @@
-import { InternalServerError } from '@proofzero/errors'
 import {
   EmailTemplateBillingReconciledEntitlements,
   EmailTemplateDevReconciledEntitlements,
@@ -9,7 +8,7 @@ import {
   EmailTemplateSuccessfulPayment,
 } from '../emailTemplate'
 import { EmailMessage, EmailNotification } from './types'
-import { CloudflareEmailMessage, EmailContent, Environment } from './types'
+import { EmailContent, Environment } from './types'
 import { Context } from './context'
 import { z } from 'zod'
 import { type EmailPlans } from './jsonrpc/methods/sendSuccesfullPaymentNotification'
@@ -155,11 +154,6 @@ export async function sendNotification(
   }
 
   await send(message, env)
-}
-
-async function forward(message: CloudflareEmailMessage, env: Environment) {
-  //TODO: Implement for masked email
-  throw new InternalServerError({ message: 'Not implemented yet' })
 }
 
 const adjustEmailParams = (params?: Partial<EmailTemplateParams>) => {

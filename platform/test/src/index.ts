@@ -1,6 +1,7 @@
 import { IRequest, RequestLike, Router } from 'itty-router'
+import type { CloudflareEmailMessage } from '@proofzero/packages/types/email'
 
-import type { Environment, CloudflareEmailMessage } from './types'
+import type { Environment } from './types'
 
 const router = Router() // no "new", as this is not a real class
 

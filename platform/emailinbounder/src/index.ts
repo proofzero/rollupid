@@ -1,4 +1,5 @@
-import type { Environment, CloudflareEmailMessage } from './types'
+import { CloudflareEmailMessage } from '@proofzero/packages/types/email'
+import type { Environment } from './types'
 import createCoreClient from '@proofzero/platform-clients/core'
 
 import {

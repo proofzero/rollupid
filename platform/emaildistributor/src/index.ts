@@ -1,4 +1,5 @@
-import type { Environment, CloudflareEmailMessage } from './types'
+import type { Environment } from './types'
+import type { CloudflareEmailMessage } from '@proofzero/packages/types/email'
 
 export default {
   async email(message: CloudflareEmailMessage, env: Environment) {
@@ -20,7 +21,7 @@ export default {
     ) as [string, string][]
 
     const envKeyPair = distEmailEntries.filter(
-      ([distributorEnvPrefix, _]) => distributorEnvPrefix === envPrefix
+      ([distributorEnvPrefix]) => distributorEnvPrefix === envPrefix
     )
     if (envKeyPair.length !== 1) {
       console.error('Incorrect relay distribution map configuration')
