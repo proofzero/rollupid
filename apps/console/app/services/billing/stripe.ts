@@ -310,11 +310,13 @@ export const createInvoice = async (
   customerID: string,
   subscriptionID: string,
   priceID: string,
-  autopay: boolean = false
+  autopay: boolean = false,
+  metadata?: Stripe.MetadataParam
 ) => {
   let invoice = await stripeClient.invoices.create({
     customer: customerID,
     subscription: subscriptionID,
+    metadata,
   })
 
   await stripeClient.invoiceItems.create({

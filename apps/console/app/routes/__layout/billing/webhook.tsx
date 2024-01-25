@@ -16,6 +16,11 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
+import {
+  UsageCategory,
+  generateUsageKey,
+  getStoredUsageWithMetadata,
+} from '@proofzero/utils/usage'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -218,7 +223,49 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         break
+      case 'invoice.finalized':
+        const { lines, metadata } = event.data.object as Stripe.Invoice
 
+        const clientID = metadata?.clientID
+        if (!clientID) {
+          throw new InternalServerError({
+            message: `Could not find clientID in metadata`,
+          })
+        }
+
+        const externalAppDataPackage =
+          await coreClient.starbase.getAppExternalDataPackage.query({
+            clientId: clientID,
+          })
+        if (!externalAppDataPackage) {
+          throw new InternalServerError({
+            message: `Could not find externalAppDataPackage`,
+          })
+        }
+
+        const finalizedPriceIDList = lines.data
+          .filter((ili) => Boolean(ili.price))
+          .map((ili) => ili.price!.id)
+          .filter((val, ind, arr) => arr.indexOf(val) === ind)
+
+        if (
+          finalizedPriceIDList.some(
+            (pi) =>
+              pi ===
+                context.env
+                  .SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID ||
+              pi ===
+                context.env.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID
+          )
+        ) {
+          await coreClient.starbase.externalAppDataLimitIncrement.mutate({
+            clientId: clientID,
+            reads: externalAppDataPackage.reads,
+            writes: externalAppDataPackage.writes,
+          })
+        }
+
+        break
       case 'invoice.payment_failed':
         const { customer: customerFail, payment_intent: paymentIntentFail } =
           event.data.object as Stripe.Invoice

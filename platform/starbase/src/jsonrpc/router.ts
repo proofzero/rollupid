@@ -145,6 +145,15 @@ import {
   setExternalAppDataPackage,
   SetExternalAppDataPackageInputSchema,
 } from './methods/setExternalAppDataPackage'
+import {
+  getAppExternalDataPackage,
+  GetAppExternalDataPackageInputSchema,
+  GetAppExternalDataPackageOutputSchema,
+} from './methods/getAppExternalDataPackage'
+import {
+  ExternalAppDataLimitIncrementInputSchema,
+  externalAppDataLimitIncrementMethod,
+} from './methods/externalAppDataLimitIncrement'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -418,6 +427,17 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(SetExternalAppDataPackageInputSchema)
     .mutation(setExternalAppDataPackage),
+  getAppExternalDataPackage: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppExternalDataPackageInputSchema)
+    .output(GetAppExternalDataPackageOutputSchema)
+    .query(getAppExternalDataPackage),
+  externalAppDataLimitIncrement: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(ExternalAppDataLimitIncrementInputSchema)
+    .mutation(externalAppDataLimitIncrementMethod),
 })
 
 export type StarbaseRouter = typeof appRouter

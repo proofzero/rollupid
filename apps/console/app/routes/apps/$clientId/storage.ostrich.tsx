@@ -94,7 +94,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           .packageType === ExternalAppDataPackageType.STARTER
           ? context.env.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID
           : context.env.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID,
-        true
+        true,
+        {
+          clientID: clientId,
+        }
       )
     }
 
