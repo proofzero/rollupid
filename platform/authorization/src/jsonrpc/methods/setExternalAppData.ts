@@ -8,7 +8,11 @@ import { Context } from '../../context'
 import { initAuthorizationNodeByName } from '../../nodes'
 import type { IdentityURN } from '@proofzero/urns/identity'
 import { AppClientIdParamSchema } from '@proofzero/platform.starbase/src/jsonrpc/validators/app'
-import { UsageCategory, generateUsageKey } from '@proofzero/utils/usage'
+import {
+  UsageCategory,
+  generateUsageKey,
+  getStoredUsageWithMetadata,
+} from '@proofzero/utils/usage'
 
 export const SetExternalAppDataInputSchema = AppClientIdParamSchema.extend({
   payload: z.any(),
@@ -44,31 +48,12 @@ export const setExternalAppDataMethod = async ({
     UsageCategory.ExternalAppDataWrite
   )
 
-  const { value: externalStorageWriteStr, metadata } =
-    await ctx.env.UsageKV.getWithMetadata<{
-      limit?: number
-    }>(externalStorageWriteKey)
-  if (!externalStorageWriteStr) {
-    throw new BadRequestError({
-      message: 'external storage not enabled',
-    })
-  }
-  if (!metadata || !metadata.limit) {
-    throw new BadRequestError({
-      message: 'missing metadata',
-    })
-  }
+  const { numValue: externalStorageWriteNumVal, metadata } =
+    await getStoredUsageWithMetadata(ctx.env.UsageKV, externalStorageWriteKey)
 
-  const externalStorageWritesNum = Number(externalStorageWriteStr)
-  if (isNaN(externalStorageWritesNum)) {
+  if (externalStorageWriteNumVal >= metadata.limit) {
     throw new BadRequestError({
-      message: 'invalid external storage write count',
-    })
-  }
-
-  if (externalStorageWritesNum >= metadata.limit) {
-    throw new BadRequestError({
-      message: 'external storage write limit reached',
+      message: 'external storage read limit reached',
     })
   }
 
@@ -76,7 +61,7 @@ export const setExternalAppDataMethod = async ({
     node.storage.put('externalAppData', payload),
     ctx.env.UsageKV.put(
       externalStorageWriteKey,
-      `${externalStorageWritesNum + 1}`,
+      `${externalStorageWriteNumVal + 1}`,
       {
         metadata,
       }
