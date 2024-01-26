@@ -1,4 +1,4 @@
-name: Relay distributor
+name: Singleton Email distributor
 
 on:
   push:
@@ -46,6 +46,6 @@ jobs:
           workingDirectory: platform/emaildistributor
           command: publish
           secrets: |
-            SECRET_RELAY_DISTRIBUTION_MAP
+            SECRET_EMAIL_DISTRIBUTION_MAP
         env:
-          SECRET_RELAY_DISTRIBUTION_MAP: ${{ secrets.SECRET_RELAY_DISTRIBUTION_MAP }}
+          SECRET_EMAIL_DISTRIBUTION_MAP: ${{ secrets.SECRET_EMAIL_DISTRIBUTION_MAP }}

@@ -1,3 +1,3 @@
 export interface Environment {
-  SECRET_RELAY_DISTRIBUTION_MAP: string //containing JSON
+  SECRET_EMAIL_DISTRIBUTION_MAP: string //containing JSON
 }

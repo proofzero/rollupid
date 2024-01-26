@@ -1,4 +1,4 @@
-name: Next Relay Processor
+name: Next Email inbounder
 
 on:
   push:
@@ -47,9 +47,9 @@ jobs:
           command: publish --config wrangler.next.toml --env next
           environment: 'next'
           secrets: |
-            SECRET_RELAY_DISTRIBUTION_MAP
-            INTERNAL_RELAY_DISTRIBUTION_KEY
+            SECRET_EMAIL_DISTRIBUTION_MAP
+            INTERNAL_EMAIL_DISTRIBUTION_KEY
 
         env:
-          SECRET_RELAY_DISTRIBUTION_MAP: ${{ secrets.SECRET_RELAY_DISTRIBUTION_MAP }}
-          INTERNAL_RELAY_DISTRIBUTION_KEY: ${{secrets.INTERNAL_RELAY_DISTRIBUTION_KEY_TEST }}
+          SECRET_EMAIL_DISTRIBUTION_MAP: ${{ secrets.SECRET_EMAIL_DISTRIBUTION_MAP }}
+          INTERNAL_EMAIL_DISTRIBUTION_KEY: ${{secrets.INTERNAL_EMAIL_DISTRIBUTION_KEY_TEST }}

@@ -57,7 +57,7 @@ const relay = async (message: string, env: Environment) => {
     .concat(email.cc || [])
     .filter((recipient) =>
       recipient.address.endsWith(
-        `.${env.INTERNAL_RELAY_DISTRIBUTION_KEY}@${env.INTERNAL_RELAY_DKIM_DOMAIN}`
+        `.${env.INTERNAL_EMAIL_DISTRIBUTION_KEY}@${env.INTERNAL_RELAY_DKIM_DOMAIN}`
       )
     )
 

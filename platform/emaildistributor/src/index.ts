@@ -17,7 +17,7 @@ export default {
     const envPrefix = userParts[1]
 
     const distEmailEntries = Object.entries(
-      JSON.parse(env.SECRET_RELAY_DISTRIBUTION_MAP)
+      JSON.parse(env.SECRET_EMAIL_DISTRIBUTION_MAP)
     ) as [string, string][]
 
     const envKeyPair = distEmailEntries.filter(
