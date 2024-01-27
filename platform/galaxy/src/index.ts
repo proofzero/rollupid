@@ -25,7 +25,7 @@ const plugins = [
         galaxyApiKey: {
           type: 'apiKey',
           in: 'header',
-          name: 'X-GALAXY-API-KEY',
+          name: 'X-GALAXY-KEY',
           description: 'Galaxy API Key',
         },
         bearerAuthorization: {
