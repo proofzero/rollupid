@@ -212,6 +212,7 @@ export const appRouter = t.router({
   getAuthorizedIdentities: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
+    .use(ApiKeyExtractMiddleware)
     .use(LogUsage)
     .use(Analytics)
     .use(OwnAppsMiddleware)
