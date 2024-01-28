@@ -1,21 +1,34 @@
+import { CloudflareEmailMessage } from '@proofzero/packages/types/email'
+import type { Environment } from './types'
+import createCoreClient from '@proofzero/platform-clients/core'
+
+import {
+  generateTraceContextHeaders,
+  generateTraceSpan,
+} from '@proofzero/platform-middleware/trace'
 import PostalMime, { type Address, Email } from 'postal-mime'
 
-import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
-import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { EmailAccountType } from '@proofzero/types/account'
-import { initAccountNodeByName } from '@proofzero/platform.account/src/nodes'
+export default {
+  async email(message: CloudflareEmailMessage, env: Environment) {
+    const decoder = new TextDecoder()
+    const reader = message.raw.getReader()
 
-import type { Environment } from './types'
+    let content = ''
+    let { done, value } = await reader.read()
+    while (!done) {
+      content += decoder.decode(value)
+      ;({ done, value } = await reader.read())
+    }
 
-export interface CloudflareEmailMessage {
-  readonly from: string
-  readonly to: string
-  readonly headers: Headers
-  readonly raw: ReadableStream<Uint8Array>
-  readonly rawSize: number
+    return relay(content, env)
+  },
+}
 
-  setReject(reason: string): void
-  forward(rcptTo: string, headers?: Headers): Promise<void>
+const getCoreClient = (env: Environment) => {
+  //New trace as entrypoint is the email trigger and not an HTTP request
+  const headers = generateTraceContextHeaders(generateTraceSpan())
+
+  return createCoreClient(env.Core, headers)
 }
 
 interface MailChannelAddress {
@@ -29,7 +42,7 @@ interface DKIM {
   dkim_private_key: string
 }
 
-export default async (message: string, env: Environment) => {
+const relay = async (message: string, env: Environment) => {
   const postalMime = new PostalMime()
   const email = await postalMime.parse(message)
 
@@ -43,27 +56,18 @@ export default async (message: string, env: Environment) => {
     .concat(email.to || [])
     .concat(email.cc || [])
     .filter((recipient) =>
-      recipient.address.endsWith(`@${env.INTERNAL_RELAY_DKIM_DOMAIN}`)
+      recipient.address.endsWith(
+        `.${env.INTERNAL_EMAIL_DISTRIBUTION_KEY}@${env.INTERNAL_RELAY_DKIM_DOMAIN}`
+      )
     )
 
   for (const recipient of recipients) {
-    const nss = generateHashedIDRef(EmailAccountType.Mask, recipient.address)
-    const urn = AccountURNSpace.componentizedUrn(nss)
-    const node = initAccountNodeByName(urn, env.Account)
-
-    const sourceAccountURN = await node.storage.get<AccountURN>(
-      'source-account'
-    )
-    if (!sourceAccountURN) continue
-
-    const sourceAccountNode = initAccountNodeByName(
-      sourceAccountURN,
-      env.Account
-    )
-
-    const name = (await sourceAccountNode.class.getNickname()) || ''
-    const address = await sourceAccountNode.class.getAddress()
-    if (!address) continue
+    const coreClient = getCoreClient(env)
+    const { sourceEmail, nickname } =
+      await coreClient.account.getSourceFromMaskedAddress.query({
+        maskedEmail: recipient.address,
+      })
+    if (!sourceEmail) continue
 
     const from: MailChannelAddress = {
       name: email.from.name,
@@ -72,11 +76,10 @@ export default async (message: string, env: Environment) => {
 
     const to: MailChannelAddress[] = [
       {
-        name,
-        email: address,
+        name: nickname,
+        email: sourceEmail,
       },
     ]
-
     await send(email, from, to, dkim)
   }
 }

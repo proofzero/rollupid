@@ -247,13 +247,19 @@ export default class EmailAccount {
     return this.node.storage.put<AccountURN>('source-account', accountURN)
   }
 
-  async getMaskedAddress(clientId: string): Promise<string> {
+  async getMaskedAddress(
+    clientId: string,
+    distributionKey: string,
+    relayDomain: string
+  ): Promise<string> {
+    const relayPattern = `.${distributionKey}@${relayDomain}`
     const key = `masked-address/${clientId}`
     const stored = await this.node.storage.get<string>(key)
-    if (stored) return stored
+    //Generates new masked email if there's an existing one using old pattern
+    if (stored && stored.endsWith(relayPattern)) return stored
     const bits = generateRandomString(6)
     const words = randomWords.generate(3).join('-')
-    const address = `${words}-${bits}@rollup.email`
+    const address = `${words}-${bits}${relayPattern}`
     await this.node.storage.put<string>(key, address)
     return address
   }

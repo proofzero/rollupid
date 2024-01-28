@@ -1,0 +1,33 @@
+{
+  "name": "@proofzero/services.emailinbounder",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20221111.1",
+    "@types/node": "18.15.3",
+    "eslint": "8.28.0",
+    "eslint-config-prettier": "8.8.0",
+    "npm-run-all": "4.1.5",
+    "prettier": "2.8.8",
+    "typescript": "5.0.4",
+    "wrangler": "3.18"
+  },
+  "private": true,
+  "scripts": {
+    "build": "wrangler publish --dry-run --outdir=dist",
+    "check": "run-s format:check lint:check types:check",
+    "format": "run-s format:src",
+    "format:src": "prettier --write src",
+    "format:check": "run-s format:check:src",
+    "format:check:src": "prettier --check src",
+    "lint": "eslint --fix src test",
+    "lint:check": "run-s lint:check:src",
+    "lint:check:src": "eslint src",
+    "types:check": "tsc --project tsconfig.json",
+    "dev": "env-cmd --file .dev.env wrangler dev",
+    "deploy": "wrangler publish",
+    "test": "run-s check"
+  },
+  "dependencies": {
+    "@proofzero/utils": "workspace:*"
+  }
+}

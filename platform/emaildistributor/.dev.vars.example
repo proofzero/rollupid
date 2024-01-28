@@ -1,0 +1,4 @@
+#This is only set in the CF environments, as a secret. Locally it can be set to anything
+#JSON object containing mapping between env specific identifier in the email address
+#and the target internal (hence, secret) email to be forwarded to for env-specific processor
+SECRET_RELAY_DISTRIBUTION_MAP="{'local':'supersecretemail@example.com'}"

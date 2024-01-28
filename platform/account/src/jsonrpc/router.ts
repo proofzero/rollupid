@@ -147,6 +147,11 @@ import {
   SetSourceAccountInput,
   SetSourceAccountOutput,
 } from './methods/setSourceAccount'
+import {
+  GetSourceByMaskedAddressInput,
+  GetSourceByMaskedAddressOutput,
+  getSourceFromMaskedAddressMethod,
+} from './methods/getSourceFromMaskedAddress'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -403,4 +408,10 @@ export const appRouter = t.router({
     .input(SetSourceAccountInput)
     .output(SetSourceAccountOutput)
     .mutation(setSourceAccountMethod),
+  getSourceFromMaskedAddress: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetSourceByMaskedAddressInput)
+    .output(GetSourceByMaskedAddressOutput)
+    .query(getSourceFromMaskedAddressMethod),
 })

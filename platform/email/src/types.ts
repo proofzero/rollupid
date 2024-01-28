@@ -14,18 +14,6 @@ export interface Environment {
   SECRET_TEST_API_TEST_TOKEN: string | undefined
 }
 
-/** CF EmailMessage type; not provided in CF types lib */
-export interface CloudflareEmailMessage<Body = unknown> {
-  readonly from: string
-  readonly to: string
-  readonly headers: Headers
-  readonly raw: ReadableStream
-  readonly rawSize: number
-
-  setReject(reason: String): void
-  forward(rcptTo: string, headers?: Headers): Promise<void>
-}
-
 export type EmailContentType = 'text/plain' | 'text/html'
 export type EmailAddressComponents = {
   name: string

@@ -41,5 +41,9 @@ export const getMaskedAddressMethod: GetMaskedAddressMethod = async ({
   }
 
   const node = new EmailAccount(ctx.account, ctx.env)
-  return node.getMaskedAddress(input.clientId)
+  return node.getMaskedAddress(
+    input.clientId,
+    ctx.env.INTERNAL_EMAIL_DISTRIBUTION_KEY,
+    ctx.env.INTERNAL_RELAY_DKIM_DOMAIN
+  )
 }
