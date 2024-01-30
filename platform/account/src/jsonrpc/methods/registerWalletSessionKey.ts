@@ -1,19 +1,26 @@
 import { z } from 'zod'
+import { createPublicClient, http } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import { polygonMumbai as chain } from 'viem/chains'
+import { addressToEmptyAccount, createKernelAccount } from '@zerodev/sdk'
+import { signerToEcdsaValidator } from '@zerodev/ecdsa-validator'
+import {
+  serializeSessionKeyAccount,
+  signerToSessionKeyValidator,
+} from '@zerodev/session-key'
 
+import { Hex } from '../validators/wallet'
 import { Context } from '../../context'
 import { initAccountNodeByName } from '../../nodes'
-import {
-  createSessionKey,
-  getZeroDevSigner,
-  getPrivateKeyOwner,
-} from '@zerodevapp/sdk'
 
 import { PaymasterSchema } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
+
+import { ZERODEV_SESSION_KEY_TTL } from '../../constants'
 import { generateSmartWalletAccountUrn } from '../../utils'
 
 export const RegisterSessionKeyInput = z.object({
-  sessionPublicKey: z.string(),
+  sessionKeyAddress: Hex,
   smartContractWalletAddress: z.string(),
   paymaster: PaymasterSchema,
 })
@@ -34,9 +41,9 @@ export const registerSessionKeyMethod = async ({
   // This method is being called only from galaxy
   // All authorization checks are done in galaxy
 
-  const { paymaster, smartContractWalletAddress, sessionPublicKey } = input
+  const { paymaster, smartContractWalletAddress, sessionKeyAddress } = input
 
-  const { baseAccountURN } = await generateSmartWalletAccountUrn(
+  const { baseAccountURN } = generateSmartWalletAccountUrn(
     smartContractWalletAddress,
     '' // empty string because we only care about base urn
   )
@@ -46,38 +53,42 @@ export const registerSessionKeyMethod = async ({
     ctx.env.Account
   )
 
-  const ownerPrivateKey = (await smartContractWalletNode.storage.get(
+  const ownerPrivateKey = await smartContractWalletNode.storage.get<Hex>(
     'privateKey'
-  )) as string
+  )
 
   if (!ownerPrivateKey) {
     throw new BadRequestError({ message: 'missing private key for the user' })
   }
 
-  let sessionKey = ''
-
   if (paymaster && paymaster.provider === 'zerodev') {
-    const zdSigner = await getZeroDevSigner({
-      projectId: paymaster.secret,
-      owner: getPrivateKeyOwner(ownerPrivateKey),
-      skipFetchSetup: true,
-    })
-
-    // We need a 90 days in Unix time from now
-    // 90 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
-    const truncatedValidUntil = Math.floor(Date.now() / 1000) + 7776000000
-
     try {
-      sessionKey = await createSessionKey(
-        zdSigner,
-        [],
-        truncatedValidUntil,
-        sessionPublicKey
-      )
+      const signer = privateKeyToAccount(ownerPrivateKey)
+
+      const publicClient = createPublicClient({
+        chain,
+        transport: http(),
+      })
+
+      const emptySessionKeySigner = addressToEmptyAccount(sessionKeyAddress)
+
+      const sessionKeyAccount = await createKernelAccount(publicClient, {
+        plugins: {
+          defaultValidator: await signerToEcdsaValidator(publicClient, {
+            signer,
+          }),
+          validator: await signerToSessionKeyValidator(publicClient, {
+            signer: emptySessionKeySigner,
+            validatorData: { validUntil: Date.now() + ZERODEV_SESSION_KEY_TTL },
+          }),
+        },
+      })
+
+      return serializeSessionKeyAccount(sessionKeyAccount)
     } catch (e) {
       throw new InternalServerError({ message: 'Failed to create session key' })
     }
   }
 
-  return sessionKey
+  return ''
 }

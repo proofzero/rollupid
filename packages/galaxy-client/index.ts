@@ -56,6 +56,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   disconnectAccount?: Maybe<Scalars['Boolean']>;
   registerSessionKey: Scalars['String'];
+  revokeSessionKey?: Maybe<Scalars['Boolean']>;
   setExternalAppData?: Maybe<Scalars['Boolean']>;
   updateAccountNickname?: Maybe<Scalars['Boolean']>;
   updateConnectedAccountsProperties?: Maybe<Scalars['Boolean']>;
@@ -68,7 +69,13 @@ export type MutationDisconnectAccountArgs = {
 
 
 export type MutationRegisterSessionKeyArgs = {
-  sessionPublicKey: Scalars['String'];
+  sessionKeyAddress: Scalars['String'];
+  smartContractWalletAddress: Scalars['String'];
+};
+
+
+export type MutationRevokeSessionKeyArgs = {
+  sessionKeyAddress: Scalars['String'];
   smartContractWalletAddress: Scalars['String'];
 };
 
@@ -215,6 +222,22 @@ export type UpdateConnectedAccountsPropertiesMutationVariables = Exact<{
 
 export type UpdateConnectedAccountsPropertiesMutation = { __typename?: 'Mutation', updateConnectedAccountsProperties?: boolean | null };
 
+export type RegisterSessionKeyMutationVariables = Exact<{
+  sessionKeyAddress: Scalars['String'];
+  smartContractWalletAddress: Scalars['String'];
+}>;
+
+
+export type RegisterSessionKeyMutation = { __typename?: 'Mutation', registerSessionKey: string };
+
+export type RevokeSessionKeyMutationVariables = Exact<{
+  sessionKeyAddress: Scalars['String'];
+  smartContractWalletAddress: Scalars['String'];
+}>;
+
+
+export type RevokeSessionKeyMutation = { __typename?: 'Mutation', revokeSessionKey?: boolean | null };
+
 export type GetExternalAppDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -291,6 +314,22 @@ export const UpdateConnectedAccountsPropertiesDocument = gql`
   updateConnectedAccountsProperties(accountURNList: $accountURNList)
 }
     `;
+export const RegisterSessionKeyDocument = gql`
+    mutation registerSessionKey($sessionKeyAddress: String!, $smartContractWalletAddress: String!) {
+  registerSessionKey(
+    sessionKeyAddress: $sessionKeyAddress
+    smartContractWalletAddress: $smartContractWalletAddress
+  )
+}
+    `;
+export const RevokeSessionKeyDocument = gql`
+    mutation revokeSessionKey($sessionKeyAddress: String!, $smartContractWalletAddress: String!) {
+  revokeSessionKey(
+    sessionKeyAddress: $sessionKeyAddress
+    smartContractWalletAddress: $smartContractWalletAddress
+  )
+}
+    `;
 export const GetExternalAppDataDocument = gql`
     query getExternalAppData {
   externalAppData: getExternalAppData
@@ -363,6 +402,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateConnectedAccountsProperties(variables: UpdateConnectedAccountsPropertiesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateConnectedAccountsPropertiesMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateConnectedAccountsPropertiesMutation>(UpdateConnectedAccountsPropertiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateConnectedAccountsProperties', 'mutation');
+    },
+    registerSessionKey(variables: RegisterSessionKeyMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RegisterSessionKeyMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<RegisterSessionKeyMutation>(RegisterSessionKeyDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'registerSessionKey', 'mutation');
+    },
+    revokeSessionKey(variables: RevokeSessionKeyMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeSessionKeyMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<RevokeSessionKeyMutation>(RevokeSessionKeyDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeSessionKey', 'mutation');
     },
     getExternalAppData(variables?: GetExternalAppDataQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetExternalAppDataQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetExternalAppDataQuery>(GetExternalAppDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getExternalAppData', 'query');

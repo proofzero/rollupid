@@ -126,11 +126,11 @@ const accountResolvers: Resolvers = {
     registerSessionKey: async (
       _parent: any,
       {
-        sessionPublicKey,
+        sessionKeyAddress,
         smartContractWalletAddress,
       }: {
-        sessionPublicKey: string
-        smartContractWalletAddress: string
+        sessionKeyAddress: `0x${string}`
+        smartContractWalletAddress: `0x${string}`
       },
       { env, jwt, traceSpan, identityURN, clientId, apiKey }: ResolverContext
     ) => {
@@ -160,7 +160,7 @@ const accountResolvers: Resolvers = {
         const sessionKey = await coreClient.account.registerSessionKey.mutate({
           paymaster,
           smartContractWalletAddress,
-          sessionPublicKey,
+          sessionKeyAddress,
         })
 
         const appData = await coreClient.authorization.getAppData.query({
@@ -175,7 +175,7 @@ const accountResolvers: Resolvers = {
 
         smartWalletSessionKeys.push({
           urn: baseAccountURN,
-          publicSessionKey: sessionPublicKey,
+          publicSessionKey: sessionKeyAddress,
         })
 
         await coreClient.authorization.setAppData.mutate({
@@ -189,6 +189,77 @@ const accountResolvers: Resolvers = {
       } catch (e) {
         throw new GraphQLError('Failed to register session key.')
       }
+    },
+    revokeSessionKey: async (
+      _parent: any,
+      {
+        sessionKeyAddress,
+        smartContractWalletAddress,
+      }: {
+        sessionKeyAddress: `0x${string}`
+        smartContractWalletAddress: `0x${string}`
+      },
+      { env, jwt, traceSpan, identityURN, clientId, apiKey }: ResolverContext
+    ) => {
+      const coreClient = createCoreClient(env.Core, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+        [AppAPIKeyHeader]: apiKey,
+      })
+
+      const [userInfo, paymaster]: [PersonaData, PaymasterType] =
+        await Promise.all([
+          coreClient.authorization.getUserInfo.query({ access_token: jwt }),
+          coreClient.starbase.getPaymaster.query({ clientId }),
+        ])
+
+      if (
+        !userInfo ||
+        !userInfo.erc_4337.some(
+          (scWallet: { nickname: string; address: string }) =>
+            scWallet.address === smartContractWalletAddress
+        )
+      ) {
+        throw new GraphQLError('Invalid smart contract wallet address.')
+      }
+
+      await coreClient.account.revokeWalletSessionKey.mutate({
+        projectId: paymaster.secret,
+        sessionKeyAddress,
+        smartContractWalletAddress,
+      })
+
+      const appData = await coreClient.authorization.getAppData.query({
+        clientId,
+      })
+
+      const { baseAccountURN } = generateSmartWalletAccountUrn(
+        smartContractWalletAddress,
+        '' // empty string because we only need a base urn
+      )
+
+      const smartWalletSessionKeys = (
+        appData?.smartWalletSessionKeys || []
+      ).filter(
+        ({
+          urn,
+          publicSessionKey,
+        }: {
+          urn: string
+          publicSessionKey: `0x${string}`
+        }) => {
+          if (urn !== baseAccountURN) return true
+          if (publicSessionKey === sessionKeyAddress) return false
+          return true
+        }
+      )
+
+      await coreClient.authorization.setAppData.mutate({
+        clientId,
+        appData: {
+          smartWalletSessionKeys,
+        },
+      })
     },
   },
 }
@@ -211,6 +282,11 @@ const AccountResolverComposition = {
     isAuthorized(),
   ],
   'Mutation.registerSessionKey': [
+    requestLogging(),
+    setupContext(),
+    validateApiKey(),
+  ],
+  'Mutation.revokeSessionKey': [
     requestLogging(),
     setupContext(),
     validateApiKey(),

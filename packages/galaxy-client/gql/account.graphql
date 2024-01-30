@@ -31,3 +31,23 @@ mutation updateConnectedAccountsProperties(
 ) {
   updateConnectedAccountsProperties(accountURNList: $accountURNList)
 }
+
+mutation registerSessionKey(
+  $sessionKeyAddress: String!
+  $smartContractWalletAddress: String!
+) {
+  registerSessionKey(
+    sessionKeyAddress: $sessionKeyAddress
+    smartContractWalletAddress: $smartContractWalletAddress
+  )
+}
+
+mutation revokeSessionKey(
+  $sessionKeyAddress: String!
+  $smartContractWalletAddress: String!
+) {
+  revokeSessionKey(
+    sessionKeyAddress: $sessionKeyAddress
+    smartContractWalletAddress: $smartContractWalletAddress
+  )
+}
