@@ -102,6 +102,6 @@
     "storybook-css-modules-preset": "1.1.1",
     "style-loader": "3.3.1",
     "tailwindcss": "3.3.3",
-    "webpack": "5.75.0"
+    "webpack": "5.76.0"
   }
 }
