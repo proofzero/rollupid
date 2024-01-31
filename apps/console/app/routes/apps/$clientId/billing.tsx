@@ -68,6 +68,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId: params.clientId as string,
     })
 
+    const appServiceBasedFoo =
+      await coreClient.starbase.getAppExternalDataUsage.query({
+        clientId: params.clientId as string,
+      })
+
     const entitlements = await coreClient.billing.getEntitlements.query({
       URN: appDetails.ownerURN,
     })
@@ -94,6 +99,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         toastNotification,
         STRIPE_PUBLISHABLE_KEY: context.env.STRIPE_PUBLISHABLE_KEY,
         groupID,
+        appServiceBasedFoo,
       },
       {
         headers: {
@@ -773,12 +779,14 @@ export default () => {
     toastNotification,
     STRIPE_PUBLISHABLE_KEY,
     groupID,
+    appServiceBasedFoo,
   } = useLoaderData<{
     STRIPE_PUBLISHABLE_KEY: string
     entitlements: GetEntitlementsOutput
     paymentData: PaymentData
     toastNotification?: ToastNotification
     groupID?: string
+    appServiceBasedFoo: any
   }>()
 
   const actionData = useActionData()
@@ -822,6 +830,7 @@ export default () => {
       <Toaster position="top-right" reverseOrder={false} />
 
       <section className="flex flex-col gap-4">
+        <pre>{JSON.stringify(appServiceBasedFoo, null, 2)}</pre>
         <PlanCard
           hasUnpaidInvoices={hasUnpaidInvoices}
           currentPlan={appDetails.appPlan}
