@@ -94,6 +94,7 @@ export const createOrUpdateSubscription = async ({
   quantity,
   URN,
   customerID,
+  metadata,
 }: {
   subscriptionID?: string | null
   planID: string
@@ -101,6 +102,7 @@ export const createOrUpdateSubscription = async ({
   quantity: number
   URN: IdentityRefURN
   customerID: string
+  metadata?: Stripe.MetadataParam
 }) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
@@ -115,6 +117,7 @@ export const createOrUpdateSubscription = async ({
         quantity,
         URN,
         handled: true,
+        metadata,
       },
       stripeClient
     )

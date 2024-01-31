@@ -42,7 +42,11 @@ import {
   ServicePlanType,
 } from '@proofzero/types/billing'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
-import { generateUsageKey, UsageCategory } from '@proofzero/utils/usage'
+import {
+  generateUsageKey,
+  getStoredUsageWithMetadata,
+  UsageCategory,
+} from '@proofzero/utils/usage'
 import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
 import { NodeMethodReturnValue } from '@proofzero/types/node'
 import { ExternalStorageAlreadyDisabledError } from '../errors'
@@ -373,11 +377,10 @@ export default class StarbaseApplication extends DOProxy {
         : undefined
 
     if (packageDetails) {
-      if (!externalStorageWrites || !externalStorageReads) {
-        console.warn(
-          `external storage reads or writes for ${clientId} in a bad state; ${externalStorageWrites} writes and ${externalStorageReads} reads.`
+      const packageDef =
+        await this.state.storage.get<ExternalAppDataPackageDefinition>(
+          'externalAppDataPackageDefinition'
         )
-      }
 
       if (!externalStorageWrites) {
         await this.env.UsageKV.put(externalStorageUsageWriteKey, '0', {
@@ -385,6 +388,37 @@ export default class StarbaseApplication extends DOProxy {
             limit: packageDetails.writes,
           },
         })
+      } else {
+        let limit = packageDetails.writes
+        if (packageDef) {
+          const {
+            numValue: externalStorageWriteVal,
+            metadata: externalStorageWriteMetadata,
+          } = await getStoredUsageWithMetadata(
+            this.env.UsageKV,
+            externalStorageUsageWriteKey
+          )
+          const writeOutstandingLimit =
+            externalStorageWriteMetadata.limit >
+            packageDef.packageDetails.writes
+              ? externalStorageWriteMetadata.limit -
+                Math.max(
+                  externalStorageWriteVal,
+                  packageDef.packageDetails.writes
+                )
+              : 0
+          limit = packageDetails.writes + Math.max(writeOutstandingLimit, 0)
+        }
+
+        await this.env.UsageKV.put(
+          externalStorageUsageWriteKey,
+          externalStorageWrites,
+          {
+            metadata: {
+              limit,
+            },
+          }
+        )
       }
       if (!externalStorageReads) {
         await this.env.UsageKV.put(externalStorageUsageReadKey, '0', {
@@ -392,6 +426,36 @@ export default class StarbaseApplication extends DOProxy {
             limit: packageDetails.reads,
           },
         })
+      } else {
+        let limit = packageDetails.reads
+        if (packageDef) {
+          const {
+            numValue: externalStorageReadVal,
+            metadata: externalStorageReadMetadata,
+          } = await getStoredUsageWithMetadata(
+            this.env.UsageKV,
+            externalStorageUsageReadKey
+          )
+          const readOutstandingLimit =
+            externalStorageReadMetadata.limit > packageDef.packageDetails.reads
+              ? externalStorageReadMetadata.limit -
+                Math.max(
+                  externalStorageReadVal,
+                  packageDef.packageDetails.reads
+                )
+              : 0
+          limit = packageDetails.reads + Math.max(readOutstandingLimit, 0)
+        }
+
+        await this.env.UsageKV.put(
+          externalStorageUsageReadKey,
+          externalStorageReads,
+          {
+            metadata: {
+              limit,
+            },
+          }
+        )
       }
     } else {
       if (!externalStorageWrites && !externalStorageReads) {

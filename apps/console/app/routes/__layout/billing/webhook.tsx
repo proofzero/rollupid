@@ -16,11 +16,6 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
-import {
-  UsageCategory,
-  generateUsageKey,
-  getStoredUsageWithMetadata,
-} from '@proofzero/utils/usage'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -224,24 +219,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'invoice.finalized':
-        const { lines, metadata } = event.data.object as Stripe.Invoice
-
-        const clientID = metadata?.clientID
-        if (!clientID) {
-          throw new InternalServerError({
-            message: `Could not find clientID in metadata`,
-          })
-        }
-
-        const externalAppDataPackage =
-          await coreClient.starbase.getAppExternalDataPackage.query({
-            clientId: clientID,
-          })
-        if (!externalAppDataPackage) {
-          throw new InternalServerError({
-            message: `Could not find externalAppDataPackage`,
-          })
-        }
+        const { lines, subscription: invoiceSubscription } = event.data
+          .object as Stripe.Invoice
 
         const finalizedPriceIDList = lines.data
           .filter((ili) => Boolean(ili.price))
@@ -258,11 +237,74 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
                 context.env.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID
           )
         ) {
+          const subscription = await stripeClient.subscriptions.retrieve(
+            invoiceSubscription as string
+          )
+          if (!subscription) {
+            throw new InternalServerError({
+              message: `Could not find subscription. Expected external app data package to be associated to a subscription.`,
+            })
+          }
+
+          const clientID = subscription.metadata?.clientID
+          if (!clientID) {
+            throw new InternalServerError({
+              message: `Could not find clientID in metadata.`,
+            })
+          }
+
+          const externalAppDataPackage =
+            await coreClient.starbase.getAppExternalDataPackage.query({
+              clientId: clientID,
+            })
+          if (!externalAppDataPackage) {
+            throw new InternalServerError({
+              message: `Could not find externalAppDataPackage.`,
+            })
+          }
+
           await coreClient.starbase.externalAppDataLimitIncrement.mutate({
             clientId: clientID,
             reads: externalAppDataPackage.reads,
             writes: externalAppDataPackage.writes,
           })
+        }
+
+        if (
+          finalizedPriceIDList.some(
+            (pi) =>
+              pi ===
+                context.env.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_PRICE_ID ||
+              pi === context.env.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID
+          )
+        ) {
+          const subscription = await stripeClient.subscriptions.retrieve(
+            invoiceSubscription as string
+          )
+          if (!subscription) {
+            throw new InternalServerError({
+              message: `Could not find subscription. Expected external app data package to be associated to a subscription.`,
+            })
+          }
+
+          const clientID = subscription.metadata?.clientID
+          if (!clientID) {
+            throw new InternalServerError({
+              message: `Could not find clientID in metadata`,
+            })
+          }
+
+          if (subscription.metadata.noReset === 'true') {
+            await stripeClient.subscriptions.update(subscription.id, {
+              metadata: {
+                noReset: null,
+              },
+            })
+          } else {
+            await coreClient.starbase.externalAppDataUsageReset.mutate({
+              clientId: clientID,
+            })
+          }
         }
 
         break

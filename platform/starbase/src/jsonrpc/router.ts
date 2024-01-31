@@ -154,6 +154,10 @@ import {
   ExternalAppDataLimitIncrementInputSchema,
   externalAppDataLimitIncrementMethod,
 } from './methods/externalAppDataLimitIncrement'
+import {
+  ExternalAppDataUsageResetInputSchema,
+  externalAppDataUsageResetMethod,
+} from './methods/externalAppDataUsageReset'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -438,6 +442,11 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(ExternalAppDataLimitIncrementInputSchema)
     .mutation(externalAppDataLimitIncrementMethod),
+  externalAppDataUsageReset: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(ExternalAppDataUsageResetInputSchema)
+    .mutation(externalAppDataUsageResetMethod),
 })
 
 export type StarbaseRouter = typeof appRouter

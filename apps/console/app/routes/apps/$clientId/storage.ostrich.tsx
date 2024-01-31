@@ -7,7 +7,7 @@ import {
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { ActionFunction } from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import {
@@ -45,65 +45,9 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { IdentityURN } from '@proofzero/urns/identity'
-import {
-  cancelSubscription,
-  changePriceID,
-  createInvoice,
-} from '~/services/billing/stripe'
+import { cancelSubscription, changePriceID } from '~/services/billing/stripe'
 import Stripe from 'stripe'
 import { packageTypeToPriceID } from '~/utils/external-app-data'
-
-export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context, params }) => {
-    const jwt = await requireJWT(request, context.env)
-    const parsedJwt = parseJwt(jwt!)
-    const identityURN = parsedJwt.sub as IdentityURN
-
-    const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const coreClient = createCoreClient(context.env.Core, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const { clientId } = params
-    if (!clientId) {
-      throw new InternalServerError({
-        message: 'Client id not found',
-      })
-    }
-
-    const appDetails = await coreClient.starbase.getAppDetails.query({
-      clientId: clientId as string,
-    })
-
-    if (
-      appDetails.externalAppDataPackageDefinition?.packageDetails.subscriptionID
-    ) {
-      const spd = await coreClient.billing.getStripePaymentData.query({
-        URN: appDetails.ownerURN,
-      })
-
-      await createInvoice(
-        new Stripe(context.env.SECRET_STRIPE_API_KEY, {
-          apiVersion: '2022-11-15',
-        }),
-        spd.customerID,
-        appDetails.externalAppDataPackageDefinition?.packageDetails
-          .subscriptionID,
-        appDetails.externalAppDataPackageDefinition.packageDetails
-          .packageType === ExternalAppDataPackageType.STARTER
-          ? context.env.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID
-          : context.env.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID,
-        true,
-        {
-          clientID: clientId,
-        }
-      )
-    }
-
-    return null
-  }
-)
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -177,6 +121,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             planID: packageTypeToPriceID(env, newPackageType),
             SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
             quantity: 1,
+            metadata: {
+              clientID: clientId,
+            },
           })
         }
 

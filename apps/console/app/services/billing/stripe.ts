@@ -36,6 +36,7 @@ type CreateSubscriptionParams = {
   quantity: number
   URN: IdentityRefURN
   handled?: boolean
+  metadata?: Stripe.MetadataParam
 }
 
 type UpdateSubscriptionParams = {
@@ -47,7 +48,6 @@ type UpdateSubscriptionParams = {
 
 type SubscriptionMetadata = Partial<{
   URN: IdentityRefURN
-  handled: string | null
 }>
 
 type GetInvoicesParams = {
@@ -131,13 +131,16 @@ export const createSubscription = async (
     quantity,
     URN,
     handled = false,
+    metadata,
   }: CreateSubscriptionParams,
   stripeClient: Stripe
 ) => {
-  const metadata: SubscriptionMetadata = {}
-  metadata.URN = URN
-
-  if (handled) metadata.handled = handled.toString()
+  const meta: Stripe.MetadataParam = {
+    URN,
+  }
+  if (metadata) {
+    Object.assign(meta, metadata)
+  }
 
   const subscription = await stripeClient.subscriptions.create({
     customer: customerID as string,
@@ -148,7 +151,7 @@ export const createSubscription = async (
       },
     ],
     expand: ['latest_invoice.payment_intent'],
-    metadata,
+    metadata: meta,
   })
 
   return subscription
@@ -208,7 +211,11 @@ export const changePriceID = async ({
         price: newPriceID,
       },
     ],
-    payment_behavior: 'pending_if_incomplete',
+    payment_behavior: 'allow_incomplete',
+    metadata: {
+      ...subscription.metadata,
+      noReset: 'true',
+    },
   })
 
   return subscription
