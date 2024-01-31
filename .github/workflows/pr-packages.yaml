@@ -33,25 +33,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: cachix/install-nix-action@v18
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-
-      - run: nix-build packages.nix
-
-      - name: Cache Dependencies
-        id: cache-modules
-        uses: actions/cache@v3
+      - name: Restore node modules
+        id: cache-node-modules-restore
+        uses: actions/cache/restore@v3
         with:
           path: |
             node_modules
             .yarn
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install --immutable
+
+      - name: Save node modules
+        if: steps.cache-node-modules-restore.outputs.cache-hit != 'true'
+        id: cache-node_modules-save
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ steps.cache-node-modules-restore.outputs.cache-primary-key }}
 
       - name: Build
         run: yarn build

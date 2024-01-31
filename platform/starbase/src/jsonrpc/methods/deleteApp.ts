@@ -1,10 +1,14 @@
 import { z } from 'zod'
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
+import { BadRequestError } from '@proofzero/errors'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import createEdgesClient from '@proofzero/platform-clients/edges'
 import { AppClientIdParamSchema } from '../validators/app'
 import { EDGE_APPLICATION } from '../../types'
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 export const DeleteAppInput = AppClientIdParamSchema
 
@@ -21,22 +25,53 @@ export const deleteApp = async ({
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
     )
 
-  if (!ctx.accountURN) throw new Error('No account URN in context')
+  if (!ctx.identityURN) throw new Error('No identity URN in context')
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp
   )
 
-  await ctx.edges.removeEdge.mutate({
-    src: ctx.accountURN,
-    dst: appURN,
-    tag: EDGE_APPLICATION,
+  if (await appDO.storage.get('customDomain'))
+    throw new BadRequestError({
+      message: 'The application has a custom domain configuration',
+    })
+
+  const caller = router.createCaller(ctx)
+
+  const referenceEdges = await caller.edges.getEdges({
+    query: { src: { baseUrn: appURN }, tag: EDGE_HAS_REFERENCE_TO },
   })
-  await ctx.edges.deleteNode.mutate({
+
+  const edgeRemovalPromises = [
+    //Reference edges
+    ...referenceEdges.edges.map((e) =>
+      caller.edges.removeEdge({
+        tag: e.tag,
+        src: e.src.baseUrn,
+        dst: e.dst.baseUrn,
+      })
+    ),
+    //Application edge
+    caller.edges.removeEdge({
+      src: ctx.identityURN,
+      dst: appURN,
+      tag: EDGE_APPLICATION,
+    }),
+  ]
+  await Promise.all(edgeRemovalPromises)
+
+  await caller.edges.deleteNode({
     urn: appURN,
   })
   await appDO.class.delete()
 
-  console.log(`Deleted app ${input.clientId} from account ${ctx.accountURN}`)
+  await createAnalyticsEvent({
+    apiKey: ctx.POSTHOG_API_KEY,
+    eventName: 'identity_deleted_app',
+    distinctId: ctx.identityURN as IdentityURN,
+    properties: {
+      $groups: { app: input.clientId },
+    },
+  })
 }

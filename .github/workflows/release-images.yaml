@@ -13,6 +13,7 @@ defaults:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - uses: actions/checkout@v3
 
@@ -30,8 +31,6 @@ jobs:
             node_modules
             .yarn
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
         run: yarn install
@@ -39,10 +38,11 @@ jobs:
       - name: Deploy Oort to Test Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
+          wranglerVersion: '3.2.0'
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/images'
-          command: publish --env current
+          command: publish --config wrangler.current.toml --env current
           environment: 'current'
           # This causes secrets to be set as if by: $ wrangler secret put.
           # Each supplied name must be defined in the env: config stanza.

@@ -7,26 +7,19 @@ import {
   AppObjectSchema,
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
-  CustomDomainSchema,
 } from './jsonrpc/validators/app'
 
 import {
-  GetAuthorizedAccountsMethodInput,
-  GetAuthorizedAccountsMethodOutput,
-  AuthorizedUser,
-} from './jsonrpc/methods/getAuthorizedAccounts'
-import { DeploymentMetadata } from '@proofzero/types'
-import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
+  CustomDomainDNSRecordsSchema,
+  CustomDomainSchema,
+} from './jsonrpc/validators/customdomain'
 
-export interface Environment {
-  Analytics: AnalyticsEngineDataset
-  ServiceDeploymentMetadata: DeploymentMetadata
-  StarbaseApp: DurableObjectNamespace
-  Edges: Fetcher
-  INTERNAL_PASSPORT_SERVICE_NAME: string
-  INTERNAL_CLOUDFLARE_ZONE_ID: string
-  TOKEN_CLOUDFLARE_API: string
-}
+import {
+  GetAuthorizedIdentitiesMethodInput,
+  GetAuthorizedIdentitiesMethodOutput,
+  AuthorizedUser,
+} from './jsonrpc/methods/getAuthorizedIdentities'
+import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
 
 export const EDGE_APPLICATION: EdgeURN = EdgeSpace.urn('owns/app')
 
@@ -37,13 +30,16 @@ export type AppAllFields = z.infer<typeof AllFieldsSchema>
 export type AppClientIdParam = z.infer<typeof AppClientIdParamSchema>
 export type AppObject = z.infer<typeof AppObjectSchema>
 
-export type AuthorizedAccountsParams = z.infer<
-  typeof GetAuthorizedAccountsMethodInput
+export type AuthorizedIdentitiesParams = z.infer<
+  typeof GetAuthorizedIdentitiesMethodInput
 >
-export type AuthorizedAccountsOutput = z.infer<
-  typeof GetAuthorizedAccountsMethodOutput
+export type AuthorizedIdentitiesOutput = z.infer<
+  typeof GetAuthorizedIdentitiesMethodOutput
 >
 export type AuthorizedUser = z.infer<typeof AuthorizedUser>
 export type EdgesMetadata = z.infer<typeof EdgesMetadata>
 
 export type CustomDomain = z.infer<typeof CustomDomainSchema>
+export type CustomDomainDNSRecords = z.infer<
+  typeof CustomDomainDNSRecordsSchema
+>

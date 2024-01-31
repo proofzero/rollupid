@@ -1,33 +1,29 @@
-# https://developers.cloudflare.com/workers/platform/compatibility-dates
-compatibility_date = "2022-04-05"
-
 main = "./build/index.js"
-
 name = "profile"
-
+compatibility_date = "2022-04-05"
+compatibility_flags = ["no_minimal_subrequests"]
 workers_dev = false
 logpush = true
 
-# The default environment
-# ------------------------------------------------------------------------------
-# name = "rollup-id-dev"
-# # Whether or not the worker should be deployed to *.workers.dev. Can use
-# # either route or workers_dev, but not both.
-# workers_dev = true
-# routes = [
-#   "rollupid-dev.rollup.id/*",
-# ]
-
-# Services binding for local development
 services = [
   { binding = "Galaxy", service = "galaxy" },
-  { binding = "Address", service = "address" },
   { binding = "Images", service = "images" },
 ]
 
 kv_namespaces = [
-  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d", preview_id = "b827cd51f02e4a569ed7b9ff2c680a75" },
+  { binding = "ProfileKV", id = "ProfileKV", preview_id = "ProfileKV" },
 ]
+
+[build]
+command = "yarn build -- --sourcemap"
+
+[site]
+bucket = "./public"
+
+[dev]
+port = 10003
+inspector_port = 11003
+local_protocol = "http"
 
 [vars]
 PASSPORT_URL = "http://localhost:10001"
@@ -40,117 +36,6 @@ TWITTER_URL = "https://twitter.com/rollupid"
 DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
-PROFILE_VERSION = 1
-ALCHEMY_ETH_NETWORK = "mainnet"
-ALCHEMY_POLYGON_NETWORK = "mainnet"
-
-[site]
-bucket = "./public"
-
-[build]
-command = "yarn build -- --sourcemap"
-
-[dev]
-port = 10003
-inspector_port = 11003
-local_protocol = "http"
-
-# dev (development) 
-# ------------------------------------------------------------------------------
-[env.dev]
-routes = [
-  { pattern = "my-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
-]
-services = [
-  { binding = "Galaxy", service = "galaxy-dev" },
-  { binding = "Address", service = "address-dev" },
-  { binding = "Images", service = "images-dev" },
-
-]
-kv_namespaces = [
-  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d" },
-]
-[env.dev.vars]
-
-PASSPORT_URL = "https://passport-dev.rollup.id"
-PASSPORT_AUTH_URL = "https://passport-dev.rollup.id/authorize"
-IMAGES_URL = "https://images-dev.rollup.id/trpc"
-PASSPORT_TOKEN_URL = "https://passport-dev.pz3r0.com/token"
-CLIENT_ID = "<console client id>"
-REDIRECT_URI = "https://my-dev.rollup.id/auth/callback"
-COOKIE_DOMAIN = "rollup.id"
-TWITTER_URL = "https://twitter.com/rollupid"
-DISCORD_URL = "https://discord.gg/rollupid"
-MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
-INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
-PROFILE_VERSION = 1
-ALCHEMY_ETH_NETWORK = "mainnet"
-ALCHEMY_POLYGON_NETWORK = "mainnet"
-
-# next (staging)
-# ------------------------------------------------------------------------------
-[env.next]
-routes = [
-  { pattern = "my-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
-]
-services = [
-  { binding = "Galaxy", service = "galaxy-next" },
-  { binding = "Address", service = "address-next" },
-  { binding = "Images", service = "images-next" },
-
-]
-kv_namespaces = [
-  { binding = "ProfileKV", id = "451e189131d74dca87b41701555a839d" },
-]
-[env.next.build]
-command = "yarn build"
-
-[env.next.vars]
-
-PASSPORT_URL = "https://passport-next.rollup.id"
-PASSPORT_AUTH_URL = "https://passport-next.rollup.id/authorize"
-IMAGES_URL = "https://images-next.rollup.id/trpc"
-PASSPORT_TOKEN_URL = "https://passport-next.pz3r0.com/token"
-CLIENT_ID = "<console client id>"
-REDIRECT_URI = "https://my-next.rollup.id/auth/callback"
-COOKIE_DOMAIN = "rollup.id"
-TWITTER_URL = "https://twitter.com/rollupid"
-DISCORD_URL = "https://discord.gg/rollupid"
-MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
-INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
-PROFILE_VERSION = 1
-ALCHEMY_ETH_NETWORK = "mainnet"
-ALCHEMY_POLYGON_NETWORK = "mainnet"
-
-# current (production)
-# ------------------------------------------------------------------------------
-[env.current]
-routes = [
-  { pattern = "my.rollup.id", custom_domain = true, zone_name = "rollup.id" },
-]
-services = [
-  { binding = "Galaxy", service = "galaxy-current" },
-  { binding = "Address", service = "address-current" },
-  { binding = "Images", service = "images-current" },
-]
-kv_namespaces = [
-  { binding = "ProfileKV", id = "3a5214b7dab24414a1cb65733a6143b2" },
-]
-[env.current.build]
-command = "yarn build"
-
-[env.current.vars]
-PASSPORT_URL = "https://passport.rollup.id"
-PASSPORT_AUTH_URL = "https://passport.rollup.id/authorize"
-IMAGES_URL = "https://images.rollup.id/trpc"
-PASSPORT_TOKEN_URL = "https://passport.pz3r0.com/token"
-CLIENT_ID = "<console client id>"
-REDIRECT_URI = "https://my.rollup.id/auth/callback"
-COOKIE_DOMAIN = "rollup.id"
-TWITTER_URL = "https://twitter.com/rollupid"
-DISCORD_URL = "https://discord.gg/rollupid"
-MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
-INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 PROFILE_VERSION = 1
 ALCHEMY_ETH_NETWORK = "mainnet"
 ALCHEMY_POLYGON_NETWORK = "mainnet"

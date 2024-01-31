@@ -14,6 +14,7 @@ defaults:
 jobs:
   build-publish-test-console-next:
     runs-on: ubuntu-latest
+    environment: next
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
@@ -32,8 +33,6 @@ jobs:
             node_modules
             .yarn
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
         run: yarn install
@@ -44,13 +43,22 @@ jobs:
       - name: Deploy to Next Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
+          wranglerVersion: '3.2.0'
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'apps/console'
-          command: publish --env next
+          command: publish --config wrangler.next.toml --env next
           environment: 'next'
           secrets: |
             SECRET_SESSION_KEY
+            SECRET_SESSION_SALT
+            SECRET_STRIPE_API_KEY
+            SECRET_STRIPE_WEBHOOK_SECRET
+            SECRET_STRIPE_PRO_PLAN_ID
         env:
           # A secret used for session encryption.
           SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_TEST }}
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_TEST }}
+          SECRET_STRIPE_API_KEY: ${{ secrets.SECRET_STRIPE_API_KEY_TEST }}
+          SECRET_STRIPE_WEBHOOK_SECRET: ${{ secrets.SECRET_STRIPE_WEBHOOK_SECRET_TEST }}
+          SECRET_STRIPE_PRO_PLAN_ID: ${{ secrets.SECRET_STRIPE_PRO_PLAN_ID_TEST }}

@@ -12,9 +12,9 @@ import {
   useOutletContext,
   useLoaderData,
 } from '@remix-run/react'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { requireJWT } from '~/utilities/session.server'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { RollType } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -32,11 +32,11 @@ import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyI
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import { MultiSelect } from '@proofzero/design-system/src/atoms/form/MultiSelect'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
@@ -121,13 +121,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         message: 'Application Client ID is required for the requested route',
       })
     }
-    const jwt = await requireJWT(request)
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const jwt = await requireJWT(request, context.env)
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const scopeMeta = (await starbaseClient.getScopes.query()).scopes
+    const scopeMeta = (await coreClient.starbase.getScopes.query()).scopes
 
     return json({ scopeMeta })
   }
@@ -143,13 +143,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     let rotatedSecret, updates
 
-    const jwt = await requireJWT(request)
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const jwt = await requireJWT(request, context.env)
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const paymaster = await starbaseClient.getPaymaster.query({
+    const paymaster = await coreClient.starbase.getPaymaster.query({
       clientId: params.clientId as string,
     })
 
@@ -165,7 +165,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (op) {
       case RollType.RollClientSecret:
         rotatedSecret = (
-          await starbaseClient.rotateClientSecret.mutate({
+          await coreClient.starbase.rotateClientSecret.mutate({
             clientId: params.clientId,
           })
         ).secret
@@ -204,11 +204,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         if (Object.keys(errors).length === 0) {
           await Promise.all([
-            starbaseClient.updateApp.mutate({
+            coreClient.starbase.updateApp.mutate({
               clientId: params.clientId,
               updates,
             }),
-            starbaseClient.publishApp.mutate({
+            coreClient.starbase.publishApp.mutate({
               clientId: params.clientId,
               published: published,
             }),
@@ -222,6 +222,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       rotatedSecret,
       updatedApp: { published, app: { ...updates } },
       errors,
+      published,
     })
   }
 )
@@ -237,24 +238,50 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: any
     paymaster: PaymasterType
-    appContactAddress?: AddressURN
+    appContactAddress?: AccountURN
   }>()
-  const { appContactAddress, paymaster } = outletContextData
+  const { appContactAddress, paymaster, notificationHandler, appDetails } =
+    outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
+
+  const ref = useRef(null)
+  const [multiselectComponentWidth, setMultiselectComponentWidth] = useState(0)
+
+  useEffect(() => {
+    if (!ref || !ref.current) {
+      return
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+    const resizeObserver = new ResizeObserver(() => {
+      if (ref?.current) {
+        if (ref.current.offsetWidth !== multiselectComponentWidth) {
+          setMultiselectComponentWidth(ref.current.offsetWidth)
+        }
+      }
+    })
+
+    resizeObserver.observe(ref.current)
+
+    // if useEffect returns a function, it is called right before the
+    // component unmounts, so it is the right place to stop observing
+    // the div
+    return function cleanup() {
+      resizeObserver.disconnect()
+    }
+  }, [ref.current])
 
   const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
 
-  const { notificationHandler, appDetails } = outletContextData
   const rotatedSecret =
     outletContextData?.rotationResult?.rotatedClientSecret ||
     actionData?.rotatedSecret
 
-  if (actionData?.updatedApp) {
-    appDetails.app = actionData.updatedApp.app
-    appDetails.published = actionData.updatedApp.published
-  }
+  useEffect(() => {
+    if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
+  }, [actionData])
 
   const errors = actionData?.errors
 
@@ -270,14 +297,15 @@ export default function AppDetailIndexPage() {
   return (
     <>
       {isImgUploading ? <Loader /> : null}
-      <DeleteAppModal
-        clientId={appDetails.clientId as string}
-        appName={appDetails.app.name}
-        deleteAppCallback={() => {
-          setDeleteModalOpen(false)
-        }}
-        isOpen={deleteModalOpen}
-      />
+      {appDetails.clientId && (
+        <DeleteAppModal
+          appClientID={appDetails.clientId}
+          appName={appDetails.app.name}
+          appHasCustomDomain={Boolean(appDetails.customDomain)}
+          isOpen={deleteModalOpen}
+          deleteAppCallback={() => setDeleteModalOpen(false)}
+        />
+      )}
 
       <Form
         method="post"
@@ -329,6 +357,7 @@ export default function AppDetailIndexPage() {
                 message="Connect email address to enable publishing"
                 linkHref={`/apps/${appDetails.clientId}/team`}
                 linkText="Connect email address"
+                type="warning"
               />
             )}
 
@@ -435,13 +464,14 @@ export default function AppDetailIndexPage() {
                     <div className="sm:mb-[1.755rem]" />
                   </div>
 
-                  <div className="flex-1">
+                  <div ref={ref} className="flex-1">
                     <MultiSelect
                       label="Allowed scope*"
                       disabled={false}
                       onChange={() => {
                         setIsFormChanged(true)
                       }}
+                      width={multiselectComponentWidth}
                       learnMore="https://docs.rollup.id/reference/scopes"
                       fieldName="scopes"
                       items={Object.entries(scopeMeta).map(([key, value]) => {
@@ -467,7 +497,9 @@ export default function AppDetailIndexPage() {
                           experimental: value.experimental,
                         }
                       })}
-                      selectedItems={appDetails.app.scopes?.map((scope) => {
+                      preselectedItems={(
+                        appDetails.app.scopes as Array<string>
+                      ).map((scope) => {
                         const meta = scopeMeta[scope]
                         return {
                           id: scope,
@@ -492,28 +524,24 @@ export default function AppDetailIndexPage() {
 
                 <div className="flex flex-col md:flex-row space-y-8 my-4 md:space-y-0 md:space-x-8 md:items-end">
                   <div className="flex-1 mb-1">
-                    <ReadOnlyInput
-                      id="appDomains"
-                      label="Domain(s)"
-                      className="cursor-no-drop"
-                      value=""
-                      required
+                    <IconPicker
+                      label="Upload Icon* (256x256)"
+                      maxSize={1048576}
+                      id="icon"
+                      errorMessage={errors?.['icon']}
+                      invalid={
+                        errors !== undefined &&
+                        errors.hasOwnProperty('icon') &&
+                        (errors['icon'] as string).length > 0
+                      }
+                      setIsFormChanged={
+                        setIsFormChanged as (val: boolean) => void
+                      }
+                      setIsImgUploading={
+                        setIsImgUploading as (val: boolean) => void
+                      }
+                      url={appDetails.app.icon}
                     />
-
-                    <Text
-                      type="span"
-                      size="xs"
-                      weight="medium"
-                      className="text-gray-400"
-                    >
-                      <a
-                        className="text-indigo-500"
-                        href="https://discord.gg/rollupid"
-                      >
-                        Contact us
-                      </a>{' '}
-                      to enable this feature
-                    </Text>
                   </div>
 
                   <div className="flex-1">
@@ -538,33 +566,6 @@ export default function AppDetailIndexPage() {
                       <div className="sm:mb-[1.755rem]" />
                     )}
                   </div>
-                </div>
-
-                <div>
-                  <IconPicker
-                    label="Upload Icon* (256x256)"
-                    ar={{
-                      w: 1,
-                      h: 1,
-                    }}
-                    minW={256}
-                    minH={256}
-                    maxSize={1048576}
-                    id="icon"
-                    errorMessage={errors?.['icon']}
-                    invalid={
-                      errors !== undefined &&
-                      errors.hasOwnProperty('icon') &&
-                      (errors['icon'] as string).length > 0
-                    }
-                    setIsFormChanged={
-                      setIsFormChanged as (val: boolean) => void
-                    }
-                    setIsImgUploading={
-                      setIsImgUploading as (val: boolean) => void
-                    }
-                    url={appDetails.app.icon}
-                  />
                 </div>
               </div>
             </Panel>
@@ -646,11 +647,9 @@ export default function AppDetailIndexPage() {
 
             <Panel title="Danger Zone">
               <Button
-                type="submit"
+                type="button"
                 btnType="dangerous-alt"
-                onClick={() => {
-                  setDeleteModalOpen(true)
-                }}
+                onClick={() => setDeleteModalOpen(true)}
               >
                 Delete the Application
               </Button>

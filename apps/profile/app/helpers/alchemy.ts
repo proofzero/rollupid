@@ -13,55 +13,65 @@ import type {
 import type { Chain, Gallery, NFT } from '../types'
 import { NFTContractNormalizer, NFTNormalizer } from './nfts'
 import { sortNftsFn } from './strings'
-import type { AccountURN } from '@proofzero/urns/account'
-import { getAccountCryptoAddresses } from './profile'
+import type { IdentityURN } from '@proofzero/urns/identity'
+import { getIdentityCryptoAddresses } from './profile'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 // -------------------- TYPES --------------------------------------------------
 
-const getChainWithNetwork = (chain: AlchemyChain): Chain => {
+const getChainWithNetwork = (chain: AlchemyChain, env: Env): Chain => {
   return chain === AlchemyChain.ethereum
     ? {
         chain: AlchemyChain.ethereum,
-        network: AlchemyNetwork[ALCHEMY_ETH_NETWORK],
+        network: AlchemyNetwork[env.ALCHEMY_ETH_NETWORK],
       }
     : {
         chain: AlchemyChain.polygon,
-        network: AlchemyNetwork[ALCHEMY_POLYGON_NETWORK],
+        network: AlchemyNetwork[env.ALCHEMY_POLYGON_NETWORK],
       }
 }
 
-export const getAlchemyClient = (chain: Chain): AlchemyClient => {
+export const getAlchemyClient = (chain: Chain, env: Env): AlchemyClient => {
   return new AlchemyClient({
-    key: chain.chain === 'eth' ? APIKEY_ALCHEMY_ETH : APIKEY_ALCHEMY_POLYGON,
+    key:
+      chain.chain === 'eth'
+        ? env.APIKEY_ALCHEMY_ETH
+        : env.APIKEY_ALCHEMY_POLYGON,
     ...chain,
   })
 }
 
-export const getAlchemyClients = () => {
+export const getAlchemyClients = (env: Env) => {
   return {
     ethereumClient: getAlchemyClient(
-      getChainWithNetwork(AlchemyChain.ethereum)
+      getChainWithNetwork(AlchemyChain.ethereum, env),
+      env
     ),
-    polygonClient: getAlchemyClient(getChainWithNetwork(AlchemyChain.polygon)),
+    polygonClient: getAlchemyClient(
+      getChainWithNetwork(AlchemyChain.polygon, env),
+      env
+    ),
   }
 }
 
 // -------------------- ALL NFTS FOR SPECIFIED CONTRACTS -----------------------
 
-export const getNfts = async ({
-  addresses,
-  contractAddresses,
-  maxRuns = 3,
-  chain,
-}: {
-  addresses: string[]
-  contractAddresses: string[]
-  maxRuns?: number
-  chain: AlchemyChain
-}) => {
-  const chainWithNetwork = getChainWithNetwork(chain)
-  const alchemyClient = getAlchemyClient(chainWithNetwork)
+export const getNfts = async (
+  {
+    addresses,
+    contractAddresses,
+    maxRuns = 3,
+    chain,
+  }: {
+    addresses: string[]
+    contractAddresses: string[]
+    maxRuns?: number
+    chain: AlchemyChain
+  },
+  env: Env
+) => {
+  const chainWithNetwork = getChainWithNetwork(chain, env)
+  const alchemyClient = getAlchemyClient(chainWithNetwork, env)
 
   const nfts: NFT[] = []
   await Promise.all(
@@ -89,19 +99,22 @@ export const getNfts = async ({
 
 // -------------------- ALL CONTRACTS ------------------------------------------
 
-export const getContracts = async ({
-  addresses,
-  excludeFilters,
-  maxRuns = 3,
-  chain,
-}: {
-  addresses: string[]
-  excludeFilters: string[]
-  maxRuns?: number
-  chain: AlchemyChain
-}) => {
-  const chainWithNetwork = getChainWithNetwork(chain)
-  const alchemyClient = getAlchemyClient(chainWithNetwork)
+export const getContracts = async (
+  {
+    addresses,
+    excludeFilters,
+    maxRuns = 3,
+    chain,
+  }: {
+    addresses: string[]
+    excludeFilters: string[]
+    maxRuns?: number
+    chain: AlchemyChain
+  },
+  env: Env
+) => {
+  const chainWithNetwork = getChainWithNetwork(chain, env)
+  const alchemyClient = getAlchemyClient(chainWithNetwork, env)
   let contracts: NFT[] = []
 
   await Promise.all(
@@ -130,28 +143,37 @@ export const getContracts = async ({
   return contracts
 }
 
-export const getContractsForAllChains = async ({
-  addresses,
-  excludeFilters,
-}: {
-  addresses: string[]
-  excludeFilters: string[]
-}) => {
+export const getContractsForAllChains = async (
+  {
+    addresses,
+    excludeFilters,
+  }: {
+    addresses: string[]
+    excludeFilters: string[]
+  },
+  env: Env
+) => {
   // To avoid duplication - if one collection comes from different addresses
   const visitedContracts = new Map<string, boolean>()
 
   try {
     const [ethereumContracts, polygonContracts] = await Promise.all([
-      getContracts({
-        addresses,
-        excludeFilters,
-        chain: AlchemyChain.ethereum,
-      }),
-      getContracts({
-        addresses,
-        excludeFilters,
-        chain: AlchemyChain.polygon,
-      }),
+      getContracts(
+        {
+          addresses,
+          excludeFilters,
+          chain: AlchemyChain.ethereum,
+        },
+        env
+      ),
+      getContracts(
+        {
+          addresses,
+          excludeFilters,
+          chain: AlchemyChain.polygon,
+        },
+        env
+      ),
     ])
 
     const ownedNfts = ethereumContracts
@@ -174,21 +196,26 @@ export const getContractsForAllChains = async ({
   }
 }
 
-export const getValidGallery = async ({
-  gallery,
-  accountURN,
-  traceSpan,
-}: {
-  gallery: Gallery
-  accountURN: AccountURN
+export const getValidGallery = async (
+  {
+    gallery,
+    identityURN,
+  }: {
+    gallery: Gallery
+    identityURN: IdentityURN
+  },
+  env: Env,
   traceSpan: TraceSpan
-}) => {
-  const { ethereumClient, polygonClient } = getAlchemyClients()
+) => {
+  const { ethereumClient, polygonClient } = getAlchemyClients(env)
 
-  const cryptoAddresses = await getAccountCryptoAddresses({
-    accountURN,
-    traceSpan,
-  })
+  const cryptoAddresses = await getIdentityCryptoAddresses(
+    {
+      identityURN,
+    },
+    env,
+    traceSpan
+  )
 
   const [ethContractAddressesSet, polyContractAddressesSet] = gallery.reduce(
     ([ethereum, polygon], nft) => {

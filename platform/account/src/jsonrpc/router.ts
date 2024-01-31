@@ -2,134 +2,318 @@ import { initTRPC } from '@trpc/server'
 
 import { errorFormatter } from '@proofzero/utils/trpc'
 
-import { Context } from '../context'
+import type { Context } from '../context'
 
 import {
-  getProfileMethod,
-  GetProfileInput,
-  GetProfileOutput,
-} from './methods/getProfile'
-import { setProfileMethod, SetProfileInput } from './methods/setProfile'
+  ResolveIdentityInput,
+  resolveIdentityMethod,
+  ResolveIdentityOutput,
+} from './methods/resolveIdentity'
 import {
-  getOwnAddressesMethod,
-  GetAddressesInput,
-} from './methods/getOwnAddresses'
-import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
-
-import { getAddressesMethod } from './methods/getAddresses'
-
+  setIdentityMethod,
+  SetIdentityInput,
+  SetIdentityOutput,
+} from './methods/setIdentity'
 import {
-  ValidateJWT,
-  AuthorizationTokenFromHeader,
-} from '@proofzero/platform-middleware/jwt'
+  getAccountAvatarMethod,
+  GetAccountAvatarOutput,
+} from './methods/getAccountAvatar'
+import {
+  GetAccountProfileBatchInput,
+  getAccountProfileBatchMethod,
+  GetAccountProfileBatchOutput,
+  getAccountProfileMethod,
+  GetAccountProfileOutput,
+} from './methods/getAccountProfile'
+import {
+  getNonceMethod,
+  GetNonceInput,
+  GetNonceOutput,
+} from './methods/getNonce'
+import {
+  verifyNonceMethod,
+  VerifyNonceInput,
+  VerifyNonceOutput,
+} from './methods/verifyNonce'
+import { getOAuthDataMethod, GetOAuthDataOutput } from './methods/getOAuthData'
+import { setOAuthDataMethod, SetOAuthDataInput } from './methods/setOAuthData'
+import {
+  getIdentityByAliasMethod,
+  GetIdentityByAliasInput,
+  GetIdentityByAliasOutput,
+} from './methods/getIdentityByAlias'
 import { LogUsage } from '@proofzero/platform-middleware/log'
-import { Scopes } from '@proofzero/platform-middleware/scopes'
+import { parse3RN } from './middlewares/parse3RN'
+import { checkCryptoNodes } from './middlewares/checkCryptoNode'
+import { initAccountNode } from './middlewares/initAccountNode'
+import {
+  getIdentityMethod,
+  GetIdentityInput,
+  GetIdentityOutput,
+} from './methods/getIdentity'
+import {
+  InitSmartContractWalletInput,
+  InitSmartContractWalletOutput,
+  initSmartContractWalletMethod,
+} from './methods/initSmartContractWallet'
+import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
-import { initAccountNodeByName } from '../nodes'
 import { Analytics } from '@proofzero/platform-middleware/analytics'
-import { getPublicAddressesMethod } from './methods/getPublicAddresses'
+import { setAccountNodeClient } from './middlewares/setAccountNodeClient'
 import {
-  GetAuthorizedAppsMethodInput,
-  GetAuthorizedAppsMethodOutput,
-  getAuthorizedAppsMethod,
-} from './methods/getAuthorizedApps'
-import { isValidMethod, IsValidOutput } from './methods/isValid'
+  SetAccountNicknameInput,
+  setAccountNicknameMethod,
+} from './methods/setAccountNickname'
 import {
-  DeleteAccountNodeInput,
+  GenerateEmailOTPInput,
+  generateEmailOTPMethod,
+  GenerateEmailOTPOutput,
+} from './methods/generateEmailOTP'
+import {
+  VerifyEmailOTPInput,
+  verifyEmailOTPMethod,
+  VerifyEmailOTPOutput,
+} from './methods/verifyEmailOTP'
+
+import {
   deleteAccountNodeMethod,
+  DeleteAccountNodeInput,
 } from './methods/deleteAccountNode'
-import { UnauthorizedError } from '@proofzero/errors'
+import {
+  getAccountReferenceTypes,
+  GetAccountReferenceTypeOutput,
+} from './methods/getAccountReferenceTypes'
+import {
+  registerSessionKeyMethod,
+  RegisterSessionKeyInput,
+  RegisterSessionKeyOutput,
+} from './methods/registerWalletSessionKey'
+import {
+  RevokeWalletSessionKeyInput,
+  RevokeWalletSessionKeyBatchInput,
+  revokeWalletSessionKeyMethod,
+  revokeWalletSessionKeyBatchMethod,
+} from './methods/revokeWalletSessionKey'
+import {
+  SendBillingNotificationInput,
+  sendBillingNotificationMethod,
+} from './methods/sendBillingNotification'
+import {
+  SendReconciliationNotificationInput,
+  sendReconciliationNotificationMethod,
+} from './methods/sendReconciliationNotificationMethod'
+import {
+  SendFailedPaymentNotificationInput,
+  sendFailedPaymentNotificationMethod,
+} from './methods/sendFailedPaymentNotification'
+import {
+  sendSuccessfulPaymentNotificationMethod,
+  SendSuccessfulPaymentNotificationInput,
+} from './methods/sendSuccessfulPaymentNotification'
+import {
+  GetAccountURNForEmailInputSchema,
+  getAccountURNForEmailMethod,
+  GetAccountURNForEmailOutputSchema,
+} from './methods/getAccountURNForEmail'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
-export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
-  const accountURN = ctx.accountURN
-
-  if (!accountURN)
-    throw new UnauthorizedError({ message: 'No accountURN in context' })
-
-  const account = await initAccountNodeByName(accountURN, ctx.Account)
-
-  return next({
-    ctx: {
-      account,
-      ...ctx,
-    },
-  })
-})
-
 export const appRouter = t.router({
-  getProfile: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+  resolveIdentity: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    // .use(injectCustomAnalytics)
+    .use(Analytics)
+    .input(ResolveIdentityInput)
+    .output(ResolveIdentityOutput)
+    .query(resolveIdentityMethod),
+  getIdentity: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .input(GetIdentityInput)
+    .output(GetIdentityOutput)
+    .query(getIdentityMethod),
+  getIdentityByAlias: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(GetProfileInput)
-    .output(GetProfileOutput)
-    .query(getProfileMethod),
-  setProfile: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
-    .use(injectAccountNode)
+    .input(GetIdentityByAliasInput)
+    .output(GetIdentityByAliasOutput)
+    .query(getIdentityByAliasMethod),
+  registerSessionKey: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(SetProfileInput)
-    .mutation(setProfileMethod),
-  isValid: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
+    .input(RegisterSessionKeyInput)
+    .output(RegisterSessionKeyOutput)
+    .mutation(registerSessionKeyMethod),
+  setIdentity: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .output(IsValidOutput)
-    .query(isValidMethod),
-  getAddresses: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+    .input(SetIdentityInput)
+    .output(SetIdentityOutput)
+    .mutation(setIdentityMethod),
+  getAccountAvatar: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .input(GetAddressesInput)
-    // .output(AddressListSchema)
-    .query(getAddressesMethod),
-  getOwnAddresses: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+    .output(GetAccountAvatarOutput)
+    .query(getAccountAvatarMethod),
+  getAccountProfile: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .input(GetAddressesInput)
-    // .output(AddressListSchema)
-    .query(getOwnAddressesMethod),
-  getPublicAddresses: t.procedure
+    .output(GetAccountProfileOutput)
+    .query(getAccountProfileMethod),
+  getAccountProfileBatch: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .input(GetAddressesInput)
-    // .output(AddressListSchema)
-    .query(getPublicAddressesMethod),
-  hasAddresses: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+    .input(GetAccountProfileBatchInput)
+    .output(GetAccountProfileBatchOutput)
+    .query(getAccountProfileBatchMethod),
+  setNickname: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .input(HasAddressesInput)
-    .mutation(hasAddressesMethod),
-  getAuthorizedApps: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+    .input(SetAccountNicknameInput)
+    .query(setAccountNicknameMethod),
+  generateEmailOTP: t.procedure
     .use(LogUsage)
-    .input(GetAuthorizedAppsMethodInput)
-    .output(GetAuthorizedAppsMethodOutput)
-    .query(getAuthorizedAppsMethod),
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(GenerateEmailOTPInput)
+    .output(GenerateEmailOTPOutput)
+    .mutation(generateEmailOTPMethod),
+  verifyEmailOTP: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(VerifyEmailOTPInput)
+    .output(VerifyEmailOTPOutput)
+    .mutation(verifyEmailOTPMethod),
+  getNonce: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(GetNonceInput)
+    .output(GetNonceOutput)
+    .query(getNonceMethod),
+  verifyNonce: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(VerifyNonceInput)
+    .output(VerifyNonceOutput)
+    .mutation(verifyNonceMethod),
+  getOAuthData: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .output(GetOAuthDataOutput)
+    .query(getOAuthDataMethod),
+  setOAuthData: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .input(SetOAuthDataInput)
+    .mutation(setOAuthDataMethod),
+  initSmartContractWallet: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .input(InitSmartContractWalletInput)
+    .output(InitSmartContractWalletOutput)
+    .query(initSmartContractWalletMethod),
   deleteAccountNode: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
+  getAccountReferenceTypes: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(Analytics)
+    .output(GetAccountReferenceTypeOutput)
+    .query(getAccountReferenceTypes),
+  revokeWalletSessionKey: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(Analytics)
+    .input(RevokeWalletSessionKeyInput)
+    .mutation(revokeWalletSessionKeyMethod),
+  revokeWalletSessionKeyBatch: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(RevokeWalletSessionKeyBatchInput)
+    .mutation(revokeWalletSessionKeyBatchMethod),
+  sendBillingNotification: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SendBillingNotificationInput)
+    .mutation(sendBillingNotificationMethod),
+  sendReconciliationNotification: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SendReconciliationNotificationInput)
+    .query(sendReconciliationNotificationMethod),
+  sendFailedPaymentNotification: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SendFailedPaymentNotificationInput)
+    .mutation(sendFailedPaymentNotificationMethod),
+  sendSuccessfulPaymentNotification: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SendSuccessfulPaymentNotificationInput)
+    .mutation(sendSuccessfulPaymentNotificationMethod),
+  getAccountURNForEmail: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAccountURNForEmailInputSchema)
+    .output(GetAccountURNForEmailOutputSchema)
+    .query(getAccountURNForEmailMethod),
 })

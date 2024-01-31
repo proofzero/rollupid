@@ -2,9 +2,8 @@ import { GraphQLError } from 'graphql'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
-import type { AccountURN } from '@proofzero/urns/account'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAccountClient from '@proofzero/platform-clients/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
+import createCoreClient from '@proofzero/platform-clients/core'
 
 import Env from '../../../env'
 import {
@@ -15,7 +14,7 @@ import {
 
 import { WriteAnalyticsDataPoint } from '@proofzero/packages/platform-clients/analytics'
 
-import { NodeType } from '@proofzero/types/address'
+import { NodeType } from '@proofzero/types/account'
 import {
   generateTraceContextHeaders,
   TraceSpan,
@@ -51,14 +50,14 @@ export const setupContext = () => (next) => (root, args, context, info) => {
 
   const parsedJwt = jwt && parseJwt(jwt)
 
-  const accountURN = jwt ? parsedJwt?.sub : undefined
+  const identityURN = jwt ? parsedJwt?.sub : undefined
 
   const clientId = jwt ? parsedJwt?.aud?.[0] : undefined
 
   return next(
     root,
     args,
-    { ...context, jwt, apiKey, accountURN, parsedJwt, clientId },
+    { ...context, jwt, apiKey, identityURN, parsedJwt, clientId },
     info
   )
 }
@@ -117,15 +116,16 @@ export const validateApiKey =
 
       const env = context.env as Env
       const traceSpan = context.traceSpan as TraceSpan
-      const starbaseClient = createStarbaseClient(
-        env.Starbase,
+
+      const coreClient = createCoreClient(
+        env.Core,
         generateTraceContextHeaders(traceSpan)
       )
 
       // API key validation
       let apiKeyValidity
       try {
-        apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
+        apiKeyValidity = await coreClient.starbase.checkApiKey.query({ apiKey })
       } catch (e) {
         throw new GraphQLError('Unable to validate given API key.', {
           extensions: {
@@ -149,12 +149,15 @@ export const validateApiKey =
       // Check matching between ClientId in API Key and in audience list of jwt
       // This is being checked only if jwt is presented
       if (context.jwt && context.jwt.length) {
-        const aud = context.parsedJwt.aud
+        const { payload: jwtPayload } =
+          await coreClient.authorization.verifyToken.query({
+            token: context.jwt,
+          })
 
         const jwtSub = jose.decodeJwt(apiKey).sub as ApplicationURN
         const clientId = ApplicationURNSpace.parse(jwtSub).decoded
 
-        if (!aud.includes(clientId)) {
+        if (jwtPayload.aud && !jwtPayload.aud.includes(clientId)) {
           throw new GraphQLError(
             "Client ID in API key doesn't match with the one in JWT.",
             {
@@ -165,6 +168,22 @@ export const validateApiKey =
               },
             }
           )
+        }
+
+        const { customDomain } =
+          await coreClient.starbase.getAppPublicProps.query({
+            clientId,
+          })
+        if (customDomain?.isActive) {
+          const expectedIssuer = `https://${customDomain.hostname}`
+          if (expectedIssuer != jwtPayload.iss)
+            throw new GraphQLError('The access token issuer does not match', {
+              extensions: {
+                http: {
+                  status: 400,
+                },
+              },
+            })
         }
       }
     }
@@ -229,26 +248,26 @@ export const logAnalytics =
     return next(root, args, context, info)
   }
 
-export const getConnectedAddresses = async ({
-  accountURN,
-  Account,
+export const getConnectedAccounts = async ({
+  identityURN,
+  Core,
   jwt,
   traceSpan,
 }: {
-  accountURN: AccountURN
-  Account: Fetcher
+  identityURN: IdentityURN
+  Core: Fetcher
   jwt?: string
   traceSpan: TraceSpan
 }) => {
-  const accountClient = createAccountClient(Account, {
+  const coreClient = createCoreClient(Core, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(traceSpan),
   })
 
-  const addresses = await accountClient.getAddresses.query({
-    account: accountURN,
+  const accounts = await coreClient.identity.getAccounts.query({
+    URN: identityURN,
   })
 
   // for alchemy calls they need to be lowercased
-  return addresses
+  return accounts
 }

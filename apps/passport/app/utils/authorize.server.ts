@@ -1,13 +1,11 @@
-import { getAccountClient, getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
-  getNormalisedConnectedEmails,
-  getNormalisedSmartContractWallets,
+  getEmailDropdownItems,
+  getAccountDropdownItems,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 import { createAuthorizationParamsCookieHeaders } from '~/session.server'
-
-import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
 
 import {
   SCOPE_CONNECTED_ACCOUNTS,
@@ -15,21 +13,21 @@ import {
   SCOPE_SMART_CONTRACT_WALLETS,
 } from '@proofzero/security/scopes'
 
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import type { PersonaData } from '@proofzero/types/application'
-import type {
-  EmailSelectListItem,
-  SCWalletSelectListItem,
-} from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { redirect } from '@remix-run/cloudflare'
-import { CryptoAddressType } from '@proofzero/types/address'
+import { CryptoAccountType, NodeType } from '@proofzero/types/account'
+import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import type { AccountURN } from '@proofzero/urns/account'
+import { Address } from 'viem'
+import { NO_OP_ACCOUNT_PLACEHOLDER } from '@proofzero/platform.account/src/constants'
 
 export type DataForScopes = {
-  connectedEmails?: EmailSelectListItem[]
-  personaData?: PersonaData
+  connectedEmails: DropdownSelectListItem[]
+  personaData: PersonaData
   requestedScope: string[]
-  connectedAccounts?: GetAddressProfileResult[]
-  connectedSmartContractWallets?: SCWalletSelectListItem[]
+  connectedAccounts: DropdownSelectListItem[]
+  connectedSmartContractWallets: DropdownSelectListItem[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -56,54 +54,58 @@ export const reorderScope = (scopes: string[]): string[] => {
 
 export const getDataForScopes = async (
   requestedScope: string[],
-  accountURN: AccountURN,
+  identityURN: IdentityURN,
   jwt?: string,
   env?: any,
   traceSpan?: any
 ): Promise<DataForScopes> => {
-  if (!accountURN)
-    throw new UnauthorizedError({ message: 'Account URN is required' })
+  if (!identityURN)
+    throw new UnauthorizedError({ message: 'Identity URN is required' })
 
-  let connectedSmartContractWallets: SCWalletSelectListItem[] = []
-  let connectedEmails: EmailSelectListItem[] = []
-  let connectedAddresses: GetAddressProfileResult[] = []
+  let connectedSmartContractWallets: Array<DropdownSelectListItem> = []
+  let connectedEmails: Array<DropdownSelectListItem> = []
+  let connectedAddresses: Array<DropdownSelectListItem> = []
 
-  const accountClient = getAccountClient(jwt || '', env, traceSpan)
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context, jwt })
 
-  const connectedAccounts = await accountClient.getAddresses.query({
-    account: accountURN,
+  const connectedAccounts = await coreClient.identity.getAccounts.query({
+    URN: identityURN,
   })
 
   if (connectedAccounts && connectedAccounts.length) {
     if (requestedScope.includes(Symbol.keyFor(SCOPE_EMAIL)!)) {
-      connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+      connectedEmails = getEmailDropdownItems(connectedAccounts)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
-      connectedAddresses = await Promise.all(
-        connectedAccounts
-          .filter((ca) => {
-            return ca.rc.addr_type !== CryptoAddressType.Wallet
-          })
-          .map((ca) => {
-            const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
-            return addressClient.getAddressProfile.query()
-          })
-      )
+      const accounts = connectedAccounts
+        .filter((ca) => {
+          return (
+            (ca.rc.node_type === NodeType.OAuth ||
+              ca.rc.node_type === NodeType.Email ||
+              ca.rc.node_type === NodeType.Crypto) &&
+            ca.rc.addr_type !== CryptoAccountType.Wallet
+          )
+        })
+        .map((ca) => {
+          return ca.baseUrn as AccountURN
+        })
+
+      const accountProfiles =
+        await coreClient.account.getAccountProfileBatch.query(accounts)
+      connectedAddresses = getAccountDropdownItems(accountProfiles)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
-      const scWalletAddresses = await Promise.all(
-        connectedAccounts
-          .filter((ca) => {
-            return ca.rc.addr_type === CryptoAddressType.Wallet
-          })
-          .map((ca) => {
-            const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
-            return addressClient.getAddressProfile.query()
-          })
-      )
-
-      connectedSmartContractWallets =
-        getNormalisedSmartContractWallets(scWalletAddresses)
+      const accounts = connectedAccounts
+        .filter((ca) => {
+          return ca.rc.addr_type === CryptoAccountType.Wallet
+        })
+        .map((ca) => {
+          return ca.baseUrn as AccountURN
+        })
+      const accountProfiles =
+        await coreClient.account.getAccountProfileBatch.query(accounts)
+      connectedSmartContractWallets = getAccountDropdownItems(accountProfiles)
     }
   }
 
@@ -163,6 +165,31 @@ export async function createAuthzParamCookieAndCreate(
     throw new BadRequestError({ message: 'Invalid create_type' })
   }
   throw redirect(redirectURL, {
-    headers: await createAuthorizationParamsCookieHeaders(authzParams, env),
+    headers: await createAuthorizationParamsCookieHeaders(
+      request,
+      authzParams,
+      env
+    ),
   })
+}
+
+export async function createNewSCWallet({
+  nickname,
+  primaryAccountURN,
+  env,
+  traceSpan,
+}: {
+  nickname: string
+  primaryAccountURN: AccountURN
+  env: Env
+  traceSpan?: any
+}) {
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context, accountURN: primaryAccountURN })
+  const { accountURN } = await coreClient.account.initSmartContractWallet.query(
+    {
+      nickname,
+    }
+  )
+  return { accountURN }
 }

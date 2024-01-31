@@ -1,8 +1,8 @@
 import {
-  CryptoAddressType,
-  EmailAddressType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
+  CryptoAccountType,
+  EmailAccountType,
+  OAuthAccountType,
+} from '@proofzero/types/account'
 
 import ethereumIcon from '@proofzero/design-system/src/assets/social_icons/ethereum.svg'
 import scWalletIcon from '@proofzero/design-system/src/assets/social_icons/sc_wallet.svg'
@@ -10,38 +10,38 @@ import emailIcon from '@proofzero/design-system/src/assets/social_icons/email.sv
 import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
 import githubIcon from '@proofzero/design-system/src/atoms/providers/Github'
-import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
+import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
 import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
 
-export const imageFromAddressType = (addressType: string) => {
+export const imageFromAccountType = (accountType: string) => {
   let providerIcon = null
-  switch (addressType) {
-    case CryptoAddressType.ETH:
+  switch (accountType) {
+    case CryptoAccountType.ETH:
       providerIcon = ethereumIcon
       break
-    case CryptoAddressType.Wallet:
+    case CryptoAccountType.Wallet:
       providerIcon = scWalletIcon
       break
-    case EmailAddressType.Email:
+    case EmailAccountType.Email:
       providerIcon = emailIcon
       break
-    case OAuthAddressType.Apple:
+    case OAuthAccountType.Apple:
       providerIcon = appleIcon
       break
-    case OAuthAddressType.Discord:
+    case OAuthAccountType.Discord:
       providerIcon = discordIcon
       break
-    case OAuthAddressType.GitHub:
+    case OAuthAccountType.GitHub:
       providerIcon = githubIcon
       break
-    case OAuthAddressType.Google:
+    case OAuthAccountType.Google:
       providerIcon = googleIcon
       break
-    case OAuthAddressType.Microsoft:
+    case OAuthAccountType.Microsoft:
       providerIcon = microsoftIcon
       break
-    case OAuthAddressType.Twitter:
+    case OAuthAccountType.Twitter:
       providerIcon = twitterIcon
       break
   }

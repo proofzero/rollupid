@@ -1,23 +1,32 @@
-import React, { useContext } from 'react'
+import React, { useContext, lazy } from 'react'
 
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '../../atoms/text/Text'
 
-import { WagmiConfig, Config } from 'wagmi'
 import ConnectOAuthButton, {
   OAuthProvider,
 } from '../../atoms/buttons/connect-oauth-button'
-import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
 
+const ConnectButton = lazy(() =>
+  import('../../atoms/buttons/connect-button/ConnectButton').then((module) => ({
+    default: module.ConnectButton,
+  }))
+)
+
 export const AuthenticationScreenDefaults = {
   defaultLogoURL: circleLogo,
   defaultHeading: 'Welcome to the Private Web',
+  defaultSignMessage: `Welcome to Rollup!
+
+Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
+
+This will not trigger a blockchain transaction or cost any gas fees.`,
   defaultSubheading: 'How would you like to continue?',
   knownKeys: [
     'wallet',
@@ -29,49 +38,45 @@ export const AuthenticationScreenDefaults = {
     'discord',
     'github',
   ],
+  color: {
+    light: '#6366F1',
+    dark: '#C6C7FF',
+  },
+  radius: 'lg',
 }
 
-export type AppProfile = {
-  name: string
-  iconURL: string
-  termsURL: string
-  privacyURL: string
-  websiteURL: string
-}
+export const appendNonceTemplate = (signMessage: string) =>
+  `${signMessage}${signMessage.endsWith('\n') ? '' : '\n'}\n{{nonce}}`
 
 export type AuthenticationProps = {
   logoURL?: string
-  appProfile?: AppProfile
   displayKeys: string[]
   mapperArgs: DisplayKeyMapperArgs
   Header?: JSX.Element
   Actions?: JSX.Element
-  radius?: string
 }
 
-export default ({
-  appProfile,
+export default function Authentication({
   displayKeys,
   mapperArgs,
   Header,
   Actions,
-  radius = 'lg',
-}: AuthenticationProps) => {
+}: AuthenticationProps) {
   displayKeys = displayKeys.filter((key) =>
     AuthenticationScreenDefaults.knownKeys.includes(key)
   )
 
-  const { dark } = useContext(ThemeContext)
+  const { dark, theme } = useContext(ThemeContext)
 
   return (
     <div className={`relative ${dark ? 'dark' : ''}`}>
       <div
         className={`flex grow-0 flex-col items-center
          gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[580px]
-          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${radius}
-          mt-auto`}
+          max-h-[100dvh] w-full lg:w-[418px] rounded-${
+            theme?.radius ? theme.radius : AuthenticationScreenDefaults.radius
+          } mt-auto border border-[#D1D5DB] dark:border-gray-600`}
         style={{
-          border: '1px solid #D1D5DB',
           boxSizing: 'border-box',
         }}
       >
@@ -89,13 +94,12 @@ export default ({
           {displayKeys.length > 2 && (
             <>
               <div className="flex flex-row items-center">
-                <div className="border-t border-gray-200 flex-1"></div>
+                <div className="border-t border-gray-200 dark:border-gray-600 flex-1"></div>
                 <Text className="px-3 text-gray-500" weight="medium">
                   or
                 </Text>
-                <div className="border-t border-gray-200 flex-1"></div>
+                <div className="border-t border-gray-200 dark:border-gray-600 flex-1"></div>
               </div>
-
               {displayKeyDisplayFn(displayKeys.slice(2), mapperArgs)}
             </>
           )}
@@ -120,7 +124,6 @@ export default ({
 
 type DisplayKeyMapperArgs = {
   clientId: string
-  wagmiConfig: Config
   signData: any
   walletConnectCallback?: (address: string) => void
   walletSignCallback?: (
@@ -131,45 +134,45 @@ type DisplayKeyMapperArgs = {
   ) => void
   walletConnectErrorCallback?: (error: Error) => void
   navigate?: (URL: string) => void
-  FormWrapperEl?: ({ children, provider }) => JSX.Element
+  authnQueryParams: string
   loading?: boolean
   flex?: boolean
   displayContinueWith?: boolean
   enableOAuthSubmit?: boolean
+  signMessageTemplate: string
 }
 const displayKeyMapper = (
   key: string,
   {
     clientId,
-    wagmiConfig,
     signData,
     walletConnectCallback = () => {},
     walletSignCallback = () => {},
     walletConnectErrorCallback = () => {},
     navigate = () => {},
-    FormWrapperEl = ({ children }) => <>{children}</>,
+    authnQueryParams,
     loading = false,
     flex = false,
     displayContinueWith = false,
     enableOAuthSubmit = false,
+    signMessageTemplate,
   }: DisplayKeyMapperArgs
 ) => {
   let el
   switch (key) {
     case 'wallet':
       el = (
-        <WagmiConfig config={wagmiConfig}>
-          <ConnectButton
-            key={key}
-            signData={signData}
-            isLoading={loading}
-            fullSize={flex}
-            displayContinueWith={displayContinueWith}
-            connectCallback={walletConnectCallback}
-            signCallback={walletSignCallback}
-            connectErrorCallback={walletConnectErrorCallback}
-          />
-        </WagmiConfig>
+        <ConnectButton
+          key={key}
+          signData={signData}
+          isLoading={loading}
+          fullSize={flex}
+          displayContinueWith={displayContinueWith}
+          connectCallback={walletConnectCallback}
+          connectErrorCallback={walletConnectErrorCallback}
+          signCallback={walletSignCallback}
+          signMessageTemplate={signMessageTemplate}
+        />
       )
       break
     case 'email':
@@ -186,14 +189,15 @@ const displayKeyMapper = (
       break
     default:
       el = (
-        <FormWrapperEl provider={key}>
-          <ConnectOAuthButton
-            provider={key as OAuthProvider}
-            fullSize={flex}
-            displayContinueWith={displayContinueWith}
-            submit={enableOAuthSubmit}
-          />
-        </FormWrapperEl>
+        <ConnectOAuthButton
+          provider={key as OAuthProvider}
+          fullSize={flex}
+          displayContinueWith={displayContinueWith}
+          onClick={() => {
+            const search = authnQueryParams ? `?${authnQueryParams}` : ''
+            navigate(`/connect/${key}${search}`)
+          }}
+        />
       )
   }
 
@@ -274,7 +278,6 @@ const displayKeyDisplayFn = (
       Math.ceil(displayKeys.length / 2),
       displayKeys.length
     )
-
     return [
       ...displayKeyDisplayFn(firstHalf, mapperArgs),
       ...displayKeyDisplayFn(secondHalf, mapperArgs),

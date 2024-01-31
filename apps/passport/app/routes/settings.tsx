@@ -1,6 +1,6 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
 
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import {
   getDefaultAuthzParams,
   getValidatedSessionContext,
@@ -15,18 +15,20 @@ import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/favicon.svg'
 import noImg from '~/assets/noImg.svg'
 
-import {
-  getAccessClient,
-  getAccountClient,
-  getAddressClient,
-  getStarbaseClient,
-} from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 
-import type { AddressURN } from '@proofzero/urns/address'
-import type { NodeType } from '@proofzero/types/address'
-import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import type { LinksFunction } from '@remix-run/cloudflare'
+import type { AccountURN } from '@proofzero/urns/account'
+import type { NodeType } from '@proofzero/types/account'
+import type {
+  LoaderFunction,
+  MetaFunction,
+  LinksFunction,
+} from '@remix-run/cloudflare'
+
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+
+import { usePostHog } from 'posthog-js/react'
+import { useEffect, useState } from 'react'
 
 export type AuthorizedAppsModel = {
   clientId: string
@@ -46,98 +48,91 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
+    const host = request.headers.get('host') as string
+    if (!context.env.DEFAULT_HOSTS.includes(host)) {
+      throw redirect('/not-found')
+    }
+
     const passportDefaultAuthzParams = getDefaultAuthzParams(request)
 
-    const { jwt, accountUrn } = await getValidatedSessionContext(
+    const { jwt, identityURN } = await getValidatedSessionContext(
       request,
       passportDefaultAuthzParams,
       context.env,
       context.traceSpan
     )
 
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const starbaseClient = getStarbaseClient(
-      jwt,
-      context.env,
-      context.traceSpan
-    )
-    const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
+    const coreClient = getCoreClient({ context, jwt })
 
-    const accountProfile = await accountClient.getProfile.query({
-      account: accountUrn,
+    const identityProfile = await coreClient.identity.getProfile.query({
+      identity: identityURN,
     })
 
-    const addressTypeUrns = accountProfile?.addresses.map((a) => ({
+    const accountTypeUrns = identityProfile?.accounts.map((a) => ({
       urn: a.baseUrn,
       nodeType: a.rc.node_type,
-    })) as { urn: AddressURN; nodeType: NodeType }[]
+    })) as { urn: AccountURN; nodeType: NodeType }[]
 
-    const apps = await accountClient.getAuthorizedApps.query({
-      account: accountUrn,
+    const accounts = accountTypeUrns.map((atu) => atu.urn)
+
+    const apps = await coreClient.identity.getAuthorizedApps.query({
+      identity: identityURN,
     })
 
     const awaitedResults = await Promise.all([
       Promise.all(
         apps.map(async (a) => {
-          try {
-            const [appPublicProps, appAuthorizedScopes] = await Promise.all([
-              starbaseClient.getAppPublicProps.query({
-                clientId: a.clientId,
-              }),
-              accessClient.getAuthorizedAppScopes.query({
-                clientId: a.clientId,
-                accountURN: accountUrn,
-              }),
-            ])
+          const appAuthorizedScopes =
+            await coreClient.authorization.getAuthorizedAppScopes.query({
+              clientId: a.clientId,
+              identityURN: identityURN,
+            })
 
-            return {
-              clientId: a.clientId,
-              icon: appPublicProps.iconURL,
-              title: appPublicProps.name,
-              timestamp: a.timestamp,
-              appScopeError: Object.entries(appAuthorizedScopes).some(
-                ([_, value]) => !value.meta.valid
-              ),
-            }
-          } catch (e) {
-            //We swallow the error and move on to next app
-            console.error(e)
-            return {
-              clientId: a.clientId,
-              icon: noImg,
-              timestamp: a.timestamp,
-              appDataError: true,
-            }
+          return {
+            clientId: a.clientId,
+            timestamp: a.timestamp,
+            appScopeError: Object.entries(appAuthorizedScopes.claimValues).some(
+              ([_, value]) => !value.meta.valid
+            ),
           }
         })
       ),
-      Promise.all(
-        addressTypeUrns.map((address) => {
-          const addressClient = getAddressClient(
-            address.urn,
-            context.env,
-            context.traceSpan
-          )
-          return addressClient.getAddressProfile.query()
-        })
-      ),
+      coreClient.starbase.getAppPublicPropsBatch.query({
+        apps: apps.map((a) => ({ clientId: a.clientId })),
+        silenceErrors: true,
+      }),
+      coreClient.account.getAccountProfileBatch.query(accounts),
     ])
 
-    const authorizedApps = awaitedResults[0]
-    const addressProfiles = awaitedResults[1]
+    const [authorizedApps, appsPublicProps, accountProfiles] = awaitedResults
 
-    const normalizedConnectedProfiles = addressProfiles.map((p, i) => ({
-      ...addressTypeUrns[i],
+    const authzAppResults: AuthorizedAppsModel[] = []
+    authorizedApps.forEach((authzApp, index) => {
+      //Merging props from authorizedApps and appsPublicProps
+      const appPublicProps = appsPublicProps[index]
+      if (appPublicProps)
+        authzAppResults.push({
+          ...authzApp,
+          icon: appPublicProps.iconURL,
+          title: appPublicProps.name,
+        })
+      else
+        authzAppResults.push({ ...authzApp, icon: noImg, appDataError: true })
+    })
+
+    const normalizedConnectedProfiles = accountProfiles.map((p, i) => ({
+      ...accountTypeUrns[i],
       ...p,
     }))
 
     return json({
-      pfpUrl: accountProfile?.pfp?.image,
-      displayName: accountProfile?.displayName,
-      authorizedApps: authorizedApps,
+      pfpUrl: identityProfile?.pfp?.image,
+      displayName: identityProfile?.displayName,
+      authorizedApps: authzAppResults,
       connectedProfiles: normalizedConnectedProfiles,
       CONSOLE_URL: context.env.CONSOLE_APP_URL,
-      primaryAddressURN: accountProfile?.primaryAddressURN,
+      primaryAccountURN: identityProfile?.primaryAccountURN,
+      identityURN,
     })
   }
 )
@@ -155,8 +150,20 @@ export default function SettingsLayout() {
     pfpUrl,
     CONSOLE_URL,
     displayName,
-    primaryAddressURN,
+    primaryAccountURN,
+    identityURN,
   } = useLoaderData()
+
+  const [isIdentified, setIsIdentified] = useState(false)
+  const posthog = usePostHog()
+
+  // need to identify only once
+  useEffect(() => {
+    if (!isIdentified) {
+      posthog?.identify(identityURN)
+    }
+    setIsIdentified(true)
+  }, [isIdentified])
 
   return (
     <Popover className="bg-white lg:bg-gray-50 min-h-[100dvh] relative">
@@ -187,7 +194,7 @@ export default function SettingsLayout() {
                   context={{
                     authorizedApps,
                     connectedProfiles,
-                    primaryAddressURN,
+                    primaryAccountURN,
                     CONSOLE_URL,
                   }}
                 />

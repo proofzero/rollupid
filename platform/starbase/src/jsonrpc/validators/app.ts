@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import { CustomDomainSchema } from './customdomain'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const AppObjectSchema = z.object({
   name: z.string(),
@@ -8,6 +10,7 @@ export const AppObjectSchema = z.object({
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
+  customDomain: CustomDomainSchema.optional(),
 })
 
 export type AppObject = z.infer<typeof AppObjectSchema>
@@ -25,6 +28,8 @@ export const AppReadableFieldsSchema = z.object({
   createdTimestamp: z.number().optional(),
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
+  customDomain: CustomDomainSchema.optional(),
+  appPlan: z.nativeEnum(ServicePlanType).default(ServicePlanType.FREE),
 })
 
 export const AppInternalFieldSchema = z.object({
@@ -43,6 +48,7 @@ export const AppClientIdParamSchema = z.object({
 
 export const AppThemeSchema = z.object({
   heading: z.string().optional(),
+  signMessageTemplate: z.string().optional(),
   radius: z.string().optional(),
   color: z
     .object({
@@ -71,15 +77,29 @@ export const EmailOTPThemeSchema = z.object({
 
 export type EmailOTPTheme = z.infer<typeof EmailOTPThemeSchema>
 
+export const OGThemeSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  image: z.string().url().optional(),
+})
+
+export type OGTheme = z.infer<typeof OGThemeSchema>
+
 export const AppPublicPropsSchema = z.object({
   name: z.string(),
   iconURL: z.string(),
-  scopes: z.array(z.string()),
+  scopes: z.array(z.string()).optional(),
   redirectURI: z.string().optional(),
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
   appTheme: AppThemeSchema.optional(),
+  customDomain: z
+    .object({
+      hostname: z.string(),
+      isActive: z.boolean(),
+    })
+    .optional(),
 })
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>
@@ -96,28 +116,3 @@ export const PaymasterSchema = z
 export type PaymasterType = z.infer<typeof PaymasterSchema>
 
 export type PaymasterProviderType = z.infer<typeof PaymasterProviderSchema>
-
-export const CustomDomainSchema = z.object({
-  id: z.string(),
-  hostname: z.string(),
-  ownership_verification: z
-    .object({
-      name: z.string(),
-      type: z.string(),
-      value: z.string(),
-    })
-    .optional(),
-  ssl: z.object({
-    status: z.string(),
-    validation_records: z
-      .array(
-        z.object({
-          status: z.string(),
-          txt_name: z.string(),
-          txt_value: z.string(),
-        })
-      )
-      .optional(),
-  }),
-  status: z.string(),
-})

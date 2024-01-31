@@ -1,10 +1,12 @@
 import { z } from 'zod'
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import * as oauth from '../../OAuth'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import createEdgesClient from '@proofzero/platform-clients/edges'
 import { EDGE_APPLICATION } from '../../types'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const CreateAppInputSchema = z.object({
   clientName: z.string(),
@@ -31,15 +33,17 @@ export const createApp = async ({
   const appURN = ApplicationURNSpace.componentizedUrn(clientId, undefined, {
     name: input.clientName,
   })
-  if (!ctx.accountURN) throw new Error('No account URN in context')
+  if (!ctx.identityURN) throw new Error('No identity URN in context')
 
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   await appDO.class.init(clientId, input.clientName)
 
+  const caller = router.createCaller(ctx)
+
   // We need to create an edge between the logged in user node (aka
   // account) and the new app.
-  const edgeRes = await ctx.edges.makeEdge.mutate({
-    src: ctx.accountURN,
+  const edgeRes = await caller.edges.makeEdge({
+    src: ctx.identityURN,
     dst: appURN,
     tag: EDGE_APPLICATION,
   })
@@ -52,6 +56,32 @@ export const createApp = async ({
   } else {
     console.log(`Created app ${clientId} for account ${ctx.accountURN}`)
   }
+
+  await createAnalyticsEvent({
+    eventName: '$groupidentify',
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: ctx.identityURN,
+    properties: {
+      $groups: { app: clientId },
+      $group_type: 'app',
+      $group_key: clientId,
+      $group_set: {
+        name: input.clientName,
+        plan: ServicePlanType.FREE,
+        clientId: clientId,
+        date_joined: new Date().toISOString(),
+      },
+    },
+  })
+
+  await createAnalyticsEvent({
+    eventName: 'identity_created_app',
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: ctx.identityURN,
+    properties: {
+      $groups: { app: clientId },
+    },
+  })
 
   return {
     clientId: clientId,

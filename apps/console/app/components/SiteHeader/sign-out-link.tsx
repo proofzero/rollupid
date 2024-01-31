@@ -3,8 +3,12 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import { HiOutlineLogout } from 'react-icons/hi'
 
+import { usePostHog } from 'posthog-js/react'
+
 export default function SignOut({ className }: { className: string }) {
   let submit = useSubmit()
+
+  const posthog = usePostHog()
 
   return (
     <button
@@ -12,7 +16,11 @@ export default function SignOut({ className }: { className: string }) {
       text-sm  hover:bg-gray-100' w-full text-left
       flex flex-row items-center text-red-500`}
       style={{ cursor: 'pointer' }}
-      onClick={() => submit(null, { method: 'post', action: `/signout/` })}
+      onClick={() => {
+        // https://posthog.com/docs/data/identify
+        posthog?.reset()
+        submit(null, { method: 'post', action: `/signout/` })
+      }}
     >
       <HiOutlineLogout size={22} className="mr-2" />
       <Text className="truncate" size="sm" weight="medium">

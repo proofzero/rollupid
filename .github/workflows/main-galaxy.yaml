@@ -14,6 +14,7 @@ jobs:
   build-publish-test-galaxy-dev:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    environment: dev
     steps:
       - uses: actions/checkout@v2
 
@@ -31,8 +32,6 @@ jobs:
             node_modules
             .yarn
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
         run: yarn install
@@ -46,10 +45,11 @@ jobs:
       - name: Deploy Galaxy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
+          wranglerVersion: '3.2.0'
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/galaxy'
-          command: publish --env dev
+          command: publish --config wrangler.dev.toml --env dev
           environment: 'dev'
         env:
           NODE_ENV: 'development'

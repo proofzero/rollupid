@@ -1,23 +1,19 @@
 import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
-import { HiOutlineX } from 'react-icons/hi'
+import classNames from 'classnames'
 
 export type ModalProps = {
   children: any
-
   isOpen: boolean
   handleClose?: (value: boolean) => void
-
   fixed?: boolean
-  closable?: boolean
 }
 
 export const Modal = ({
   isOpen = false,
   fixed = false,
   handleClose,
-  closable = true,
   children,
   ...rest
 }: ModalProps) => {
@@ -53,25 +49,18 @@ export const Modal = ({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel>
+              <Dialog.Panel className={`${fixed ? 'pb-10' : ''}`}>
                 <div
-                  className={`flex flex-col ${
-                    fixed
-                      ? `w-full min-[480px]:w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]`
-                      : `max-w-[96vw] lg:w-full max-h-[89vh] lg:h-full pb-10`
-                  }`}
+                  className={classNames(
+                    'border bg-white rounded-lg shadow-xl thin-scrollbar overflow-y-auto ',
+                    {
+                      'h-max min-w-fit w-max min-[480px]:w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]':
+                        fixed,
+                      'h-max min-w-fit w-max min-h-max max-w-[96vw] lg:w-full max-h-[89vh] lg:h-full':
+                        !fixed,
+                    }
+                  )}
                 >
-                  <div className="flex flex-row justify-end p-3">
-                    <div
-                      className={`bg-white rounded-full p-2 text-3xl cursor-pointer
-                      ${!closable ? 'bg-[#f3f4f6] text-[#d1d5db]' : ''}`}
-                      onClick={() => {
-                        if (handleClose && closable) handleClose(false)
-                      }}
-                    >
-                      <HiOutlineX />
-                    </div>
-                  </div>
                   {children}
                 </div>
               </Dialog.Panel>

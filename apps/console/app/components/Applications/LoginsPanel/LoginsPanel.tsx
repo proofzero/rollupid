@@ -70,7 +70,7 @@ export const LoginsPanel = ({
   return (
     <div
       className="border flex-1 flex flex-col rounded-lg h-full pb-7
-     relative shadow bg-white"
+     relative bg-white"
     >
       {authorizedProfiles.length ? (
         <>

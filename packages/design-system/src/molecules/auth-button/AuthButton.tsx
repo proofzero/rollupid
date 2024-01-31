@@ -22,15 +22,14 @@ export const AuthButton = ({
   displayContinueWith = false,
 }: AuthButtonProps) => (
   <Button
-    className="button w-full hover:bg-gray-100 dark:bg-[#374151] dark:border-gray-600"
-    btnType="secondary-alt"
+    className="button w-full hover:bg-gray-100 dark:hover:bg-gray-600 dark:bg-[#374151] dark:border-gray-600"
+    btnType="secondary-alt-skin"
     disabled={disabled}
     onClick={onClick}
   >
     <div
-      className={`flex ${
-        fullSize ? 'justify-start' : 'justify-center'
-      } items-center w-full space-x-3 h-[36px]`}
+      className={`flex ${fullSize ? 'justify-start' : 'justify-center'
+        } items-center w-full space-x-3 h-[36px]`}
     >
       {Graphic && (
         <div

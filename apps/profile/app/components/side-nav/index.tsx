@@ -37,10 +37,10 @@ const subNavigation = [
 
 export const DesktopSideNav = ({
   profile,
-  accountURN,
+  identityURN,
 }: {
   profile: { displayName: string; pfp?: { image: string } }
-  accountURN: string
+  identityURN: string
 }) => {
   return (
     <aside
@@ -51,7 +51,7 @@ export const DesktopSideNav = ({
         className="flex flex-row justify-center items-center lg:flex-none
       hidden lg:block space-y-1"
       >
-        <SideNavBarebone profile={profile} accountURN={accountURN} />
+        <SideNavBarebone profile={profile} identityURN={identityURN} />
       </nav>
     </aside>
   )
@@ -59,13 +59,13 @@ export const DesktopSideNav = ({
 
 export const MobileSideNav = ({
   profile,
-  accountURN,
+  identityURN,
   close,
   ref,
   open,
 }: {
   profile: { displayName: string; pfp?: { image: string } }
-  accountURN: string
+  identityURN: string
   close: (
     focusableElement?:
       | HTMLElement
@@ -101,7 +101,7 @@ export const MobileSideNav = ({
 
       <SideNavBarebone
         profile={profile}
-        accountURN={accountURN}
+        identityURN={identityURN}
         close={close}
       />
 
@@ -125,11 +125,11 @@ export const MobileSideNav = ({
 
 export const SideNavBarebone = ({
   profile,
-  accountURN,
+  identityURN,
   close,
 }: {
   profile: { displayName: string; pfp?: { image: string } }
-  accountURN: string
+  identityURN: string
   close?: (
     focusableElement?:
       | HTMLElement
@@ -159,7 +159,7 @@ export const SideNavBarebone = ({
             {profile.displayName}
           </Text>
           <Link
-            to={`/p/${accountURN}`}
+            to={`/p/${identityURN}`}
             target="_blank"
             className="flex flex-row items-center text-indigo-500"
           >

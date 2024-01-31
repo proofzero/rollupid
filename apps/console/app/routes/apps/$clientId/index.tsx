@@ -15,10 +15,9 @@ import {
 } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Panel } from '@proofzero/design-system/src/atoms/panels/Panel'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { CTA } from '@proofzero/design-system/src/molecules/cta/cta'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
@@ -28,7 +27,7 @@ import { LoginsPanel } from '~/components/Applications/LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 import type { appDetailsProps } from '~/types'
 
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { requireJWT } from '~/utilities/session.server'
 
 import { RollType } from '~/types'
@@ -36,7 +35,7 @@ import type { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { loader as usersLoader } from './users'
-import type { AuthorizedAccountsOutput } from '@proofzero/platform/starbase/src/types'
+import type { AuthorizedIdentitiesOutput } from '@proofzero/platform/starbase/src/types'
 import type { UsersLoaderData } from './users'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { BadRequestError } from '@proofzero/errors'
@@ -51,7 +50,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 export const NUMBER_OF_DISPLAYED_USERS = 8
 
 type LoaderData = {
-  edgesResult: Promise<AuthorizedAccountsOutput>
+  edgesResult: Promise<AuthorizedIdentitiesOutput>
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -81,8 +80,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const jwt = await requireJWT(request)
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const jwt = await requireJWT(request, context.env)
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -94,7 +93,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (op) {
       case RollType.RollAPIKey:
         const rotatedApiKey = (
-          await starbaseClient.rotateApiKey.mutate({
+          await coreClient.starbase.rotateApiKey.mutate({
             clientId: params.clientId,
           })
         ).apiKey
@@ -103,7 +102,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         })
       case RollType.RollClientSecret:
         const rotatedClientSecret = (
-          await starbaseClient.rotateClientSecret.mutate({
+          await coreClient.starbase.rotateClientSecret.mutate({
             clientId: params.clientId,
           })
         ).secret
@@ -299,18 +298,14 @@ export default function AppDetailIndexPage() {
         </div>
         <div className="flex-1">
           <div className="flex h-full flex-col">
-            <Text
-              className="text-gray-900 py-3 px-6"
-              weight="semibold"
-              size="lg"
-            >
+            <Text className="text-gray-900 py-3" weight="semibold" size="lg">
               Users
             </Text>{' '}
             <Suspense
               fallback={
                 <div
                   className="flex bg-white justify-center items-center h-full
-            rounded-lg border shadow"
+            rounded-lg border"
                 >
                   <Spinner />
                 </div>
@@ -324,7 +319,7 @@ export default function AppDetailIndexPage() {
                   return (
                     <LoginsPanel
                       authorizedProfiles={
-                        edgesResult.accounts.slice(
+                        edgesResult.identities.slice(
                           0,
                           NUMBER_OF_DISPLAYED_USERS
                         ) || []

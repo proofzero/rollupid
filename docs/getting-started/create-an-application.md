@@ -2,67 +2,38 @@
 description: Step-by-step guide to creating a Rollup application.
 ---
 
-# Create an application
-
-Follow these steps to create and configure your Rollup ID application:
+# Create an Application
 
 ### Step 1: Connect with Rollup Passport
 
-First, visit [https://console.rollup.id](https://passport.rollup.id/) and log in to the [Console](../platform/console/) using Rollup Passport. You'll see a screen that offers various authentication methods to register or log in.
+* Begin by visiting the [Rollup Console](https://console.rollup.id/) and logging in.
+* Once logged in, you'll land on the [Console](../platform/console/) dashboard. If this is your first time logging in you will be presented with an quick onboarding flow where you will be directed to create an application.
 
-<figure><img src="../.gitbook/assets/authenticate.svg" alt=""><figcaption><p>Rollup Passport Authentication</p></figcaption></figure>
+### Step 2: Register Your Application
 
-### Step 2: Create an App
-
-Once you've logged in, you'll be redirected to the Console dashboard. Here, you can register and configure your Rollup ID application.
-
-Click on the "Create Application" button in the center of the screen. You'll be prompted to enter a name for your application and then redirected to the application's configuration screen.
-
-<div>
-
-<figure><img src="../.gitbook/assets/DashboardInstruction.png" alt=""><figcaption></figcaption></figure>
-
- 
-
-<figure><img src="../.gitbook/assets/Create Application.png" alt=""><figcaption></figcaption></figure>
-
-</div>
+* In your personal or group dashboard click on the "Create Application" button.
+* Provide a name for your application. After this, you'll be redirected to the application's configuration screen.
 
 ### Step 3: Configure your Application
 
-Upon creating your app, you'll land on the application dashboard. This is where you can obtain your [Galaxy API](../reference/galaxy-api.md) key and application keys.
+On the application dashboard, you can obtain your Galaxy API key and application keys.
 
 {% hint style="warning" %}
 The Client Secret is only shared once so, if you missed it you can click the "roll keys" link to regenerate the keys.
 {% endhint %}
 
-<div>
+Navigate to the "OAuth" section for a comprehensive application configuration. Here, you'll find a standard [OAuth 2.0](https://oauth.net/2/) configuration form. Ensure you fill in the required fields to customize your auth flow:
 
-<figure><img src="../.gitbook/assets/Application Detail - Dashboard.png" alt=""><figcaption></figcaption></figure>
-
- 
-
-<figure><img src="../.gitbook/assets/Application Detail - Dashboard (1) (1).png" alt=""><figcaption></figcaption></figure>
-
-</div>
-
-Next, click the "OAuth" link in the left navigation bar to access the full application configuration screen. Here, you'll find a standard [OAuth 2.0](https://oauth.net/2/) configuration form.
-
-<figure><img src="../.gitbook/assets/oauth.png" alt=""><figcaption></figcaption></figure>
-
-Fill in the following required fields:
-
-* **Redirect URL**: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md)).
-* **App Icon**: Your application's logo, which will be displayed to users during the auth flow ([see passport for more](../platform/passport.md)).
+* **Application Name:** The name of your application. This will be displayed to users during the auth flow.
+* **Redirect URL**: Where Rollup redirects users post-authentication to exchange tokens (more details on this on next page).
+* **App Icon**: Your application's logo, which will be displayed to users during the auth flow.
+* **Allowed scope**: The superset of [scope](../reference/scopes.md) values that the application can request from users.
 * **Terms of Service URL**: A link to your application's TOS
-* **Website**: A link to your application's website
-* **Allowed scope**: The superset of scope values that the application can request
-* **Domains**: \[coming soon]
+* **Privacy Policy URL**: A link to your application's Privacy Policy
+* **Website URL**: A link to your application's website
 
 {% hint style="warning" %}
-In most cases, you'll need to set up an app for each environment and provide the appropriate **redirect URL** for each. For instance, you might use a "**localhost**" redirect URL for local development and a "staging" redirect URL for test environments.
+For different environments (like development or testing), set up distinct apps with the appropriate redirect URLs (e.g. "localhost").
 {% endhint %}
 
-Fill in any additional optional fields as needed. When you're done, click the "Published" toggle and then the "Save" button.
-
-With your application fully configured, you're now ready to complete the integration.
+Once all details are filled in, activate the "Published" toggle and hit the "Save" button. With your application fully configured, you're now ready to complete integrate the auth flow into your app.

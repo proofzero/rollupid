@@ -38,13 +38,29 @@ export default function handleRequest(
     (nonce, dev) =>
       getCSP({
         directives: {
-          'default-src': [SELF],
+          'default-src': [
+            SELF,
+            'https://verify.walletconnect.com',
+            'form.typeform.com',
+            'https://*.stripe.com',
+          ],
           'connect-src': [
             SELF,
             '*.google-analytics.com',
+            'wss://relay.walletconnect.com',
+            'https://*.g.alchemy.com',
             'https://upload.imagedelivery.net',
+            'https://analytics.rollup.id',
+            'https://maps.googleapis.com',
+            'https://api.stripe.com',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
+          ],
+          'frame-src': [
+            SELF,
+            'https://js.stripe.com',
+            'https://hooks.stripe.com',
+            'form.typeform.com',
           ],
           'script-src': [SELF, `'nonce-${nonce}' ${STRICT_DYNAMIC}`],
           'style-src': [

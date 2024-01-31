@@ -3,6 +3,7 @@
  */
 
 // TODO migrate to FolderPlusIcon and remove bespoke version
+import { ServicePlanType } from '@proofzero/types/billing'
 import { ApplicationList } from '../Applications/ApplicationList'
 
 // AppBox
@@ -16,6 +17,8 @@ type AppBoxProps = {
     published?: boolean
     createdTimestamp?: number
     icon?: string
+    hasCustomDomain: boolean
+    appPlan: ServicePlanType
   }[]
   // Link target for creating a new application.
   createLink: string
@@ -31,6 +34,8 @@ export default function AppBox(props: AppBoxProps) {
     createdTimestamp: app.createdTimestamp,
     published: app.published,
     icon: app.icon,
+    hasCustomDomain: app.hasCustomDomain,
+    appPlan: app.appPlan,
   }))
 
   return (

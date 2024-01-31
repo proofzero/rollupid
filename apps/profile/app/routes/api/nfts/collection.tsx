@@ -1,19 +1,19 @@
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { getAccessToken } from '~/utils/session.server'
 import { getNfts } from '~/helpers/alchemy'
-import { getAccountCryptoAddresses } from '~/helpers/profile'
+import { getIdentityCryptoAddresses } from '~/helpers/profile'
 import type { AlchemyChain } from '@proofzero/packages/alchemy-client'
 import { JsonError } from '@proofzero/utils/errors'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const srcUrl = new URL(request.url)
 
-  const jwt = await getAccessToken(request)
+  const jwt = await getAccessToken(request, context.env)
 
-  const owner = srcUrl.searchParams.get('owner') as AccountURN
+  const owner = srcUrl.searchParams.get('owner') as IdentityURN
   if (!owner) {
     throw new Error('Owner is required')
   }
@@ -29,19 +29,25 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
 
   try {
-    const addresses = await getAccountCryptoAddresses({
-      jwt,
-      traceSpan: context.traceSpan,
-    })
+    const addresses = await getIdentityCryptoAddresses(
+      {
+        jwt,
+      },
+      context.env,
+      context.traceSpan
+    )
 
-    const nftsForAccount = await getNfts({
-      addresses,
-      contractAddresses: [collection],
-      chain,
-    })
+    const nftsForIdentity = await getNfts(
+      {
+        addresses,
+        contractAddresses: [collection],
+        chain,
+      },
+      context.env
+    )
 
     return json({
-      ownedNfts: nftsForAccount,
+      ownedNfts: nftsForIdentity,
     })
   } catch (error) {
     throw JsonError(error, context.traceSpan.getTraceParent())

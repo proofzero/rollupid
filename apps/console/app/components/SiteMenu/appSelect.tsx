@@ -7,11 +7,12 @@
 import { useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { HiGlobeAlt } from 'react-icons/hi'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { TbWorld } from 'react-icons/tb'
+import { Button, Text } from '@proofzero/design-system'
 
 import { useNavigate } from '@remix-run/react'
+import { ServicePlanType } from '@proofzero/types/billing'
+import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 
 // Utility
 // -----------------------------------------------------------------------------
@@ -41,6 +42,7 @@ type AppListboxProps = {
     clientId: string
     name?: string
     icon?: string
+    appPlan?: ServicePlanType
   }[]
   //
   selectedAppIndex: number
@@ -93,12 +95,11 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
           <div className="relative">
             <Listbox.Button
               className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700
-               bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm"
+               bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm sm:text-sm"
             >
               <span className="flex items-center">
-                {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
                 {selected.clientId === 'none' && (
-                  <HiGlobeAlt
+                  <TbWorld
                     className={`h-6 w-6 ${
                       apps?.length === 0 ? 'text-gray-600' : 'text-gray-300'
                     } mr-2.5`}
@@ -160,7 +161,7 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                       clientId: 'all',
                     }}
                   >
-                    <HiGlobeAlt className={`h-6 w-6 mr-2.5`} />
+                    <TbWorld className={`h-6 w-6 mr-2.5`} />
 
                     <Text size="sm" weight="medium">
                       All Applications
@@ -172,25 +173,41 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                   <Listbox.Option key={app.clientId} value={app}>
                     {({ selected, active }) => (
                       <>
-                        <div className="flex items-center py-2 px-4 cursor-pointer hover:bg-gray-700">
-                          {!app.icon && (
-                            <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden mr-2.5">
-                              <Text className="text-gray-500">
-                                {app.name?.substring(0, 1)}
-                              </Text>
-                            </div>
-                          )}
-                          {app.icon && (
-                            <img
-                              src={app.icon}
-                              className="object-cover w-6 h-6 rounded-full mr-2.5"
-                              alt="app icon"
-                            />
-                          )}
+                        <div className="flex items-center justify-between py-2 pl-4 pr-2 cursor-pointer hover:bg-gray-700 ">
+                          <div className="flex flex-row items-center space-x-2.5">
+                            {!app.icon && (
+                              <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
+                                <Text className="text-gray-500">
+                                  {app.name?.substring(0, 1)}
+                                </Text>
+                              </div>
+                            )}
+                            {app.icon && (
+                              <img
+                                src={app.icon}
+                                className="object-cover w-6 h-6 rounded-full mr-2.5"
+                                alt="app icon"
+                              />
+                            )}
 
-                          <Text size="sm" className="truncate" weight="medium">
-                            {app.name}
-                          </Text>
+                            <Text
+                              size="sm"
+                              className="truncate"
+                              weight="medium"
+                            >
+                              {app.name}
+                            </Text>
+                          </div>
+
+                          {app.appPlan !== ServicePlanType.FREE ? (
+                            <Pill
+                              className={`rounded-3xl py-none text-gray-400 ${
+                                active ? 'bg-gray-800' : 'bg-gray-700'
+                              }`}
+                            >
+                              <Text size="xs">{app.appPlan}</Text>
+                            </Pill>
+                          ) : null}
                         </div>
                       </>
                     )}
@@ -222,6 +239,7 @@ type AppSelectProps = {
     clientId: string
     name?: string
     icon?: string
+    appPlan?: ServicePlanType
   }[]
   // The currently selected Client ID.
   selected?: string

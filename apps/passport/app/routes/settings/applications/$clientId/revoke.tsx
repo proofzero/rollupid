@@ -2,7 +2,7 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { getValidatedSessionContext } from '~/session.server'
 
-import { getAccessClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 
 import { getFlashSession, commitFlashSession } from '~/session.server'
 import { BadRequestError } from '@proofzero/errors'
@@ -26,9 +26,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     try {
-      const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
-
-      await accessClient.revokeAppAuthorization.mutate({ clientId })
+      const coreClient = getCoreClient({ context, jwt })
+      await coreClient.authorization.revokeAppAuthorization.mutate({
+        clientId,
+        issuer: new URL(request.url).origin,
+      })
 
       session.flash(
         'tooltipMessage',
@@ -51,7 +53,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     return redirect('/settings/applications', {
       headers: {
-        'Set-Cookie': await commitFlashSession(context.env, session),
+        'Set-Cookie': await commitFlashSession(request, context.env, session),
       },
     })
   }

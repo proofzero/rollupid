@@ -1,10 +1,8 @@
 name = "email"
-
 main = "src/index.ts"
 compatibility_date = "2022-10-05"
-
-workers_dev = false
 logpush = true
+workers_dev = false
 
 services = [{ binding = "Test", service = "test" }]
 
@@ -16,15 +14,3 @@ local_protocol = "http"
 [vars]
 NotificationFromName = "Rollup Local - Notification"
 NotificationFromUser = "noreplylocal"
-
-[env.dev.vars]
-NotificationFromName = "Rollup Dev - Notifcation"
-NotificationFromUser = 'noreply-dev'
-
-[env.next.vars]
-NotificationFromName = "Rollup Next - Notifcation"
-NotificationFromUser = 'noreply-next'
-
-[env.current.vars]
-NotificationFromName = "Rollup - Notifcation"
-NotificationFromUser = 'noreply'

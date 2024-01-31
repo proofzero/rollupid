@@ -20,10 +20,9 @@ import { JsonError, getErrorCause } from '@proofzero/utils/errors'
 import { getAccessToken, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
-import { getAccountProfile } from '~/helpers/profile'
+import { getIdentityProfile } from '~/helpers/profile'
 
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { gatewayFromIpfs } from '@proofzero/utils'
 
 import ProfileTabs from '~/components/profile/tabs/tabs'
@@ -31,11 +30,11 @@ import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/social.png'
 import subtractLogo from '~/assets/subtract-logo.svg'
-import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
-import type { AccountURN } from '@proofzero/urns/account'
-import { AccountURNSpace } from '@proofzero/urns/account'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
-import { imageFromAddressType } from '~/helpers'
+import { CryptoAccountType, OAuthAccountType } from '@proofzero/types/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
+import { Button, Text } from '@proofzero/design-system'
+import { imageFromAccountType } from '~/helpers'
 import type { FullProfile } from '~/types'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -54,38 +53,43 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   }
 
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(context.traceSpan)
+    generateTraceContextHeaders(context.traceSpan),
+    context.env
   )
   if (!address) throw new Error('No address provided in URL')
   if (!type) throw new Error('No provider specified in URL')
 
-  // redirect from any addressURN to its addressURNs
-  let accountURN: AccountURN
+  // redirect from any accountURN to its accountURNs
+  let identityURN: IdentityURN
   if (type !== 'p') {
     try {
-      const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
+      const { identityFromAlias } = await galaxyClient.getIdentityURNFromAlias({
         provider: type,
         alias: address,
       })
 
-      if (!accountFromAlias) {
+      if (!identityFromAlias) {
         throw json({ message: 'Not Found' }, { status: 404 })
       }
 
-      accountURN = accountFromAlias
+      identityURN = identityFromAlias as IdentityURN
     } catch (error) {
       throw JsonError(error, context.traceSpan.getTraceParent())
     }
   } else {
-    accountURN = AccountURNSpace.urn(address) as AccountURN
+    identityURN = IdentityURNSpace.urn(address) as IdentityURN
   }
 
   // if not handle is this let's assume this is an idref
   let profile, jwt
   try {
-    jwt = await getAccessToken(request)
+    jwt = await getAccessToken(request, context.env)
 
-    profile = await getAccountProfile({ jwt, accountURN }, context.traceSpan)
+    profile = await getIdentityProfile(
+      { jwt, identityURN },
+      context.env,
+      context.traceSpan
+    )
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
@@ -95,6 +99,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     if (request.cf.botManagement.score < 30) {
       ogImage = await ogImageFromProfile(
         profile.pfp?.image as string,
+        context.env,
         context.traceSpan
       )
     } else {
@@ -107,20 +112,20 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]
 
-    // Check if the accountURN in jwt matches with accountURN in URL
-    const isOwner = jwt ? parseJwt(jwt).sub === accountURN : false
+    // Check if the identityURN in jwt matches with identityURN in URL
+    const isOwner = jwt ? parseJwt(jwt).sub === identityURN : false
 
     return json({
       uname: profile.displayName || address,
       ogImage: ogImage || defaultOG,
       profile,
-      accountURN,
+      identityURN,
       path,
       isOwner,
     })
   } catch (error) {
     console.log(
-      `Galaxy did not return a profile for address ${accountURN}. Moving on.`
+      `Galaxy did not return a profile for address ${identityURN}. Moving on.`
     )
     console.error(getErrorCause(error))
     throw new Response('No address found', { status: 404 })
@@ -166,11 +171,11 @@ export const meta: MetaFunction = ({
 const UserAddressLayout = () => {
   //TODO: this needs to be optimized so profile isn't fetched from the loader
   //but used from context alone.
-  const { profile, path, isOwner, accountURN } = useLoaderData<{
+  const { profile, path, isOwner, identityURN } = useLoaderData<{
     profile: FullProfile
     path: string
     isOwner: boolean
-    accountURN: string
+    identityURN: string
   }>()
 
   const finalProfile = profile
@@ -251,7 +256,7 @@ const UserAddressLayout = () => {
     >
       <Outlet
         context={{
-          accountURN,
+          identityURN,
           profile: finalProfile,
           isOwner,
         }}
@@ -267,26 +272,26 @@ export function CatchBoundary() {
   console.error('Caught in $type/$address catch boundary', { caught })
 
   const { address, type } = useParams()
-  const icon = imageFromAddressType(type as string)
+  const icon = imageFromAccountType(type as string)
 
   let providerCopy
   switch (type) {
-    case CryptoAddressType.ETH:
+    case CryptoAccountType.ETH:
       providerCopy = 'with Wallet'
       break
-    case OAuthAddressType.Apple:
+    case OAuthAccountType.Apple:
       providerCopy = 'with Apple'
       break
-    case OAuthAddressType.GitHub:
+    case OAuthAccountType.GitHub:
       providerCopy = 'with GitHub'
       break
-    case OAuthAddressType.Google:
+    case OAuthAccountType.Google:
       providerCopy = 'with Google'
       break
-    case OAuthAddressType.Microsoft:
+    case OAuthAccountType.Microsoft:
       providerCopy = 'with Microsoft'
       break
-    case OAuthAddressType.Twitter:
+    case OAuthAccountType.Twitter:
       providerCopy = 'with Twitter'
       break
   }

@@ -3,9 +3,9 @@
  */
 
 import type {
-  MetaFunction,
   LinksFunction,
   LoaderFunction,
+  MetaFunction,
 } from '@remix-run/cloudflare'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -38,14 +38,22 @@ import icon16 from './images/favicon-16x16.png'
 
 import * as gtag from '~/utils/gtags.client'
 import { parseJwt, requireJWT } from './utilities/session.server'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAccountClient from '@proofzero/platform-clients/account'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import type { AccountURN } from '@proofzero/urns/account'
+
+import type { IdentityURN } from '@proofzero/urns/identity'
+
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
+
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { BadRequestError } from '@proofzero/errors'
+import posthog from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
+import { useHydrated } from 'remix-utils'
+import { getCurrentAndUpcomingInvoices } from './utils/billing'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const links: LinksFunction = () => {
   return [
@@ -58,47 +66,57 @@ export const links: LinksFunction = () => {
   ]
 }
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Console - Rollup',
-  viewport: 'width=device-width,initial-scale=1',
-})
+export type AppLoaderData = {
+  clientId: string
+  name?: string
+  icon?: string
+  published?: boolean
+  createdTimestamp?: number
+  appPlan: ServicePlanType
+  hasCustomDomain: boolean
+}
 
 export type LoaderData = {
-  apps: {
-    clientId: string
-    name?: string
-    icon?: string
-    published?: boolean
-    createdTimestamp?: number
-  }[]
+  apps: AppLoaderData[]
   avatarUrl: string
   PASSPORT_URL: string
   displayName: string
+  hasUnpaidInvoices: boolean
+  unpaidInvoiceURL: string
   ENV: {
+    POSTHOG_API_KEY: string
+    POSTHOG_PROXY_HOST: string
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
   }
+  identityURN: IdentityURN
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const jwt = await requireJWT(request)
+    if (
+      request.cf.botManagement.score <= 30 &&
+      !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+    ) {
+      return null
+    }
+    const jwt = await requireJWT(request, context.env)
+    if (!jwt) {
+      throw new BadRequestError({
+        message: 'No JWT found in request.',
+      })
+    }
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const parsedJwt = parseJwt(jwt)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     try {
-      const accountClient = createAccountClient(Account, {
+      const coreClient = createCoreClient(context.env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
-      const starbaseClient = createStarbaseClient(Starbase, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...traceHeader,
-      })
-      const apps = await starbaseClient.listApps.query()
+      const apps = await coreClient.starbase.listApps.query()
       const reshapedApps = apps.map((a) => {
         return {
           clientId: a.clientId,
@@ -106,14 +124,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           icon: a.app?.icon,
           published: a.published,
           createdTimestamp: a.createdTimestamp,
+          appPlan: a.appPlan,
+          hasCustomDomain: Boolean(a.customDomain),
         }
       })
 
       let avatarUrl = ''
       let displayName = ''
       try {
-        const profile = await accountClient.getProfile.query({
-          account: accountURN,
+        const profile = await coreClient.identity.getProfile.query({
+          identity: identityURN,
         })
         avatarUrl = profile?.pfp?.image || ''
         displayName = profile?.displayName || ''
@@ -121,19 +141,54 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         console.error('Could not retrieve profile image.', e)
       }
 
+      const {
+        PASSPORT_URL,
+        POSTHOG_PROXY_HOST,
+        POSTHOG_API_KEY,
+        INTERNAL_GOOGLE_ANALYTICS_TAG,
+        WALLET_CONNECT_PROJECT_ID,
+      } = context.env
+
+      const spd = await coreClient.billing.getStripePaymentData.query({
+        URN: identityURN,
+      })
+
+      // might be quite heavy object
+      // for that reason I don't put it in outlet context
+      const invoices = await getCurrentAndUpcomingInvoices(
+        spd,
+        context.env.SECRET_STRIPE_API_KEY
+      )
+
+      let unpaidInvoiceURL = '/billing/portal'
+
+      const hasUnpaidInvoices = invoices.some((invoice) => {
+        if (invoice.status)
+          if (['uncollectible', 'open'].includes(invoice.status)) {
+            unpaidInvoiceURL = invoice.url as string
+            return true
+          }
+        return false
+      })
+
       return json<LoaderData>({
         apps: reshapedApps,
         avatarUrl,
+        hasUnpaidInvoices,
+        unpaidInvoiceURL,
         PASSPORT_URL,
         ENV: {
-          WALLET_CONNECT_PROJECT_ID,
+          POSTHOG_API_KEY,
+          POSTHOG_PROXY_HOST,
           INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'
               ? +process.env.REMIX_DEV_SERVER_WS_PORT!
               : undefined,
+          WALLET_CONNECT_PROJECT_ID,
         },
         displayName,
+        identityURN,
       })
     } catch (error) {
       console.error({ error })
@@ -142,25 +197,70 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
+export const meta: MetaFunction = () => {
+  return {
+    charset: 'utf-8',
+    title: 'Console - Rollup',
+    viewport: 'width=device-width,initial-scale=1',
+    'og:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'og:description': 'Simple & Secure Private Auth',
+    'og:title': 'Console - Rollup',
+    'og:url': 'https://console.rollup.id',
+    'twitter:card': 'summary_large_image',
+    'twitter:site': '@rollupid_xyz',
+    'twitter:creator': '@rollupid_xyz',
+    'twitter:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'theme-color': '#ffffff',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+  }
+}
+
 export default function App() {
   const nonce = useContext(NonceContext)
 
   const transition = useTransition()
   const location = useLocation()
-  const loaderData = useLoaderData()
+  const loaderData = useLoaderData() ?? {}
 
-  const GATag = loaderData.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+  const GATag = loaderData?.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
 
-  const remixDevPort = loaderData.ENV.REMIX_DEV_SERVER_WS_PORT
+  const remixDevPort = loaderData?.ENV.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
+  const {
+    apps,
+    avatarUrl,
+    PASSPORT_URL,
+    displayName,
+    identityURN,
+    hasUnpaidInvoices,
+    unpaidInvoiceURL,
+  } = loaderData ?? {}
 
   useEffect(() => {
     if (GATag) {
       gtag.pageview(location.pathname, GATag)
     }
   }, [location, GATag])
+
+  const hydrated = useHydrated()
+  useEffect(() => {
+    // https://posthog.com/docs/libraries/react#posthog-provider
+    if (hydrated) {
+      try {
+        posthog?.init(loaderData.ENV.POSTHOG_API_KEY, {
+          api_host: loaderData.ENV.POSTHOG_PROXY_HOST,
+          autocapture: false,
+        })
+        posthog?.identify(identityURN)
+      } catch (ex) {
+        console.error(ex)
+      }
+    }
+  }, [hydrated])
 
   return (
     <html lang="en" className="h-full">
@@ -169,8 +269,9 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        {!GATag ? null : (
+        {GATag && (
           <>
+            {/* <!-- Google tag (gtag.js) --> */}
             <script
               async
               src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
@@ -187,6 +288,7 @@ export default function App() {
                   gtag('config', '${GATag}', {
                     page_path: window.location.pathname,
                   });
+                  gtag('event', 'conversion', {'send_to': '${GATag}/x8scCNaPzMgYEPT6sYEq'});
               `,
               }}
               nonce={nonce}
@@ -194,13 +296,41 @@ export default function App() {
           </>
         )}
         {transition.state !== 'idle' ? <Loader /> : null}
-        <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
+        {typeof window !== 'undefined' ? (
+          <PostHogProvider client={posthog}>
+            <Outlet
+              context={{
+                apps,
+                ENV: loaderData?.ENV ?? {},
+                avatarUrl,
+                PASSPORT_URL,
+                displayName,
+                identityURN,
+                hasUnpaidInvoices,
+                unpaidInvoiceURL,
+              }}
+            />
+          </PostHogProvider>
+        ) : (
+          <Outlet
+            context={{
+              apps,
+              ENV: loaderData?.ENV ?? {},
+              avatarUrl,
+              PASSPORT_URL,
+              displayName,
+              identityURN,
+              hasUnpaidInvoices,
+              unpaidInvoiceURL,
+            }}
+          />
+        )}
         <ScrollRestoration nonce={nonce} />
         <script
           nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `!window ? null : window.ENV = ${JSON.stringify(
-              loaderData.ENV
+              loaderData?.ENV ? loaderData.ENV : {}
             )}`,
           }}
         />
@@ -211,24 +341,19 @@ export default function App() {
   )
 }
 
-export const ErrorBoundary = ({
-  error,
-}: {
-  error?: {
-    stack: any
-    message: string
-  }
-}) => {
+// https://remix.run/docs/en/v1/guides/errors
+// @ts-ignore
+export function ErrorBoundary({ error }) {
   const nonce = useContext(NonceContext)
 
   console.error('ErrorBoundary', error)
+
   return (
     <html lang="en">
       <head>
         <Meta />
         <Links />
       </head>
-
       <body className="min-h-[100dvh] flex justify-center items-center">
         <div className="w-full">
           <ErrorPage
@@ -236,11 +361,14 @@ export const ErrorBoundary = ({
             message="Something went terribly wrong!"
             trace={error?.stack}
             error={error}
+            pepe={false}
+            backBtn={false}
           />
         </div>
 
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
+        <LiveReload port={8002} nonce={nonce} />
       </body>
     </html>
   )
@@ -248,10 +376,12 @@ export const ErrorBoundary = ({
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.error('CatchBoundary', { caught })
+  console.error('CaughtBoundary', JSON.stringify(caught, null, 2))
+
+  const { status } = caught
 
   let secondary = 'Something went wrong'
-  switch (caught.status) {
+  switch (status) {
     case 404:
       secondary = 'Page not found'
       break
@@ -268,14 +398,22 @@ export function CatchBoundary() {
         <Meta />
         <Links />
       </head>
-
-      <body className="min-h-[100dvh] flex justify-center items-center">
-        <div className="w-full">
-          <ErrorPage code={caught.status.toString()} message={secondary} />
+      <body>
+        <div
+          className={
+            'flex flex-col h-[100dvh] gap-4 justify-center items-center'
+          }
+        >
+          <h1>{status}</h1>
+          <p>
+            {secondary}
+            {caught.data?.message && `: ${caught.data?.message}`}
+          </p>
+          <p>({caught.data?.traceparent && `${caught.data?.traceparent}`})</p>
         </div>
-
         <ScrollRestoration />
         <Scripts />
+        <LiveReload port={8002} />
       </body>
     </html>
   )

@@ -2,9 +2,9 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 
 import { BadRequestError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -12,15 +12,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (!params['address'])
       throw new BadRequestError({ message: 'address is missing' })
 
-    const addressUrn = AddressURNSpace.urn(params['address'])
-
-    const addressClient = getAddressClient(
-      addressUrn,
-      context.env,
-      context.traceSpan
-    )
-
-    const data = atob(await addressClient.getAddressAvatar.query())
+    const accountURN = AccountURNSpace.urn(params['address'])
+    const coreClient = getCoreClient({ context, accountURN })
+    const data = atob(await coreClient.account.getAccountAvatar.query())
     const buffer = new ArrayBuffer(data.length)
     const bufferView = new Uint8Array(buffer)
     for (var i = 0; i < data.length; i++) {

@@ -11,22 +11,22 @@ import { parseJwt, requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
 
-import type { AccountURN } from '@proofzero/urns/account'
-import { AccountURNSpace } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 import { DesktopSideNav } from '~/components/side-nav'
 
 import {
-  getAccountAddresses,
-  getAccountProfile,
-  getAddressProfiles,
+  getIdentityAccounts,
+  getIdentityProfile,
+  getAccountProfiles,
 } from '~/helpers/profile'
 import type {
-  GetAddressProfilesQuery,
+  GetAccountProfilesQuery,
   Node,
   Profile,
 } from '@proofzero/galaxy-client'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 import type { FullProfile } from '~/types'
 import {
   toast,
@@ -51,53 +51,54 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (url.pathname === '/account') {
     return redirect('/account/dashboard')
   }
-  const jwt = await requireJWT(request)
+  const jwt = await requireJWT(request, context.env)
 
   // We go through this because
   // the context had connected addresses
   // but don't have the profiles
   // and it's complex to send them to a loader / action
 
-  const accountURN = parseJwt(jwt).sub as AccountURN
+  const identityURN = parseJwt(jwt).sub as IdentityURN
 
   try {
-    const [loggedInUserProfile, addresses] = await Promise.all([
-      getAccountProfile({ jwt, accountURN }, context.traceSpan),
-      getAccountAddresses({ jwt, traceSpan: context.traceSpan }),
+    const [loggedInUserProfile, accounts] = await Promise.all([
+      getIdentityProfile({ jwt, identityURN }, context.env, context.traceSpan),
+      getIdentityAccounts({ jwt }, context.env, context.traceSpan),
     ])
 
-    const addressTypeUrns = addresses.map((a) => ({
+    const accountTypeUrns = accounts.map((a) => ({
       urn: a.baseUrn,
       nodeType: a.rc.node_type,
     }))
 
-    let connectedProfiles: GetAddressProfilesQuery['addressProfiles'] = []
+    let connectedProfiles: GetAccountProfilesQuery['accountProfiles'] = []
 
     // We get the full profiles
     connectedProfiles =
-      (await getAddressProfiles(
+      (await getAccountProfiles(
         jwt,
-        addressTypeUrns.map((atu) => atu.urn as AddressURN),
+        accountTypeUrns.map((atu) => atu.urn as AccountURN),
+        context.env,
         context.traceSpan
       )) ?? []
 
     // This mapps to a new structure that contains urn also;
-    // useful for list keys as well as for address context actions as param
+    // useful for list keys as well as for account context actions as param
     const normalizedConnectedProfiles = connectedProfiles.map((p, i) => ({
-      ...addressTypeUrns[i],
+      ...accountTypeUrns[i],
       ...p,
     }))
 
-    const cryptoAddresses =
-      addresses?.filter((e) => {
+    const cryptoAccounts =
+      accounts?.filter((e) => {
         if (!e.rc) return false
         return e?.rc?.node_type === 'crypto'
       }) || []
 
     return json({
       connectedProfiles: normalizedConnectedProfiles,
-      cryptoAddresses,
-      accountURN,
+      cryptoAccounts,
+      identityURN,
       profile: loggedInUserProfile,
     })
   } catch (error) {
@@ -124,12 +125,12 @@ const notify = (success: boolean = true) => {
 }
 
 export default function AccountLayout() {
-  const { profile, accountURN, connectedProfiles, cryptoAddresses } =
+  const { profile, identityURN, connectedProfiles, cryptoAccounts } =
     useLoaderData<{
       profile: FullProfile
-      accountURN: AccountURN
+      identityURN: IdentityURN
       connectedProfiles: Node & Profile[]
-      cryptoAddresses: Node[]
+      cryptoAccounts: Node[]
     }>()
 
   return (
@@ -144,7 +145,7 @@ export default function AccountLayout() {
             >
               <HeadNav
                 loggedIn={!!profile}
-                accountURN={AccountURNSpace.decode(accountURN)}
+                identityURN={IdentityURNSpace.decode(identityURN)}
                 avatarUrl={profile.pfp?.image as string}
                 displayName={profile.displayName}
                 open={open}
@@ -175,7 +176,7 @@ export default function AccountLayout() {
                     <Toaster position="top-right" reverseOrder={false} />
                     <DesktopSideNav
                       profile={profile}
-                      accountURN={AccountURNSpace.decode(accountURN)}
+                      identityURN={IdentityURNSpace.decode(identityURN)}
                     />
                     <div
                       className="min-h-[100dvh] divide-y divide-transparent px-4
@@ -187,8 +188,8 @@ export default function AccountLayout() {
                         context={{
                           profile,
                           connectedProfiles,
-                          cryptoAddresses,
-                          accountURN,
+                          cryptoAccounts,
+                          identityURN,
                           notify,
                         }}
                       />

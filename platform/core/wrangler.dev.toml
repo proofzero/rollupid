@@ -1,0 +1,61 @@
+name = "core"
+main = "src/index.ts"
+compatibility_date = "2023-03-14"
+compatibility_flags = ["no_minimal_subrequests"]
+logpush = true
+node_compat = true
+workers_dev = false
+
+[env.dev]
+durable_objects.bindings = [
+  { name = "Account", class_name = "Account" },
+  { name = "Authorization", class_name = "Authorization" },
+  { name = "ExchangeCode", class_name = "ExchangeCode" },
+  { name = "Identity", class_name = "Identity" },
+  { name = "IdentityGroup", class_name = "IdentityGroup" },
+  { name = "StarbaseApp", class_name = "StarbaseApplication" },
+]
+
+services = [
+  { binding = "Core", service = "core-dev" },
+  { binding = "Email", service = "email-dev" },
+  { binding = "Images", service = "images-dev" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
+]
+
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
+
+[[env.dev.d1_databases]]
+binding = "EDGES"
+database_name = "edges-v2-dev"
+database_id = "bd11ba92-bfcf-4d37-8224-d57467cced48"
+migrations_dir = "../edges/migrations"
+
+[env.dev.vars]
+ENVIRONMENT = "dev"
+
+INTERNAL_PASSPORT_SERVICE_NAME = "passport-dev"
+
+PASSPORT_URL = "https://passport-dev.rollup.id"
+MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
+TTL_IN_MS = 25_000
+MAX_ATTEMPTS = 5
+DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 2_000
+REGENERATION_COOLDOWN_PERIOD_IN_MS = 30_000
+MAX_ATTEMPTS_TIME_PERIOD_IN_MS = 300_000
+
+POSTHOG_API_KEY = "phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5"
+
+[[migrations]]
+tag = "v0"
+new_classes = ["IdentityGroup"]
+transferred_classes = [
+  { from = "Access", from_script = "access-dev", to = "Authorization" },
+  { from = "Account", from_script = "account-dev", to = "Identity" },
+  { from = "Address", from_script = "address-dev", to = "Account" },
+  { from = "Authorization", from_script = "access-dev", to = "ExchangeCode" },
+  { from = "StarbaseApplication", from_script = "starbase-dev", to = "StarbaseApplication" },
+]

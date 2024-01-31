@@ -1,8 +1,7 @@
 import { Link } from '@remix-run/react'
 import { useState, useEffect } from 'react'
 
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 
 import type { FullProfile } from '../../types'
 import type { ProfileCompletionStatus } from '../../utils/cta.client'
@@ -10,10 +9,10 @@ import { determineProfileCompletionStatus } from '../../utils/cta.client'
 
 const CTA = ({
   profile,
-  addresses,
+  accounts,
 }: {
   profile: FullProfile
-  addresses: any[]
+  accounts: any[]
 }) => {
   const ctaDict: {
     [key: string]: {
@@ -68,7 +67,7 @@ const CTA = ({
   }
 
   const handleCompletionStatus = () => {
-    const pcs = determineProfileCompletionStatus(profile, addresses)
+    const pcs = determineProfileCompletionStatus(profile, accounts)
 
     let ctaKey
     ctaKey = handleCTAKey(pcs, 'gallery') || ctaKey

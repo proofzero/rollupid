@@ -1,17 +1,11 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import {
-  ApplicationURN,
-  ApplicationURNSpace,
-} from '@proofzero/urns/application'
-import createEdgesClient from '@proofzero/platform-clients/edges'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 import {
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
 } from '../validators/app'
-import { EdgeDirection } from '@proofzero/types/graph'
-import { EDGE_APPLICATION } from '../../types'
 import { NoInput } from '@proofzero/platform-middleware/inputValidators'
 
 export const ListAppsOutput = z.array(
@@ -25,11 +19,12 @@ export const listApps = async ({
   input: z.infer<typeof NoInput>
   ctx: Context
 }): Promise<z.infer<typeof ListAppsOutput>> => {
-  if (!ctx.accountURN) throw new Error('No account URN in context')
+  if (!ctx.identityURN) throw new Error('No identity URN in context')
   //Iterate through edges, pull out the clientId, and get app objects for each
   //app edge
   const result = []
   for (const appURN of ctx.ownAppURNs || []) {
+    if (!ApplicationURNSpace.is(appURN)) continue
     const clientId = ApplicationURNSpace.decode(appURN)
     try {
       const appDO = await getApplicationNodeByClientId(

@@ -1,9 +1,10 @@
 import { z } from 'zod'
 
 import { Context } from '../context'
-import { CustomDomainSchema } from '../validators/app'
+import { CustomDomainSchema } from '../validators/customdomain'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { getCloudflareFetcher, getCustomHostname } from '../../utils/cloudflare'
+import { getDNSRecordValue } from '@proofzero/utils'
 
 export const GetCustomDomainInput = z.object({
   clientId: z.string(),
@@ -34,6 +35,18 @@ export const getCustomDomain: GetCustomDomainMethod = async ({
     'customDomain'
   )
   if (!stored) return
+  if (!stored.dns_records) {
+    //This is here as a quick way to address setups that were created before infroduction
+    //of DNS records in the customDomain structure. Could not load the custom domain page
+    //to delete and set up again without this check.
+    stored.dns_records = [
+      {
+        name: 'Error',
+        expected_value: 'Delete custom domain and reconfigure',
+        record_type: 'TXT',
+      },
+    ]
+  }
   if (!refresh) return stored
 
   const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)
@@ -47,6 +60,11 @@ export const getCustomDomain: GetCustomDomainMethod = async ({
 
   if (stored.ssl.validation_records)
     customDomain.ssl.validation_records = stored.ssl.validation_records
+
+  for (const dnsRec of stored.dns_records) {
+    dnsRec.value = await getDNSRecordValue(dnsRec.name, dnsRec.record_type)
+  }
+  customDomain.dns_records = stored.dns_records
 
   await node.storage.put({ customDomain })
   return customDomain

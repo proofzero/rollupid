@@ -6,11 +6,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "wrangler publish --dry-run --outdir=dist",
     "db:generate": "drizzle-kit generate:sqlite --schema=src/db/schema.ts",
-    "db:execute": "wrangler d1 migrations apply edges --local",
-    "dev": "env-cmd --file .dev.env run-s dev:local",
-    "dev:local": "run-s types:check wrangler:local",
     "docs": "run-s build:* docs:*",
     "docs:build": "api-extractor run --local",
     "format": "run-s format:src",
@@ -21,8 +17,7 @@
     "lint:check": "run-s lint:check:*",
     "lint:check:src": "eslint *.ts",
     "test": "tap --ts test/",
-    "types:check": "tsc --project tsconfig.json --noEmit",
-    "wrangler:local": "wrangler dev --local --persist"
+    "types:check": "tsc --project tsconfig.json --noEmit"
   },
   "tap": {
     "check-coverage": false
@@ -41,10 +36,10 @@
     "prettier": "2.7.1",
     "tap": "16.3.2",
     "typescript": "5.0.4",
-    "wrangler": "2.14.0",
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {
+    "@proofzero/platform.core": "workspace:*",
     "@proofzero/security": "workspace:*",
     "@proofzero/urns": "workspace:*",
     "@proofzero/utils": "workspace:*",

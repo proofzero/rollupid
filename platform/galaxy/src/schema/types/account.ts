@@ -1,44 +1,31 @@
 export default /* GraphQL */ `
-  type StandardPFP {
-    image: String
+  type AccountProfile {
+    id: String!
+    type: String
+    address: String
+    title: String
+    icon: String
   }
 
-  type NFTPFP {
-    image: String
-    isToken: Boolean
-  }
-
-  type App {
-    clientId: String!
-    icon: String!
-    title: String!
-    timestamp: Float!
-  }
-
-  union PFP = StandardPFP | NFTPFP
-
-  type Profile {
-    displayName: String
-    pfp: PFP
-  }
-
-  input PFPInput {
-    image: String!
-    isToken: Boolean
-  }
-
-  input ProfileInput {
-    displayName: String
-    pfp: PFPInput
+  input ConnectedAccountPropertiesUpdateInput {
+    accountURN: String!
+    public: Boolean
   }
 
   type Query {
-    profile(targetAccountURN: String): Profile
-    connectedAddresses(targetAccountURN: String): [Node!]
-    authorizedApps: [App]
+    identityFromAlias(provider: String!, alias: String!): String!
+    accountProfile(accountURN: String!): AccountProfile!
+    accountProfiles(accountURNList: [String!]): [AccountProfile!]!
   }
 
   type Mutation {
-    disconnectAddress(addressURN: String!): Boolean
+    updateAccountNickname(accountURN: String!, nickname: String!): Boolean
+    updateConnectedAccountsProperties(
+      accountURNList: [ConnectedAccountPropertiesUpdateInput!]!
+    ): Boolean
+    registerSessionKey(
+      sessionPublicKey: String!
+      smartContractWalletAddress: String!
+    ): String!
   }
 `

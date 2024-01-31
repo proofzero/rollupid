@@ -1,26 +1,22 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
 import { Text } from '../../atoms/text/Text'
 import authorizeCheck from './authorize-check.svg'
-import { SmartContractWalletSelect } from '../../atoms/smart_contract_wallets/SmartContractWalletSelect'
 import subtractLogo from '../../assets/subtract-logo.svg'
 import { Spinner } from '../../atoms/spinner/Spinner'
 import { Button } from '../../atoms/buttons/Button'
 import Info from '../../atoms/info/Info'
-import {
-  EmailSelectListItem,
-  OptionType,
-  SCWalletSelectListItem,
-} from '@proofzero/utils/getNormalisedConnectedAccounts'
-import { EmailSelect } from '../../atoms/email/EmailSelect'
-import { ConnectedAccountSelect } from '../../atoms/accounts/ConnectedAccountSelect'
-import { GetAddressProfileResult } from '@proofzero/platform/address/src/jsonrpc/methods/getAddressProfile'
-import { AuthorizationControlSelection } from '@proofzero/types/application'
-import { AddressURN } from '@proofzero/urns/address'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
+import { AuthorizationControlSelection } from '@proofzero/types/application'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
-import { ThemeContext } from '../../contexts/theme'
 import ScopeIcon from './ScopeIcon'
+import {
+  Dropdown,
+  DropdownListboxButtonType,
+  DropdownSelectListItem,
+} from '../../atoms/dropdown/DropdownSelectList'
+
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 
 type UserProfile = {
   pfpURL: string
@@ -44,19 +40,28 @@ type AuthorizationProps = {
 
   transitionState: 'idle' | 'submitting' | 'loading'
 
-  connectedSmartContractWallets: SCWalletSelectListItem[]
+  connectedSmartContractWallets?: Array<DropdownSelectListItem>
   addNewSmartWalletCallback: () => void
-  selectSmartWalletCallback: (selected: AddressURN[]) => void
-
-  connectedEmails: EmailSelectListItem[]
-  addNewEmailCallback: () => void
-  selectEmailCallback: (selected: EmailSelectListItem) => void
-
-  connectedAccounts: GetAddressProfileResult[]
-  addNewAccountCallback: () => void
-  selectAccountsCallback: (
-    selected: AddressURN[] | AuthorizationControlSelection[]
+  selectSmartWalletsCallback: (selected: Array<DropdownSelectListItem>) => void
+  selectAllSmartWalletsCallback: (
+    val: Array<AuthorizationControlSelection>
   ) => void
+  selectedSCWallets:
+    | Array<DropdownSelectListItem>
+    | Array<AuthorizationControlSelection>
+
+  connectedEmails?: Array<DropdownSelectListItem>
+  addNewEmailCallback: () => void
+  selectEmailCallback: (selected: DropdownSelectListItem) => void
+  selectedEmail?: DropdownSelectListItem
+
+  connectedAccounts?: Array<DropdownSelectListItem>
+  addNewAccountCallback: () => void
+  selectAccountsCallback: (selected: Array<DropdownSelectListItem>) => void
+  selectAllAccountsCallback: (val: Array<AuthorizationControlSelection>) => void
+  selectedConnectedAccounts:
+    | Array<DropdownSelectListItem>
+    | Array<AuthorizationControlSelection>
 
   cancelCallback: () => void
   authorizeCallback: (scopes: string[]) => void
@@ -64,6 +69,7 @@ type AuthorizationProps = {
   radius?: string
 }
 
+//eslint-disable-next-line react/display-name
 export default ({
   userProfile,
   appProfile,
@@ -72,13 +78,18 @@ export default ({
   transitionState,
   connectedSmartContractWallets,
   addNewSmartWalletCallback,
-  selectSmartWalletCallback,
+  selectSmartWalletsCallback,
+  selectAllSmartWalletsCallback,
+  selectedSCWallets,
   connectedEmails,
   addNewEmailCallback,
   selectEmailCallback,
+  selectedEmail,
   connectedAccounts,
   addNewAccountCallback,
   selectAccountsCallback,
+  selectAllAccountsCallback,
+  selectedConnectedAccounts,
   cancelCallback,
   authorizeCallback,
   disableAuthorize = false,
@@ -100,234 +111,336 @@ export default ({
     }
     scopesToDisplay.unshift('system_identifiers')
   }
-
-  const { dark, theme } = useContext(ThemeContext)
-
   return (
-    <div className={`${dark ? 'dark' : ''}`}>
-      <div
-        className={
-          'flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
-           lg:rounded-${radius} min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh]'
-        }
-        style={{
-          width: 418,
-          border: '1px solid #D1D5DB',
-          boxSizing: 'border-box',
-        }}
-      >
-        <div className={'flex flex-row items-center justify-center'}>
-          <Avatar
-            src={userProfile.pfpURL}
-            hex={false}
-            size={'sm'}
+    <div
+      className={`flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
+           rounded-${radius} min-h-fit lg:min-h-[580px] border border-[#D1D5DB] dark:border-gray-600`}
+      style={{
+        width: 418,
+        boxSizing: 'border-box',
+      }}
+    >
+      <div className={'flex flex-row items-center justify-center'}>
+        <Avatar
+          src={userProfile.pfpURL}
+          hex={false}
+          size={'sm'}
           // alt="User Profile"
-          />
-          <img src={authorizeCheck} alt="Authorize Check" />
-          <Avatar src={appProfile.iconURL} size={'sm'} />
-        </div>
-        <div className={'flex flex-col items-center justify-center gap-2'}>
-          <h1 className={'font-semibold text-xl text-xl dark:text-white'}>
-            {appProfile.name}
-          </h1>
-          <p style={{ color: '#6B7280' }} className={'font-light text-base'}>
-            would like access to the following information
-          </p>
-        </div>
-        <div className={'flex flex-col gap-4 items-start justify-start w-full'}>
-          <p
-            style={{ color: '#6B7280' }}
-            className={'mb-2 font-extralight text-xs'}
-          >
-            REQUESTED
-          </p>
-          <ul
-            style={{ color: '#6B7280' }}
-            className={'flex flex-col font-light text-base gap-2 w-full'}
-          >
-            {scopesToDisplay.map((scope: string, i: number) => {
+        />
+        <img src={authorizeCheck} alt="Authorize Check" />
+        <Avatar src={appProfile.iconURL} size={'sm'} />
+      </div>
+      <div className={'flex flex-col items-center justify-center'}>
+        <h1 className={'font-semibold text-xl text-xl dark:text-white'}>
+          {appProfile.name}
+        </h1>
+        <p style={{ color: '#6B7280' }} className={'font-light text-base'}>
+          would like access to the following information
+        </p>
+      </div>
+      <div className={'flex flex-col gap-4 items-start justify-start w-full'}>
+        <p
+          style={{ color: '#6B7280' }}
+          className={'mb-2 font-extralight text-xs'}
+        >
+          APP ASKS FOR
+        </p>
+        <ul
+          style={{ color: '#6B7280' }}
+          className={'flex flex-col font-light text-base w-full'}
+        >
+          {scopesToDisplay.map((scope: string, i: number) => {
+            const DropdownListboxButton = ({
+              selectedItem,
+              selectedItems,
+              allItemsSelected,
+              placeholder,
+              selectAllCheckboxTitle,
+              open,
+            }: DropdownListboxButtonType) => {
               return (
-                <li
-                  key={i}
-                  className={'flex flex-row gap-2 items-center w-full'}
+                <div
+                  className={`
+          border-b w-full transition-transform flex-row
+          flex justify-between items-center px-3 bg-white
+          dark:bg-[#1F2937] dark:border-gray-600 py-2
+          ${open ? 'bg-gray-50 shadow-sm rounded-lg' : ''}`}
                 >
-                  <div className="flex flex-row w-full gap-2 items-center">
+                  <div className="flex flex-row items-center gap-2 ">
+                    <Info
+                      name={scopeMeta.scopes[scope].name}
+                      description={scopeMeta.scopes[scope].description}
+                    />
+
+                    <div
+                      data-popover
+                      id={`popover-${scope}`}
+                      role="tooltip"
+                      className="absolute z-10 invisible inline-block
+                    font-[Inter] rounded-lg text-gray-500
+                    min-w-64 text-sm font-light bg-white
+                    transition-opacity duration-300 border
+                    dark:bg-[#1F2937] border-gray-200
+                    shadow-sm opacity-0 dark:text-gray-400
+                    dark:border-gray-600 dark:bg-gray-800"
+                    >
+                      <div
+                        className="px-3 py-2 bg-gray-100
+        border-b border-gray-200 rounded-t-lg
+        dark:border-gray-600 dark:bg-gray-700"
+                      >
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {scope}
+                        </h3>
+                      </div>
+                      <div className="px-3 py-2">
+                        <p className="dark:text-white">
+                          {scopeMeta.scopes[scope].description}
+                        </p>
+                      </div>
+                    </div>
                     <ScopeIcon scope={scope} />
 
-                    {(scope === 'profile' ||
-                      scope === 'system_identifiers') && (
+                    <div className="flex flex-col items-start w-max">
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="flex-1 text-gray-500"
+                      >
+                        {scopeMeta.scopes[scope].name}
+                      </Text>
+                      {!selectedItem &&
+                        !selectedItems?.length &&
+                        !allItemsSelected && (
+                          <Text
+                            size="sm"
+                            className={`
+          ${
+            scopeMeta.scopes[scope].name === 'Smart contract wallets'
+              ? ''
+              : 'text-orange-500 dark:text-orange-500'
+          }
+          dark:text-white truncate text-ellipsis
+          `}
+                          >
+                            {placeholder}
+                          </Text>
+                        )}
+
+                      {selectedItem?.title?.length && (
                         <Text
                           size="sm"
-                          weight="medium"
-                          className="flex-1 text-gray-500"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
                         >
-                          {scopeMeta.scopes[scope].name}
+                          {selectedItem.title}
                         </Text>
                       )}
 
-                    {scope === 'erc_4337' && (
-                      <div className="flex-1 min-w-0">
-                        <SmartContractWalletSelect
-                          wallets={connectedSmartContractWallets}
-                          onSelect={(selected: SCWalletSelectListItem) => {
-                            if (selected?.type === OptionType.AddNew) {
-                              addNewSmartWalletCallback()
-                            } else if (selected) {
-                              selectSmartWalletCallback([selected.addressURN])
-                            }
-                          }}
-                        />
-                      </div>
-                    )}
+                      {selectedItems?.length > 1 && !allItemsSelected && (
+                        <Text
+                          size="sm"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                        >
+                          {selectedItems?.length} items selected
+                        </Text>
+                      )}
 
-                    {scope === 'email' && (
-                      <div className="flex-1 min-w-0">
-                        <EmailSelect
-                          items={connectedEmails || []}
-                          enableAddNew={true}
-                          defaultAddress={connectedEmails![0]?.addressURN}
-                          onSelect={(selected: EmailSelectListItem) => {
-                            if (selected?.type === OptionType.AddNew) {
-                              addNewEmailCallback()
-                            } else if (selected) {
-                              selectEmailCallback(selected)
-                            }
-                          }}
-                        />
-                      </div>
-                    )}
+                      {selectedItems?.length === 1 && !allItemsSelected && (
+                        <Text
+                          size="sm"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                        >
+                          {selectedItems?.[0].title} selected
+                        </Text>
+                      )}
 
-                    {scope === 'connected_accounts' && (
-                      <div className="flex-1 min-w-0">
-                        <ConnectedAccountSelect
-                          accounts={connectedAccounts.map((ca) => ({
-                            addressURN: ca.id,
-                            address: ca.address,
-                            title: ca.title,
-                            provider:
-                              ca.type === 'eth' ? 'blockchain' : ca.type,
-                          }))}
-                          onSelect={(addresses) => {
-                            selectAccountsCallback(
-                              addresses.map((a) => a.addressURN)
-                            )
-                          }}
-                          onSelectAll={() => {
-                            selectAccountsCallback([
-                              AuthorizationControlSelection.ALL,
-                            ])
-                          }}
-                          onConnectNew={() => {
-                            addNewAccountCallback()
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    <div>
-                      <Info
-                        name={scopeMeta.scopes[scope].name}
-                        description={scopeMeta.scopes[scope].description}
-                      />
-
-                      <div
-                        data-popover
-                        id={`popover-${scope}`}
-                        role="tooltip"
-                        className="absolute z-10 invisible inline-block
-                    font-[Inter]
-                     min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white dark:bg-[#1F2937] border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                      >
-                        <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">
-                            {scope}
-                          </h3>
-                        </div>
-                        <div className="px-3 py-2">
-                          <p className="dark:text-white">
-                            {scopeMeta.scopes[scope].description}
-                          </p>
-                        </div>
-                        <div data-popper-arrow></div>
-                      </div>
+                      {allItemsSelected && (
+                        <Text
+                          size="sm"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                        >
+                          {selectAllCheckboxTitle}
+                        </Text>
+                      )}
                     </div>
                   </div>
-                </li>
+
+                  {open ? (
+                    <ChevronUpIcon className="w-5 h-5 shrink-0 text-indigo-500" />
+                  ) : (
+                    <ChevronDownIcon className="w-5 h-5 shrink-0" />
+                  )}
+                </div>
               )
-            })}
-          </ul>
-        </div>
+            }
 
-        {(appProfile?.termsURL || appProfile?.privacyURL) && (
-          <div className="mt-auto">
-            <Text size="sm" className="text-gray-500">
-              Before using this app, you can review{' '}
-              {appProfile?.name ?? `Company`}
-              's{' '}
-              <a href={appProfile.privacyURL} className="text-skin-primary
-               text-indigo-500">
-                privacy policy
-              </a>
-              {appProfile?.termsURL && appProfile?.privacyURL && (
-                <span> and </span>
-              )}
-              <a href={appProfile.termsURL} className="text-skin-primary 
-              text-indigo-500">
-                terms of service
-              </a>
-              .
-            </Text>
-          </div>
-        )}
+            return (
+              <li key={i} className={'flex flex-row gap-2 items-center w-full'}>
+                {(scope === 'profile' || scope === 'system_identifiers') && (
+                  <div
+                    className="w-full transition-transform flex flex-row
+                      justify-between items-center px-3 bg-white
+                      dark:bg-[#1F2937] dark:border-gray-600 gap-2 py-2 border-b"
+                  >
+                    <Info
+                      name={scopeMeta.scopes[scope].name}
+                      description={scopeMeta.scopes[scope].description}
+                    />
 
-        <div className="flex flex-col w-full items-center justify-center mt-auto">
-          <div
-            className={'flex flex-row w-full items-end justify-center gap-4'}
-          >
-            {transitionState === 'idle' && (
-              <>
-                <Button
-                  btnSize="xl"
-                  btnType="secondary-alt"
-                  onClick={cancelCallback}
-                >
-                  <Text
-                    weight="medium"
-                    className="truncate text-gray-800 dark:text-white"
-                  >
-                    Cancel
-                  </Text>
-                </Button>
-                <Button
-                  btnSize="xl"
-                  btnType="primary-alt"
-                  disabled={disableAuthorize}
-                  className="dark:bg-gray-800 dark:border dark:border-gray-700"
-                  onClick={() => {
-                    authorizeCallback(requestedScope)
-                  }}
-                >
-                  <Text
-                    weight="medium"
-                    className="truncate text-gray-800 dark:text-gray-600"
-                  >
-                    Continue
-                  </Text>
-                </Button>
-              </>
+                    <div
+                      data-popover
+                      id={`popover-${scope}`}
+                      role="tooltip"
+                      className="absolute z-10 invisible inline-block
+                    font-[Inter]
+                     min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white dark:bg-[#1F2937] border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
+                    >
+                      <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {scope}
+                        </h3>
+                      </div>
+                      <div className="px-3 py-2">
+                        <p className="dark:text-white">
+                          {scopeMeta.scopes[scope].description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="flex-1 text-gray-500"
+                    >
+                      {scopeMeta.scopes[scope].name}
+                    </Text>
+                  </div>
+                )}
+
+                {scope === 'erc_4337' && (
+                  <div className="flex-1 min-w-0">
+                    <Dropdown
+                      items={connectedSmartContractWallets}
+                      defaultItems={selectedSCWallets}
+                      placeholder="Create New Wallet"
+                      multiple={true}
+                      onSelect={(
+                        selectedItems: Array<DropdownSelectListItem>
+                      ) => {
+                        selectSmartWalletsCallback(selectedItems)
+                      }}
+                      onSelectAll={selectAllSmartWalletsCallback}
+                      ConnectButtonPhrase="New Smart Contract Wallet"
+                      ConnectButtonCallback={addNewSmartWalletCallback}
+                      selectAllCheckboxTitle="All Smart Contract Wallets"
+                      selectAllCheckboxDescription="All current and future SC Wallets"
+                      DropdownListboxButton={DropdownListboxButton}
+                    />
+                  </div>
+                )}
+
+                {scope === 'email' && (
+                  <div className="flex-1 min-w-0">
+                    <Dropdown
+                      items={connectedEmails}
+                      defaultItems={[selectedEmail]}
+                      placeholder="Select an Email Address"
+                      onSelect={(selectedItem: DropdownSelectListItem) => {
+                        selectEmailCallback(selectedItem)
+                      }}
+                      ConnectButtonPhrase="Connect New Email Account"
+                      ConnectButtonCallback={addNewEmailCallback}
+                      DropdownListboxButton={DropdownListboxButton}
+                    />
+                  </div>
+                )}
+
+                {scope === 'connected_accounts' && (
+                  <div className="flex-1 min-w-0">
+                    <Dropdown
+                      items={connectedAccounts}
+                      defaultItems={selectedConnectedAccounts}
+                      onSelect={(
+                        selectedItems: Array<DropdownSelectListItem>
+                      ) => {
+                        selectAccountsCallback(selectedItems)
+                      }}
+                      onSelectAll={selectAllAccountsCallback}
+                      placeholder="Select at least one"
+                      ConnectButtonPhrase="Connect New Account"
+                      ConnectButtonCallback={addNewAccountCallback}
+                      multiple={true}
+                      selectAllCheckboxTitle="All Connected Accounts"
+                      selectAllCheckboxDescription="All current and future accounts"
+                      DropdownListboxButton={DropdownListboxButton}
+                    />
+                  </div>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+
+      {(appProfile?.termsURL || appProfile?.privacyURL) && (
+        <div className="mt-auto">
+          <Text size="sm" className="text-gray-500">
+            Before using this app, you can review{' '}
+            {appProfile?.name ?? `Company`}
+            &apos;s{' '}
+            <a href={appProfile.privacyURL} className="text-skin-primary">
+              privacy policy
+            </a>
+            {appProfile?.termsURL && appProfile?.privacyURL && (
+              <span> and </span>
             )}
-            {transitionState !== 'idle' && <Spinner />}
-          </div>
-          <div className="mt-5 flex justify-center items-center space-x-2">
-            <img src={subtractLogo} alt="powered by rollup.id" />
-            <Text size="xs" weight="normal" className="text-gray-400">
-              Powered by{' '}
-              <a href="https://rollup.id" className="hover:underline">
-                rollup.id
-              </a>
-            </Text>
-            <TosAndPPol />
-          </div>
+            <a href={appProfile.termsURL} className="text-skin-primary">
+              terms of service
+            </a>
+            .
+          </Text>
+        </div>
+      )}
+
+      <div className="flex flex-col w-full items-center justify-center mt-auto">
+        <div className={'flex flex-row w-full items-end justify-center gap-4'}>
+          {transitionState === 'idle' && (
+            <>
+              <Button
+                btnSize="xl"
+                btnType="secondary-alt-skin"
+                onClick={cancelCallback}
+              >
+                <Text
+                  weight="medium"
+                  className="truncate text-gray-800 dark:text-white"
+                >
+                  Cancel
+                </Text>
+              </Button>
+              <Button
+                btnSize="xl"
+                btnType="primary-alt-skin"
+                disabled={disableAuthorize}
+                onClick={() => {
+                  authorizeCallback(requestedScope)
+                }}
+              >
+                Continue
+              </Button>
+            </>
+          )}
+          {transitionState !== 'idle' && <Spinner />}
+        </div>
+        <div className="mt-5 flex justify-center items-center space-x-2">
+          <img src={subtractLogo} alt="powered by rollup.id" />
+          <Text size="xs" weight="normal" className="text-gray-400">
+            Powered by{' '}
+            <a href="https://rollup.id" className="hover:underline">
+              rollup.id
+            </a>
+          </Text>
+          <TosAndPPol />
         </div>
       </div>
     </div>

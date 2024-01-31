@@ -50,7 +50,6 @@ module.exports = {
         Buffer: ['buffer', 'Buffer'],
       })
     )
-
     config.resolve.fallback = {
       crypto: require.resolve('crypto-browserify'),
       stream: require.resolve('stream-browserify'),
@@ -69,6 +68,7 @@ module.exports = {
       child_process: false,
 
     }
+
     // Return the altered config
     return config
   },

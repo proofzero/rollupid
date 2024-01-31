@@ -1,5 +1,5 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { imageFromAddressType } from '../../../helpers'
+import { imageFromAccountType } from '../../../helpers'
 
 type Link = {
   name: string
@@ -36,7 +36,7 @@ export const Links = ({ links, isOwner = false, displayName }: LinksProps) => {
       {links
         .map((link) => ({
           ...link,
-          providerIcon: imageFromAddressType(link.provider),
+          providerIcon: imageFromAccountType(link.provider),
         }))
         .map((link, i: number) => (
           <a

@@ -1,0 +1,41 @@
+name = "passport"
+main = "./build/index.js"
+compatibility_date = "2022-04-05"
+compatibility_flags = ["streams_enable_constructors"]
+node_compat = true
+workers_dev = false
+logpush = true
+
+[build]
+command = "yarn build"
+
+[site]
+bucket = "./public"
+
+[env.next]
+routes = [
+  { pattern = "passport-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+  { pattern = "passport-next.pz3r0.com", custom_domain = true, zone_name = "pz3r0.com" },
+]
+
+services = [
+  { binding = "Core", service = "core-next" },
+  { binding = "Images", service = "images-next" },
+]
+
+[env.next.vars]
+DEFAULT_HOSTS = ["passport-next.rollup.id", "passport-next.pz3r0.com"]
+COOKIE_DOMAIN = "rollup.id"
+PROFILE_APP_URL = "https://my-next.rollup.id"
+CONSOLE_APP_URL = "https://console-next.rollup.id"
+PASSPORT_REDIRECT_URL = "https://passport-next.rollup.id/connect/token"
+INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/twitter/callback"
+INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/apple/callback"
+INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/microsoft/callback"
+INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/discord/callback"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
+WALLET_CONNECT_PROJECT_ID = "7bce942e261433eb70c2a72d555dd61f"
+POSTHOG_API_KEY = "phc_JsZaA3PKO8jNF6gJ7HusRN3C7yzp56JakJJZfNRI9n7"
+POSTHOG_PROXY_HOST = "https://analytics.rollup.id"

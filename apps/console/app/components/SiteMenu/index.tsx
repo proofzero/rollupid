@@ -20,6 +20,7 @@ import {
   HiOutlineBookOpen,
   HiOutlineExternalLink,
   HiOutlineLogout,
+  HiUserGroup,
 } from 'react-icons/hi'
 import {
   TbScan,
@@ -28,13 +29,20 @@ import {
   TbReceipt2,
   TbUsers,
   TbWorld,
+  TbRocket,
+  TbUserCog,
 } from 'react-icons/tb'
-import { BsGear } from 'react-icons/bs'
+
 import { Popover, Transition } from '@headlessui/react'
 import { usePopper } from 'react-popper'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import type { IconType } from 'react-icons'
 import { Avatar } from '@proofzero/design-system'
+
+import { usePostHog } from 'posthog-js/react'
+import { ServicePlanType } from '@proofzero/types/billing'
+import _ from 'lodash'
+import { isPlanGuarded } from '~/utils/planGate'
 
 // RollupLogo
 // -----------------------------------------------------------------------------
@@ -59,6 +67,7 @@ type RollupMenuProps = {
     clientId: string
     name?: string
     icon?: string
+    appPlan: ServicePlanType
   }[]
   // Current selected Client ID.
   selected?: string
@@ -77,6 +86,7 @@ export default function SiteMenu(props: RollupMenuProps) {
   let [referenceElement, setReferenceElement] = useState()
   let [popperElement, setPopperElement] = useState()
   let { attributes } = usePopper(referenceElement, popperElement)
+  const posthog = usePostHog()
 
   const submit = useSubmit()
 
@@ -152,6 +162,7 @@ export default function SiteMenu(props: RollupMenuProps) {
                   <button
                     onClick={() => {
                       close()
+                      posthog?.reset()
                       submit(null, { method: 'post', action: 'signout' })
                     }}
                     className={`w-full flex self-center justify-between w-full
@@ -202,6 +213,7 @@ const appSubmenuStruct: {
     title: string
     subroute?: string
     disabled?: boolean
+    plan?: ServicePlanType
   }[]
 }[] = [
   {
@@ -231,11 +243,13 @@ const appSubmenuStruct: {
         title: 'Designer',
         icon: HiOutlineColorSwatch,
         subroute: '/designer',
+        plan: ServicePlanType.PRO,
       },
       {
         title: 'Custom Domain',
         icon: TbWorld,
         subroute: '/domain',
+        plan: ServicePlanType.PRO,
       },
     ],
   },
@@ -273,16 +287,24 @@ const appSubmenuStruct: {
         subroute: '/team',
       },
       {
-        title: 'Billing',
-        icon: TbReceipt2,
+        title: 'Service Plan',
+        icon: TbRocket,
         subroute: '/billing',
       },
     ],
   },
 ]
 
-const AppSubmenu = (appSubroute: string, close?: () => void) =>
-  appSubmenuStruct.map((ass) => (
+const AppSubmenu = (
+  appSubroute: string,
+  appPlanType?: ServicePlanType,
+  close?: () => void
+) => {
+  if (!appPlanType) {
+    throw new Error('App plan type is undefined')
+  }
+
+  return appSubmenuStruct.map((ass) => (
     <div key={ass.title} className="mt-6">
       <Text size="xs" weight="medium" className="uppercase text-gray-500">
         {ass.title}
@@ -303,23 +325,36 @@ const AppSubmenu = (appSubroute: string, close?: () => void) =>
             end
           >
             <al.icon size={24} />
-            <Text size="sm" weight="medium">
-              {al.title}
-            </Text>
+            <div className="flex-1">
+              <Text size="sm" weight="medium" className="text-left">
+                {al.title}
+              </Text>
+            </div>
+
+            {al.plan && isPlanGuarded(appPlanType, al.plan) && (
+              <div className="py-0.5 px-2 rounded-lg bg-gray-800">
+                <Text size="xs" className="text-gray-400">
+                  PRO
+                </Text>
+              </div>
+            )}
           </NavLink>
         ))}
       </section>
     </div>
   ))
+}
 
 function AppMenu({ props, close }: AppMenuProps) {
+  const appPlan = props.apps.find((a) => a.clientId === props.selected)?.appPlan
+
   return (
     <div>
       <AppSelect apps={props.apps} selected={props.selected} close={close} />
 
       {props.selected && (
         <section className="px-2 lg:flex lg:flex-col">
-          {AppSubmenu(props.selected, close)}
+          {AppSubmenu(props.selected, appPlan, close)}
         </section>
       )}
     </div>
@@ -335,6 +370,34 @@ type ExternalLinksProps = {
 function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
+      {false && (
+        <div className="px-2 p-2 hover:bg-gray-800">
+          <NavLink
+            to={'/spuorg'}
+            className={({ isActive }) => `${menuItemClass(isActive, false)} `}
+          >
+            <HiUserGroup size={24} className="mr-2" />
+            <div className="flex flex-row w-full items-center justify-between">
+              <Text size="sm" weight="medium">
+                Groups
+              </Text>
+            </div>
+          </NavLink>
+        </div>
+      )}
+      <div className="px-2 p-2 hover:bg-gray-800">
+        <NavLink
+          to={'/billing'}
+          className={({ isActive }) => `${menuItemClass(isActive, false)} `}
+        >
+          <TbReceipt2 size={24} className="mr-2" />
+          <div className="flex flex-row w-full items-center justify-between">
+            <Text size="sm" weight="medium">
+              Billing & Invoicing
+            </Text>
+          </div>
+        </NavLink>
+      </div>
       <div className="px-2 p-2 hover:bg-gray-800">
         <NavLink
           to={PASSPORT_URL}
@@ -344,7 +407,7 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
             if (close) close()
           }}
         >
-          <BsGear size={24} className="mr-2" />
+          <TbUserCog size={24} className="mr-2" />
           <div className="flex flex-row w-full items-center justify-between">
             <Text size="sm" weight="medium">
               User Settings

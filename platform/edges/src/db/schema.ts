@@ -1,12 +1,5 @@
 import { AnyURN } from '@proofzero/urns'
-import {
-  integer,
-  sqliteTable,
-  text,
-  index,
-  uniqueIndex,
-  primaryKey,
-} from 'drizzle-orm-sqlite'
+import { sqliteTable, text, index, primaryKey } from 'drizzle-orm-sqlite'
 
 export type URNRComponentTable = {
   nodeUrn: number

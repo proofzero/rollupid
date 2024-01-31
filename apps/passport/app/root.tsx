@@ -1,12 +1,12 @@
 import type {
-  MetaFunction,
   LinksFunction,
   LoaderFunction,
+  MetaFunction,
 } from '@remix-run/cloudflare'
 
-import { json, redirect } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import {
   Links,
@@ -30,7 +30,7 @@ import appleIcon from '~/assets/root-apple-touch-icon.png'
 import icon32 from '~/assets/root-favicon-32x32.png'
 import icon16 from '~/assets/root-favicon-16x16.png'
 import faviconSvg from '~/assets/root-favicon.svg'
-import social from '~/assets/passport-social.png'
+import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
@@ -43,6 +43,9 @@ import type { FLASH_MESSAGE } from './utils/flashMessage.server'
 
 import { getFlashSession, commitFlashSession } from './session.server'
 
+import posthog from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
+
 import {
   toast,
   Toaster,
@@ -54,21 +57,10 @@ import * as gtag from '~/utils/gtags.client'
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
+import { useHydrated } from 'remix-utils'
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Passport - Rollup',
-  viewport: 'width=device-width,initial-scale=1',
-  'og:url': 'https://passport.rollup.id',
-  'og:description': 'Identity management for the private web.',
-  'og:image': social,
-  'twitter:card': 'summary_large_image',
-  'twitter:site': '@rollupid_xyz',
-  'twitter:creator': '@rollupid_xyz',
-  'theme-color': '#ffffff',
-  'mobile-web-app-capable': 'yes',
-  'apple-mobile-web-app-capable': 'yes',
-})
+import { getCoreClient } from './platform.server'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -77,16 +69,57 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
-    const url = new URL(request.url)
-    /**
-     * We use the same technique in profile for `$type/$address` route.
-     * This redirect here prevents us from calling this loader multiple times.
-     * In this case it's essential since flashSessions gets wiped out without
-     * displaying toast messages.
-     */
+    const clientId = new URL(request.url).searchParams.get('client_id')
+    if (
+      request.cf.botManagement.score <= 30 &&
+      !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+    ) {
+      let ogTheme = {}
+      if (
+        (params.clientId || clientId) &&
+        !['console', 'passport'].includes(params.clientId!)
+      ) {
+        const coreClient = getCoreClient({ context })
+        ogTheme = await coreClient.starbase.getOgTheme.query({
+          clientId: params.clientId!,
+        })
+      }
 
-    if (url.pathname === `/`) {
-      return redirect(`/authenticate`)
+      return json(ogTheme)
+    }
+    let appProps
+    if (context.appProps) {
+      appProps = context.appProps
+    } else {
+      if (!params.clientId && !clientId) {
+        const name = 'Passport'
+        appProps = {
+          name: `Rollup - ${name}`,
+          iconURL: LogoIndigo,
+          termsURL: 'https://rollup.id/tos',
+          privacyURL: 'https://rollup.id/privacy-policy',
+          redirectURI: `https://passport.rollup.id`,
+          websiteURL: 'https://rollup.id',
+        }
+      } else {
+        if (['console', 'passport'].includes(params.clientId!)) {
+          const name =
+            params.clientId!.charAt(0).toUpperCase() + params.clientId!.slice(1)
+          appProps = {
+            name: `Rollup - ${name}`,
+            iconURL: LogoIndigo,
+            termsURL: 'https://rollup.id/tos',
+            privacyURL: 'https://rollup.id/privacy-policy',
+            redirectURI: `https://${params.clientId}.rollup.id`,
+            websiteURL: 'https://rollup.id',
+          }
+        } else {
+          const coreClient = getCoreClient({ context })
+          appProps = await coreClient.starbase.getAppPublicProps.query({
+            clientId: (params.clientId || clientId) as string,
+          })
+        }
+      }
     }
 
     const flashes = []
@@ -103,38 +136,72 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return json(
       {
+        appProps: { ...appProps, clientId: params.clientId },
         flashes,
         ENV: {
+          POSTHOG_API_KEY: context.env.POSTHOG_API_KEY,
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
-          WALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
+          POSTHOG_PROXY_HOST: context.env.POSTHOG_PROXY_HOST,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
-          APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'
               ? process.env.REMIX_DEV_SERVER_WS_PORT
               : undefined,
+          WALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
+          APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
         },
       },
       {
         headers: {
-          'Set-Cookie': await commitFlashSession(context.env, flashSession),
+          'Set-Cookie': await commitFlashSession(
+            request,
+            context.env,
+            flashSession
+          ),
         },
       }
     )
   }
 )
 
+export const meta: MetaFunction = ({ data }) => {
+  return {
+    charset: 'utf-8',
+    title: data?.title ? data.title : 'Passport - Rollup',
+    viewport: 'width=device-width,initial-scale=1',
+    'og:url': 'https://passport.rollup.id',
+    'og:title': data?.title ? data.title : 'Passport - Rollup',
+    'og:description': data?.description
+      ? data.description
+      : 'Simple & Secure Private Auth',
+    'og:image': data?.image
+      ? data.image
+      : 'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'twitter:card': 'summary_large_image',
+    'twitter:site': '@rollupid_xyz',
+    'twitter:creator': '@rollupid_xyz',
+    'twitter:image': data?.image
+      ? data.image
+      : 'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'theme-color': '#ffffff',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+  }
+}
+
 export default function App() {
   const nonce = useContext(NonceContext)
 
   const location = useLocation()
   const transition = useTransition()
-  const browserEnv = useLoaderData()
+  const browserEnv = useLoaderData() ?? {}
 
-  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+  const hydrated = useHydrated()
 
-  const remixDevPort = browserEnv.ENV.REMIX_DEV_SERVER_WS_PORT
+  const GATag = browserEnv?.ENV?.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  const remixDevPort = browserEnv?.ENV?.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
 
   useEffect(() => {
@@ -144,22 +211,77 @@ export default function App() {
   }, [location, GATag])
 
   useEffect(() => {
-    browserEnv.flashes?.forEach(
+    browserEnv?.flashes?.forEach(
       (flash: { type: ToastType; message: string }) => {
         toast(flash.type, {
           message: flash.message,
         })
       }
     )
-  }, [browserEnv.flashes])
+  }, [browserEnv?.flashes])
+
+  const loaderColorHandler = (isDark: boolean): string | undefined => {
+    if (browserEnv?.appProps?.appTheme?.color) {
+      return isDark
+        ? browserEnv?.appProps?.appTheme?.color.dark
+        : browserEnv?.appProps.appTheme.color.light
+    }
+  }
+
+  const [dark, setDark] = useState<boolean>(false)
+  const [loaderColor, setLoaderColor] = useState<string | undefined>(
+    browserEnv?.appProps?.appTheme?.color?.light
+  )
+
+  const [ueComplete, setUEComplete] = useState(false)
+  useEffect(() => {
+    const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
+    setDark(darkMode.matches)
+    setLoaderColor(loaderColorHandler(darkMode.matches))
+
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', (event) => {
+        setDark(event.matches)
+        setLoaderColor(loaderColorHandler(event.matches))
+      })
+    setUEComplete(true)
+  }, [])
+
+  useEffect(() => {
+    // https://posthog.com/docs/libraries/react#posthog-provider
+    if (hydrated) {
+      try {
+        posthog?.init(browserEnv?.ENV.POSTHOG_API_KEY, {
+          api_host: browserEnv?.ENV.POSTHOG_PROXY_HOST,
+          autocapture: false,
+        })
+        posthog?.reset()
+      } catch (ex) {
+        console.error(ex)
+      }
+    }
+  }, [hydrated])
 
   return (
     <html lang="en">
       <head>
         <Meta />
 
-        {browserEnv.appProps ? (
-          <link rel="icon" type="image" href={browserEnv.appProps.iconURL} />
+        {browserEnv?.appProps?.iconURL ? (
+          <>
+            <link
+              rel="apple-touch-icon"
+              href={browserEnv?.appProps.iconURL}
+              sizes="180x180"
+            />
+            <link rel="icon" type="image" href={browserEnv?.appProps.iconURL} />
+            <link
+              rel="shortcut icon"
+              type="image"
+              href={browserEnv?.appProps.iconURL}
+            />
+          </>
         ) : (
           <>
             <link rel="apple-touch-icon" href={appleIcon} sizes="180x180" />
@@ -168,10 +290,9 @@ export default function App() {
             <link rel="icon" type="image/png" href={icon16} sizes="16x16" />
           </>
         )}
-
         <Links />
       </head>
-      <body style={{ backgroundColor: '#F9FAFB' }}>
+      <body>
         {!GATag ? null : (
           <>
             <script
@@ -196,16 +317,31 @@ export default function App() {
             />
           </>
         )}
-        {transition.state !== 'idle' && <Loader />}
+        {transition.state !== 'idle' && <Loader mainColor={loaderColor} />}
         <Toaster position="top-right" />
-        <Outlet />
+        {ueComplete && (
+          <ThemeContext.Provider
+            value={{
+              dark,
+              theme: undefined,
+            }}
+          >
+            {typeof window !== 'undefined' ? (
+              <PostHogProvider client={posthog}>
+                <Outlet context={{ appProps: browserEnv?.appProps }} />
+              </PostHogProvider>
+            ) : (
+              <Outlet context={{ appProps: browserEnv?.appProps }} />
+            )}
+          </ThemeContext.Provider>
+        )}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
         <script
           nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `!window ? null : window.ENV = ${JSON.stringify(
-              browserEnv.ENV
+              browserEnv?.ENV ?? {}
             )}`,
           }}
         />
@@ -255,7 +391,8 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.error('CaughtBoundary', caught)
+
+  console.error('CaughtBoundary', JSON.stringify(caught, null, 2))
 
   const { status } = caught
 
@@ -271,6 +408,7 @@ export function CatchBoundary() {
       secondary = 'Internal Server Error'
       break
   }
+
   return (
     <html lang="en">
       <head>
@@ -292,7 +430,7 @@ export function CatchBoundary() {
           {caught.data?.isAuthenticated && (
             <RollupIdButton
               text={'Continue to Rollup'}
-              href={typeof window !== 'undefined' && window.ENV.PROFILE_APP_URL}
+              href={'https://rollup.id'}
             />
           )}
         </div>

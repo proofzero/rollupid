@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { Context } from '../context'
-import { CustomDomainSchema } from '../validators/app'
+import { CustomDomainSchema } from '../validators/customdomain'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import {
   deleteCustomHostname,
