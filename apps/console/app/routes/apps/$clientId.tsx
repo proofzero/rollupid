@@ -6,8 +6,8 @@ import { json } from '@remix-run/cloudflare'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { requireJWT } from '~/utilities/session.server'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import { commitFlashSession, requireJWT } from '~/utilities/session.server'
+import createCoreClient from '@proofzero/platform-clients/core'
 import type { appDetailsProps } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { Popover } from '@headlessui/react'
@@ -20,16 +20,25 @@ import {
 } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import type { LoaderData as OutletContextData } from '~/root'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { BadRequestError, NotFoundError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { PlatformAccountURNHeader } from '@proofzero/types/headers'
+import { getToastsAndFlashSession } from '~/utils/toast.server'
+import { useEffect } from 'react'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 
 type LoaderData = {
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
-  appContactAddress?: AddressURN
+  appContactAddress?: AccountURN
+  appContactEmail?: string
   paymaster: PaymasterType
+  toasts: {
+    message: string
+    type: ToastType
+  }[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -40,21 +49,21 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const clientId = params?.clientId
 
     try {
-      const starbaseClient = createStarbaseClient(Starbase, {
+      const coreClient = createCoreClient(context.env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
 
-      const appDetails = await starbaseClient.getAppDetails.query({
+      const appDetails = await coreClient.starbase.getAppDetails.query({
         clientId: clientId as string,
       })
 
-      const paymaster = await starbaseClient.getPaymaster.query({
+      const paymaster = await coreClient.starbase.getPaymaster.query({
         clientId: clientId as string,
       })
 
@@ -63,8 +72,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       //has just been created; we rotate both secrets and set the timestamps
       if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
         const [apiKeyRes, secretRes] = await Promise.all([
-          starbaseClient.rotateApiKey.mutate({ clientId }),
-          starbaseClient.rotateClientSecret.mutate({
+          coreClient.starbase.rotateApiKey.mutate({ clientId }),
+          coreClient.starbase.rotateClientSecret.mutate({
             clientId,
           }),
         ])
@@ -80,25 +89,51 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
       }
 
-      const appContactAddress = await starbaseClient.getAppContactAddress.query(
-        {
+      const appContactAddress =
+        await coreClient.starbase.getAppContactAddress.query({
           clientId: params.clientId,
-        }
+        })
+
+      let appContactEmail
+      if (appContactAddress) {
+        const coreClient = createCoreClient(context.env.Core, {
+          [PlatformAccountURNHeader]: appContactAddress,
+          ...getAuthzHeaderConditionallyFromToken(jwt),
+          ...generateTraceContextHeaders(context.traceSpan),
+        })
+
+        const { address } = await coreClient.account.getAccountProfile.query()
+        appContactEmail = address
+      }
+
+      const { flashSession, toasts } = await getToastsAndFlashSession(
+        request,
+        context.env
       )
 
-      return json<LoaderData>({
-        appDetails: appDetails as appDetailsProps,
-        rotationResult,
-        appContactAddress,
-        paymaster,
-      })
+      return json<LoaderData>(
+        {
+          appDetails: appDetails as appDetailsProps,
+          rotationResult,
+          appContactAddress,
+          appContactEmail,
+          paymaster,
+          toasts,
+        },
+        {
+          headers: {
+            'Set-Cookie': await commitFlashSession(flashSession, context.env),
+          },
+        }
+      )
     } catch (error) {
       console.error('Caught error in loader', { error })
       if (error instanceof Response) {
         throw error
-      } else throw new NotFoundError({
-        message: `Request received for clientId ${clientId} which is not owned by provided account`
-      })
+      } else
+        throw new NotFoundError({
+          message: `Request received for clientId ${clientId} which is not owned by provided identity`,
+        })
     }
   }
 )
@@ -109,10 +144,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export default function AppDetailIndexPage() {
   const loaderData = useLoaderData<LoaderData>()
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } =
-    useOutletContext<OutletContextData>()
-  const { appDetails, rotationResult, appContactAddress, paymaster } =
-    loaderData
+  const {
+    apps,
+    avatarUrl,
+    PASSPORT_URL,
+    displayName,
+    identityURN,
+    hasUnpaidInvoices,
+    unpaidInvoiceURL,
+  } = useOutletContext<OutletContextData>()
+  const {
+    appDetails,
+    rotationResult,
+    appContactAddress,
+    appContactEmail,
+    paymaster,
+    toasts,
+  } = loaderData
 
   const notify = (success: boolean = true) => {
     if (success) {
@@ -129,6 +177,16 @@ export default function AppDetailIndexPage() {
     }
   }
 
+  useEffect(() => {
+    if (!toasts || !toasts.length) return
+
+    for (const { type, message } of toasts) {
+      toast(type, {
+        message: message,
+      })
+    }
+  }, [toasts])
+
   return (
     <Popover className="min-h-[100dvh] relative">
       {({ open }) => (
@@ -143,26 +201,39 @@ export default function AppDetailIndexPage() {
           />
           <main className="flex flex-col flex-initial min-h-full w-full">
             <SiteHeader avatarUrl={avatarUrl} />
+            {hasUnpaidInvoices && (
+              <ToastWithLink
+                message="We couldn't process payment for your account"
+                linkHref={unpaidInvoiceURL}
+                linkText="Update payment information"
+                type={'urgent'}
+              />
+            )}
             <Toaster position="top-right" reverseOrder={false} />
 
             <section
-              className={`${open
-                ? 'max-lg:opacity-50\
+              className={`${
+                open
+                  ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
-                : 'h-full '
-                } py-9 sm:mx-11 max-w-[1636px]`}
+                  : 'h-full '
+              } py-9 sm:mx-11 max-w-[1636px]`}
             >
               <Outlet
                 context={{
+                  apps,
                   notificationHandler: notify,
                   appDetails,
                   avatarUrl,
                   rotationResult,
                   PASSPORT_URL,
                   appContactAddress,
+                  appContactEmail,
                   paymaster,
+                  identityURN,
+                  hasUnpaidInvoices,
                 }}
               />
             </section>

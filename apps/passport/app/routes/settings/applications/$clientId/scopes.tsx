@@ -1,12 +1,12 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { getValidatedSessionContext } from '~/session.server'
-import { getAccessClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const { accountUrn } = await getValidatedSessionContext(
+    const { identityURN } = await getValidatedSessionContext(
       request,
       context.authzQueryParams,
       context.env,
@@ -18,10 +18,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       throw new BadRequestError({ message: 'Client ID is required for query' })
     }
 
-    const accessClient = getAccessClient(context.env, context.traceSpan)
-    return await accessClient.getAuthorizedAppScopes.query({
+    const coreClient = getCoreClient({ context })
+    return await coreClient.authorization.getAuthorizedAppScopes.query({
       clientId,
-      accountURN: accountUrn,
+      identityURN,
     })
   }
 )

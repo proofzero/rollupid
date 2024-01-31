@@ -22,7 +22,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
     "@proofzero/platform.account": "workspace:*",
-    "@proofzero/platform.address": "workspace:*",
+    "@proofzero/platform.identity": "workspace:*",
     "@types/node": "18.15.3",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
@@ -37,6 +37,7 @@
     "jose": "*"
   },
   "dependencies": {
+    "@dnsquery/dns-packet": "6.1.1",
     "@proofzero/errors": "workspace:*"
   }
 }

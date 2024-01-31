@@ -15,7 +15,7 @@ The decoded contents of an ID token looks like the following:
 ```json
 {
   "iss": "https://passport.rollup.id/",
-  "sub": "{accountUrn}",
+  "sub": "{identityUrn}",
   "aud": ["{yourClientId}"],
   "exp": 1311281970,
   "iat": 1311280970,
@@ -42,7 +42,7 @@ Here is an example of an access token:
 ```json
 {
   "iss": "https://passport.rollup.id/",
-  "sub": "{accountUrn}",
+  "sub": "{identityUrn}",
   "aud": ["{yourClientId}"],
   "azp": "{yourClientId}",
   "exp": 1489179954,
@@ -58,3 +58,28 @@ In the Pro version of Rollup you can set the issuer (iss) to your own custom dom
 Access tokens do not contain any user information other than their ID (sub claim) and authorization information about the actions the application is allowed to perform via the API (scope claim). This makes them useful for securing an API but not for authenticating a user.
 
 In some situations, it may be desirable to include additional information about the user or other custom claims in the access token to save the API from having to fetch details about the user. If you choose to do this, be aware that these extra claims will be readable in the access token. Non-access claims, however, will be readable in the ID token. To learn more, read [Create Custom Claims](custom-claims.md).
+
+## Refresh Tokens
+
+In addition to ID tokens and access tokens, OAuth 2.0 also introduces the concept of refresh tokens. A refresh token is a special kind of token that can be used to obtain a renewed access token. This is useful in situations where the access token has expired or has been invalidated, and the application needs to gain access to the user's resources without having to re-authenticate the user.
+
+Refresh tokens are typically long-lived and can be used to request new access tokens from the authorization server. This is done by sending a request to the token endpoint of the authorization server, including the refresh token along with the client's ID and secret.
+
+Here is an example of a refresh token:
+
+```json
+{
+  "iss": "https://passport.rollup.id/",
+  "aud": ["{yourClientId}"],
+  "sub": "{userId}",
+  "exp": "{expiryTimestamp}",
+  "iat": "{issuedAtTimestamp}",
+  "jti": "{uniqueTokenIdentifier}"
+}
+```
+
+In the Pro version of Rollup, you can set the issuer (iss) to your own custom domain. See the custom domain feature in your Console app.
+
+Refresh tokens provide a more seamless user experience by reducing the need for the user to re-authenticate and grant permissions, while also maintaining the security and privacy of the user's data. However, because refresh tokens can be used to obtain new access tokens, they must be stored securely and treated with the same level of care as the user's credentials.
+
+To learn more about using refresh tokens with Rollup ID, refer to our [API documentation](../reference/passport-api.md#exchange-token) and resources.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Form, NavLink, useFetcher, useOutletContext } from '@remix-run/react'
 
@@ -9,12 +9,7 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
 
-import {
-  getAccountClient,
-  getAccessClient,
-  getAddressClient,
-  getStarbaseClient,
-} from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getValidatedSessionContext,
   destroyUserSession,
@@ -23,13 +18,15 @@ import {
 import { FLASH_MESSAGE } from '~/utils/flashMessage.server'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 import { RollupError, ERROR_CODES, BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { HiOutlineX } from 'react-icons/hi'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const { jwt, accountUrn } = await getValidatedSessionContext(
+    const { jwt, identityURN } = await getValidatedSessionContext(
       request,
       context.authzQueryParams,
       context.env,
@@ -37,26 +34,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     )
 
     try {
-      const accountClient = getAccountClient(
-        jwt,
-        context.env,
-        context.traceSpan
-      )
-      const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
-      const starbaseClient = getStarbaseClient(
-        jwt,
-        context.env,
-        context.traceSpan
-      )
-
-      const [addresses, apps, ownedApps] = await Promise.all([
-        accountClient.getAddresses.query({
-          account: accountUrn,
+      const coreClient = getCoreClient({ context, jwt })
+      const [accounts, apps, ownedApps] = await Promise.all([
+        coreClient.identity.getAccounts.query({
+          URN: identityURN,
         }),
-        accountClient.getAuthorizedApps.query({
-          account: accountUrn,
+        coreClient.identity.getAuthorizedApps.query({
+          identity: identityURN,
         }),
-        starbaseClient.listApps.query(),
+        coreClient.starbase.listApps.query(),
       ])
 
       if (ownedApps.length > 0) {
@@ -66,34 +52,40 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         })
       }
 
-      const addressURNs = addresses?.map(
-        (address) => address.baseUrn
-      ) as AddressURN[]
+      const accountURNs = accounts?.map(
+        (account) => account.baseUrn
+      ) as AccountURN[]
 
       await Promise.all([
         Promise.all(
           apps.map((app) => {
-            return accessClient.revokeAppAuthorization.mutate({
+            return coreClient.authorization.revokeAppAuthorization.mutate({
               clientId: app.clientId,
+              issuer: new URL(request.url).origin,
             })
           })
         ),
         Promise.all(
-          addressURNs.map((addressURN) => {
-            const addressClient = getAddressClient(
-              addressURN,
-              context.env,
-              context.traceSpan
-            )
-            return addressClient.deleteAddressNode.mutate({
-              accountURN: accountUrn,
+          accountURNs.map((accountURN) => {
+            const coreClient = getCoreClient({ context, accountURN })
+            return coreClient.account.deleteAccountNode.mutate({
+              identityURN: identityURN,
               forceDelete: true,
             })
           })
         ),
+        coreClient.identity.purgeIdentityGroupMemberships.mutate(),
       ])
 
-      await accountClient.deleteAccountNode.mutate({ account: accountUrn })
+      await coreClient.identity.deleteIdentityNode.mutate({
+        identity: identityURN,
+      })
+
+      await createAnalyticsEvent({
+        apiKey: context.env.POSTHOG_API_KEY,
+        eventName: 'identity_deleted_identity',
+        distinctId: identityURN,
+      })
     } catch (ex) {
       console.error(ex)
       throw new RollupError({
@@ -129,8 +121,8 @@ const DeleteRollupIdentityModal = ({
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
         className={`min-w-[260px] sm:min-w-[400px] md:max-w-[512px] lg:max-w-[512px]
-     relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left
-    shadow-xl transition-all sm:p-6 overflow-y-auto`}
+     relative bg-white p-4 text-left
+    transition-all sm:p-6 rounded-lg overflow-y-auto`}
       >
         <div className="flex flex-row space-x-6 items-center justify-start">
           <img
@@ -140,9 +132,20 @@ const DeleteRollupIdentityModal = ({
           />
 
           <div className="flex flex-col space-y-2">
-            <Text weight="medium" size="lg" className="text-gray-900">
-              Delete Rollup Identity
-            </Text>
+            <div className="flex flex-row w-full items-center justify-between">
+              <Text weight="medium" size="lg" className="text-gray-900">
+                Delete Rollup Identity
+              </Text>
+              <button
+                className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+                onClick={() => {
+                  setIsOpen(false)
+                }}
+              >
+                <HiOutlineX />
+              </button>
+            </div>
             <Text size="xs" weight="normal">
               {hasOwnedApps
                 ? 'Identity cannot be deleted as it has applications associated to it.\
@@ -171,7 +174,7 @@ const DeleteRollupIdentityModal = ({
               <Button
                 btnType="secondary-alt"
                 onClick={() => setIsOpen(false)}
-                className="bg-gray-100"
+                className="bg-gray-100 hover:bg-gray-200"
               >
                 Developer Console
               </Button>
@@ -180,7 +183,7 @@ const DeleteRollupIdentityModal = ({
             <Button
               btnType="secondary-alt"
               onClick={() => setIsOpen(false)}
-              className="bg-gray-100"
+              className="bg-gray-100 hover:bg-gray-200"
             >
               Cancel
             </Button>

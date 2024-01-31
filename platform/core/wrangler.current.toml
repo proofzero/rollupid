@@ -1,0 +1,61 @@
+name = "core"
+main = "src/index.ts"
+compatibility_date = "2023-03-14"
+compatibility_flags = ["no_minimal_subrequests"]
+logpush = true
+node_compat = true
+workers_dev = false
+
+[env.current]
+durable_objects.bindings = [
+  { name = "Account", class_name = "Account" },
+  { name = "Authorization", class_name = "Authorization" },
+  { name = "ExchangeCode", class_name = "ExchangeCode" },
+  { name = "Identity", class_name = "Identity" },
+  { name = "IdentityGroup", class_name = "IdentityGroup" },
+  { name = "StarbaseApp", class_name = "StarbaseApplication" },
+]
+
+services = [
+  { binding = "Core", service = "core-current" },
+  { binding = "Email", service = "email-current" },
+  { binding = "Images", service = "images-current" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
+]
+
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
+
+[[env.current.d1_databases]]
+binding = "EDGES"
+database_name = "edges-v2-current"
+database_id = "825ee9f1-8de8-4f73-a0e0-1998feea3d7f"
+migrations_dir = "../edges/migrations"
+
+[env.current.vars]
+ENVIRONMENT = "current"
+
+INTERNAL_PASSPORT_SERVICE_NAME = "passport-current"
+
+PASSPORT_URL = "https://passport.rollup.id"
+MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
+TTL_IN_MS = 300_000
+MAX_ATTEMPTS = 5
+DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 30_000
+REGENERATION_COOLDOWN_PERIOD_IN_MS = 600_000
+MAX_ATTEMPTS_TIME_PERIOD_IN_MS = 300_000
+
+POSTHOG_API_KEY = "phc_QGmYrKfXcyIAUBBTX3NBDJjNg2MX24ijFemeUuykzWr"
+
+[[migrations]]
+tag = "v0"
+new_classes = ["IdentityGroup"]
+transferred_classes = [
+  { from = "Access", from_script = "access-current", to = "Authorization" },
+  { from = "Account", from_script = "account-current", to = "Identity" },
+  { from = "Address", from_script = "address-current", to = "Account" },
+  { from = "Authorization", from_script = "access-current", to = "ExchangeCode" },
+  { from = "StarbaseApplication", from_script = "starbase-current", to = "StarbaseApplication" },
+]

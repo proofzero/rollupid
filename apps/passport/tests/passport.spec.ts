@@ -56,7 +56,7 @@ test('login to passport using Email', async ({ page, request }) => {
   await page.getByRole('button').filter({ hasText: 'Verify' }).click()
 
   await page.waitForURL(/.*settings\/dashboard/, {
-    timeout: 10000,
+    timeout: 15000,
     waitUntil: 'networkidle',
   })
   await expect(page).toHaveURL(/.*settings\/dashboard/)

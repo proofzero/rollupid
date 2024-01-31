@@ -8,8 +8,7 @@ import {
 } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
@@ -20,7 +19,7 @@ import {
 } from '~/session.server'
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { AuthorizedAppsModel } from '~/routes/settings'
+import type { AuthorizedAppsModel } from '~/routes/settings'
 import { WarningCTA } from '@proofzero/design-system/src/molecules/cta/warning'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
@@ -45,7 +44,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       },
       {
         headers: {
-          'Set-Cookie': await commitFlashSession(context.env, session),
+          'Set-Cookie': await commitFlashSession(request, context.env, session),
         },
       }
     )

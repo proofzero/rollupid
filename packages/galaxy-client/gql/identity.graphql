@@ -1,0 +1,35 @@
+query getProfile($targetIdentityURN: String) {
+  profile(targetIdentityURN: $targetIdentityURN) {
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    displayName
+  }
+}
+
+query getConnectedAccounts($targetIdentityURN: String) {
+  accounts: connectedAccounts(targetIdentityURN: $targetIdentityURN) {
+    baseUrn
+    qc
+    rc
+  }
+}
+
+query getAuthorizedApps {
+  authorizedApps {
+    clientId
+    icon
+    title
+    timestamp
+  }
+}
+
+mutation disconnectAccount($accountURN: String!) {
+  disconnectAccount(accountURN: $accountURN)
+}

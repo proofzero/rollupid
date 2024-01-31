@@ -5,11 +5,10 @@ import {
   useTransition,
   useFetcher,
 } from '@remix-run/react'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import InputText from '~/components/inputs/InputText'
 import { getAccessToken, parseJwt } from '~/utils/session.server'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 
@@ -27,7 +26,9 @@ import { FullProfileSchema } from '~/validation'
 import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const { sub: accountURN } = parseJwt(await getAccessToken(request))
+  const { sub: identityURN } = parseJwt(
+    await getAccessToken(request, context.env)
+  )
 
   const formData = await request.formData()
 
@@ -39,7 +40,10 @@ export const action: ActionFunction = async ({ request, context }) => {
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
 
-  const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
+  const currentProfile = await context.env.ProfileKV.get<FullProfile>(
+    identityURN!,
+    'json'
+  )
   const updatedProfile = Object.assign(currentProfile || {}, {
     displayName,
     pfp: {
@@ -60,19 +64,24 @@ export const action: ActionFunction = async ({ request, context }) => {
     }
   }
 
-  await ProfileKV.put(accountURN!, JSON.stringify(zodValidation.data))
+  await context.env.ProfileKV.put(
+    identityURN!,
+    JSON.stringify(zodValidation.data)
+  )
 
   return null
 }
 
 export default function AccountSettingsProfile() {
-  const { notify, profile, accountURN } = useOutletContext<{
+  const { notify, profile, identityURN } = useOutletContext<{
     profile: FullProfile
     notify: (success: boolean) => void
-    accountURN: string
+    identityURN: string
   }>()
 
   const { displayName, pfp, bio, job, location } = profile
+
+  const [bioInput, setBioInput] = useState(bio || '')
 
   const [pfpUrl, setPfpUrl] = useState(pfp?.image || undefined)
   const [isToken, setIsToken] = useState<boolean>(false)
@@ -162,7 +171,7 @@ export default function AccountSettingsProfile() {
             (nft: NFT) => nft.contract.address === collection
           )[0].chain.chain
         : null
-    getMoreNftsModal(modalFetcher, accountURN, collection, chain)
+    getMoreNftsModal(modalFetcher, identityURN, collection, chain)
   }, [collection])
   // --------------------- END OF MODAL PART ---------------------- //
 
@@ -317,7 +326,8 @@ export default function AccountSettingsProfile() {
             heading="Bio"
             charLimit={256}
             rows={3}
-            defaultValue={bio || ''}
+            value={bioInput}
+            onChange={setBioInput}
             error={actionData?.errors.bio}
           />
 

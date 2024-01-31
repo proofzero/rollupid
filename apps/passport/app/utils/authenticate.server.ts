@@ -1,18 +1,14 @@
-import { AddressURNSpace } from '@proofzero/urns/address'
-import type { AddressURN } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
-import { JsonError } from '@proofzero/utils/errors'
-import { GrantType, ResponseType } from '@proofzero/types/access'
+import { GrantType, ResponseType } from '@proofzero/types/authorization'
 
-import {
-  getAccessClient,
-  getAccountClient,
-  getAddressClient,
-} from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   createUserSession,
   getAuthzCookieParamsSession,
+  getUserSession,
   parseJwt,
 } from '~/session.server'
 import { generateGradient } from './gradient.server'
@@ -24,9 +20,9 @@ import {
   createAuthenticatorSessionStorage,
 } from '~/auth.server'
 
-export const authenticateAddress = async (
-  address: AddressURN,
+export const authenticateAccount = async (
   account: AccountURN,
+  identity: IdentityURN,
   appData: AuthzParams,
   request: Request,
   env: Env,
@@ -40,27 +36,40 @@ export const authenticateAddress = async (
     })
   }
 
+  const jwt = await getUserSession(request, env, appData?.clientId)
   if (
     appData.rollup_action &&
-    ['connect', 'reconnect'].includes(appData?.rollup_action)
+    (['connect', 'reconnect'].includes(appData?.rollup_action) ||
+      appData?.rollup_action.startsWith('groupconnect'))
   ) {
-    const redirectURL = getAuthzRedirectURL(
-      appData,
-      existing && appData.rollup_action === 'connect'
-        ? 'ALREADY_CONNECTED'
-        : undefined
-    )
+    let result = undefined
+
+    if (
+      existing &&
+      (appData.rollup_action === 'connect' ||
+        appData.rollup_action.startsWith('groupconnect'))
+    ) {
+      const loggedInIdentity = parseJwt(jwt).sub
+      if (identity !== loggedInIdentity) {
+        result = 'ACCOUNT_CONNECT_ERROR'
+      } else {
+        result = 'ALREADY_CONNECTED_ERROR'
+      }
+    }
+
+    const redirectURL = getAuthzRedirectURL(appData, result)
 
     return redirect(redirectURL)
   }
 
-  const accessClient = getAccessClient(env, traceSpan)
-  const clientId = AddressURNSpace.decode(address)
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context })
+  const clientId = AccountURNSpace.decode(account)
   const redirectUri = env.PASSPORT_REDIRECT_URL
   const scope = ['admin']
   const state = ''
-  const { code } = await accessClient.authorize.mutate({
-    account,
+  const { code } = await coreClient.authorization.authorize.mutate({
+    identity,
     responseType: ResponseType.Code,
     clientId,
     redirectUri,
@@ -69,16 +78,17 @@ export const authenticateAddress = async (
   })
 
   const grantType = GrantType.AuthenticationCode
-  const { accessToken } = await accessClient.exchangeToken.mutate({
+  const { accessToken } = await coreClient.authorization.exchangeToken.mutate({
     grantType,
     code,
     clientId,
     issuer: new URL(request.url).origin,
   })
 
-  await provisionProfile(accessToken, env, traceSpan, address)
+  await provisionProfile(accessToken, env, traceSpan, account)
 
   return createUserSession(
+    request,
     accessToken,
     getAuthzRedirectURL(appData),
     env,
@@ -114,20 +124,22 @@ const provisionProfile = async (
   jwt: string,
   env: Env,
   traceSpan: TraceSpan,
-  address: AddressURN
+  accountURN: AccountURN
 ) => {
-  const accountClient = getAccountClient(jwt, env, traceSpan)
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context, accountURN, jwt })
   const parsedJWT = parseJwt(jwt)
-  const account = parsedJWT.sub as AccountURN
+  const identity = parsedJWT.sub as IdentityURN
 
-  const profile = await accountClient.getProfile.query({
-    account,
+  const profile = await coreClient.identity.getProfile.query({
+    identity,
   })
 
   if (!profile) {
-    console.log(`Profile doesn't exist for account ${account}. Creating one...`)
-    const addressClient = getAddressClient(address, env, traceSpan)
-    const newProfile = await addressClient.getAddressProfile
+    console.log(
+      `Profile doesn't exist for identity ${identity}. Creating one...`
+    )
+    const newProfile = await coreClient.account.getAccountProfile
       .query()
       .then(async (res) => {
         const gradient = await generateGradient(res.address, env, traceSpan)
@@ -139,40 +151,41 @@ const provisionProfile = async (
         }
       })
     // set the default profile
-    await accountClient.setProfile.mutate({
-      name: account,
-      profile: { ...newProfile, primaryAddressURN: address },
+    await coreClient.identity.setProfile.mutate({
+      name: identity,
+      profile: { ...newProfile, primaryAccountURN: accountURN },
     })
   } else {
-    console.log(`Profile for account ${account} found. Continuing...`)
+    console.log(`Profile for identity ${identity} found. Continuing...`)
   }
 }
 
-export const setNewPrimaryAddress = async (
+export const setNewPrimaryAccount = async (
   jwt: string,
   env: Env,
   traceSpan: TraceSpan,
-  newPrimaryAddress: AddressURN,
+  newPrimaryAccount: AccountURN,
   pfp: string,
   displayName: string
 ) => {
-  const accountClient = getAccountClient(jwt, env, traceSpan)
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context, jwt })
   const parsedJWT = parseJwt(jwt)
-  const account = parsedJWT.sub as AccountURN
+  const identity = parsedJWT.sub as IdentityURN
 
-  const profile = await accountClient.getProfile.query({
-    account,
+  const profile = await coreClient.identity.getProfile.query({
+    identity,
   })
 
-  // Update the profile with the new primary address if it exists
+  // Update the profile with the new primary account if it exists
 
   if (profile) {
-    await accountClient.setProfile.mutate({
-      name: account,
+    await coreClient.identity.setProfile.mutate({
+      name: identity,
       profile: {
         displayName: displayName,
         pfp: { ...profile.pfp, image: pfp },
-        primaryAddressURN: newPrimaryAddress,
+        primaryAccountURN: newPrimaryAccount,
       },
     })
   }
@@ -189,7 +202,10 @@ export const checkOAuthError = async (request: Request, env: Env) => {
   console.error({ error, uri, description })
 
   const authzParams = await getAuthzCookieParamsSession(request, env)
-  const authenticatorStorage = await createAuthenticatorSessionStorage(env)
+  const authenticatorStorage = await createAuthenticatorSessionStorage(
+    request,
+    env
+  )
   const session = await authenticatorStorage.getSession(
     request.headers.get('Cookie')
   )

@@ -1,7 +1,7 @@
-import { AccountURN } from '@proofzero/urns/account'
+import { type IdentityURN } from '@proofzero/urns/identity'
 import {
-  ActionFunction,
-  LoaderFunction,
+  type ActionFunction,
+  type LoaderFunction,
   json,
   redirect,
 } from '@remix-run/cloudflare'
@@ -11,7 +11,7 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import { getAccountClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getAuthzCookieParams,
   getUserSession,
@@ -37,9 +37,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const jwt = await getUserSession(request, context.env, params.clientId)
     if (!jwt) return redirectToAuthentication(request, params.clientId)
 
-    const account = parseJwt(jwt).sub as AccountURN
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const profile = await accountClient.getProfile.query({ account })
+    const identity = parseJwt(jwt).sub as IdentityURN
+    const coreClient = getCoreClient({ context, jwt })
+    const profile = await coreClient.identity.getProfile.query({ identity })
     if (!profile) return redirectToAuthentication(request, params.clientId)
     return json({
       profile,

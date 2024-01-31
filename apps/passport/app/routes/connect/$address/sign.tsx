@@ -1,16 +1,24 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
-import { getAddressClient } from '../../../platform.server'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { getCoreClient } from '../../../platform.server'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { CryptoAddressType, NodeType } from '@proofzero/types/address'
+import { CryptoAccountType, NodeType } from '@proofzero/types/account'
 import { getAuthzCookieParams, getUserSession } from '../../../session.server'
 import { getAuthzRedirectURL } from '../../../utils/authenticate.server'
 
-import { signMessageTemplate } from '@proofzero/design-system/src/atoms/buttons/connect-button/ConnectButton'
+import { parseJwt } from '@proofzero/packages/utils'
 import { BadRequestError } from '@proofzero/errors'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import {
+  JsonError,
+  getRollupReqFunctionErrorWrapper,
+} from '@proofzero/utils/errors'
+import type { IdentityURN } from '@proofzero/urns/identity'
+import {
+  AuthenticationScreenDefaults,
+  appendNonceTemplate,
+} from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -19,21 +27,37 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       throw new BadRequestError({ message: 'No address included in request' })
 
     const state = Math.random().toString(36).substring(7)
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(CryptoAddressType.ETH, address),
-      { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(CryptoAccountType.ETH, address),
+      { node_type: NodeType.Crypto, addr_type: CryptoAccountType.ETH },
       { alias: address }
     )
 
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
+    const coreClient = getCoreClient({ context, accountURN })
+
+    let signTemplate = AuthenticationScreenDefaults.defaultSignMessage
+
+    let clientId: string = ''
     try {
-      const nonce = await addressClient.getNonce.query({
+      const res = await getAuthzCookieParams(request, context.env)
+      clientId = res.clientId
+    } catch (ex) {
+      const traceparent = context.traceSpan.getTraceParent()
+      return JsonError(ex, traceparent)
+    }
+    if (clientId !== 'console' && clientId !== 'passport') {
+      const appProps = await coreClient.starbase.getAppPublicProps.query({
+        clientId,
+      })
+      if (appProps.appTheme?.signMessageTemplate) {
+        signTemplate = appProps.appTheme.signMessageTemplate
+      }
+    }
+
+    try {
+      const nonce = await coreClient.account.getNonce.query({
         address: address as string,
-        template: signMessageTemplate,
+        template: appendNonceTemplate(signTemplate),
         state,
         redirectUri: context.env.PASSPORT_REDIRECT_URL,
         scope: ['admin'],
@@ -49,33 +73,43 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const appData = await getAuthzCookieParams(request, context.env)
+    const jwt = await getUserSession(request, context.env, params.clientId)
 
     const { address } = params
     if (!address)
       throw new BadRequestError({ message: 'No address included in request' })
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(CryptoAddressType.ETH, address),
-      { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(CryptoAccountType.ETH, address),
+      { node_type: NodeType.Crypto, addr_type: CryptoAccountType.ETH },
       { alias: address }
     )
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
+    const coreClient = getCoreClient({ context, accountURN })
     const formData = await request.formData()
 
     // TODO: validate from data
-    const { existing } = await addressClient.verifyNonce.mutate({
+    const { existing } = await coreClient.account.verifyNonce.mutate({
       nonce: formData.get('nonce') as string,
       signature: formData.get('signature') as string,
       jwt: await getUserSession(request, context.env, appData?.clientId),
-      forceAccountCreation: !appData || appData.rollup_action !== 'connect',
+      forceAccountCreation:
+        !appData ||
+        (appData.rollup_action !== 'connect' &&
+          !appData.rollup_action?.startsWith('groupconnect')),
     })
 
-    if (appData?.rollup_action === 'connect' && existing) {
-      return redirect(getAuthzRedirectURL(appData, 'ALREADY_CONNECTED'))
+    const identityURNFromAccount = await coreClient.account.getIdentity.query()
+
+    if (
+      (appData?.rollup_action === 'connect' ||
+        appData?.rollup_action?.startsWith('groupconnect')) &&
+      existing
+    ) {
+      const identityURN = parseJwt(jwt).sub! as IdentityURN
+      if (identityURN === identityURNFromAccount) {
+        return redirect(getAuthzRedirectURL(appData, 'ALREADY_CONNECTED_ERROR'))
+      }
+      return redirect(getAuthzRedirectURL(appData, 'ACCOUNT_CONNECT_ERROR'))
     }
 
     // TODO: handle the error case

@@ -7,16 +7,20 @@ import {
   MicrosoftStrategy,
   MicrosoftStrategyOptions,
 } from 'remix-auth-microsoft'
-import { TwitterStrategy } from 'remix-auth-twitter'
+import { Twitter2Strategy } from 'remix-auth-twitter'
 
 import { AppleStrategy } from '~/utils/applestrategy.server'
+import { getCookieDomain } from './utils/cookie'
 
 // OAuth state
 
-export const createAuthenticatorSessionStorage = (env: Env) => {
+export const createAuthenticatorSessionStorage = (
+  request: Request,
+  env: Env
+) => {
   return createCookieSessionStorage({
     cookie: {
-      domain: env.COOKIE_DOMAIN,
+      domain: getCookieDomain(request, env),
       httpOnly: true,
       name: 'external_oauth_login',
       path: '/',
@@ -30,6 +34,18 @@ export const createAuthenticatorSessionStorage = (env: Env) => {
 }
 
 export const AUTHN_PARAMS_SESSION_KEY = 'authnParams'
+
+export const getAuthnParams = async (
+  request: Request,
+  env: Env
+): Promise<URLSearchParams> => {
+  const authenticatorStorage = createAuthenticatorSessionStorage(request, env)
+  const session = await authenticatorStorage.getSession(
+    request.headers.get('Cookie')
+  )
+  return new URLSearchParams(session.get(AUTHN_PARAMS_SESSION_KEY))
+}
+
 /**
  * Returns a custom Request and authenticator SessionStorage. Needed to hook into response
  * lifecycle that authenticator fully controls, to set custom data needed after external
@@ -40,7 +56,7 @@ export const injectAuthnParamsIntoSession = async (
   request: Request,
   env: Env
 ) => {
-  const authenticatorStorage = createAuthenticatorSessionStorage(env)
+  const authenticatorStorage = createAuthenticatorSessionStorage(request, env)
   const session = await authenticatorStorage.getSession(
     request.headers.get('Cookie')
   )
@@ -110,17 +126,14 @@ export const getMicrosoftStrategy = (
 }
 
 export const getTwitterStrategy = (env: Env) => {
-  return new TwitterStrategy(
+  return new Twitter2Strategy(
     {
       clientID: env.INTERNAL_TWITTER_OAUTH_CLIENT_ID,
       clientSecret: env.SECRET_TWITTER_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_TWITTER_OAUTH_CALLBACK_URL,
-      includeEmail: true,
-      alwaysReauthorize: false,
+      scopes: ['users.read', 'tweet.read'],
     },
-    async ({ ...args }) => {
-      return { ...args }
-    }
+    async (params) => params
   )
 }
 

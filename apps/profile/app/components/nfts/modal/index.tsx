@@ -1,7 +1,7 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 
-import { HiChevronDown } from 'react-icons/hi'
+import { HiChevronDown, HiOutlineX } from 'react-icons/hi'
 
 import { gatewayFromIpfs } from '@proofzero/utils'
 
@@ -31,18 +31,9 @@ const NftModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div
-        style={{
-          /**
-           * This works only in Firefox for now
-           * https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-color
-           * MDN convincingly written not to use ::-webkit-scrollbar
-           * https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar
-           **/
-          scrollbarColor: '#D1D5DB white',
-        }}
         className={`flex-1 relative h-max w-full sm:min-w-[37rem] sm:max-h-[35rem] sm:max-w-[58rem] h-[86vh] sm:w-[62vw]
-          transform rounded-lg  bg-white px-4 pt-5 pb-4 
-         text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+           bg-white rounded-lg p-4 thin-scrollbar
+         text-left transition-all sm:p-6 overflow-y-auto`}
       >
         <div className="flex flex-col justify-between lg:flex-row max-w-full ">
           <div>
@@ -50,7 +41,6 @@ const NftModal = ({
               {!imgLoaded && (
                 <div className="w-[24rem] h-[24rem] bg-gray-100 rounded-lg animate-pulse"></div>
               )}
-
               <img
                 className={`object-fill rounded-lg shrink-0 ${
                   imgLoaded
@@ -65,16 +55,27 @@ const NftModal = ({
           </div>
 
           <div
-            className="p-0 lg:p-4
+            className="p-0 lg:px-4
           w-screen
           h-[27rem]
           max-h-full max-w-full
           lg:max-w-md
-          mt-3"
+          "
           >
-            <Text className="mb-2 text-gray-900" size="lg" weight="medium">
-              {nft?.collectionTitle}
-            </Text>
+            <div className="mb-2 flex flex-row items-center justify-between w-full">
+              <Text className="text-gray-900" size="lg" weight="medium">
+                {nft?.collectionTitle}
+              </Text>
+              <button
+                className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+                onClick={() => {
+                  handleClose(false)
+                }}
+              >
+                <HiOutlineX />
+              </button>
+            </div>
             <Text
               className="mb-5 lg:mb-10 text-gray-900"
               size="4xl"
@@ -86,7 +87,7 @@ const NftModal = ({
             <div>
               <div
                 className="
-                border-t-0 border-l-0 border-r-0 
+                border-t-0 border-l-0 border-r-0
                 rounded-none bg-white mt-2 lg:mt-8 lg:mb-4"
               >
                 <Text className=" text-gray-900" size="lg" weight="semibold">
@@ -159,7 +160,7 @@ const NftModal = ({
                                     <Text
                                       size="xs"
                                       weight="semibold"
-                                      className="text-gray-700 pb-2 max-w-[12rem] sm:max-w-[19rem] lg:max-w-[17rem] 
+                                      className="text-gray-700 pb-2 max-w-[12rem] sm:max-w-[19rem] lg:max-w-[17rem]
                             truncate"
                                       onClick={async () => {
                                         navigator.clipboard.writeText(d.value)
@@ -179,7 +180,7 @@ const NftModal = ({
                                 <Text
                                   size="xs"
                                   weight="semibold"
-                                  className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
+                                  className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem]
                             truncate"
                                 >
                                   {d.value}

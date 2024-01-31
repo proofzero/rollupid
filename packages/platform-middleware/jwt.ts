@@ -1,6 +1,5 @@
 import { RollupError } from '@proofzero/errors'
-import type { AccountURN } from '@proofzero/urns/account'
-import { AccountURNSpace } from '@proofzero/urns/account'
+import { IdentityURNSpace, type IdentityURN } from '@proofzero/urns/identity'
 import { getAuthzTokenFromReq } from '@proofzero/utils'
 import { checkToken } from '@proofzero/utils/token'
 
@@ -24,11 +23,11 @@ export const ValidateJWT: BaseMiddlewareFunction<{
   if (ctx.token) {
     try {
       const { sub: subject } = checkToken(ctx.token)
-      if (subject && AccountURNSpace.is(subject)) {
+      if (subject && IdentityURNSpace.is(subject)) {
         return next({
           ctx: {
             ...ctx,
-            accountURN: subject,
+            identityURN: subject,
           },
         })
       }
@@ -42,28 +41,28 @@ export const ValidateJWT: BaseMiddlewareFunction<{
 }
 
 /**
- * Require that a valid account be defined on the context.
+ * Require that a valid identity be defined on the context.
  *
  * Typically this will be obtained by first using the ValidateJWT
- * middleware which extracts the account details from an incoming JWT,
- * but other possibilities may arise. The ValidateJWT middleware doesn't
- * error in the case that the JWT/account is not provided, instead
- * passing an undefined account value to the handler (which may be what
- * is needed if handler must branch on the presence or absence of the
- * account).
+ * middleware which extracts the identity details from an incoming
+ * JWT, but other possibilities may arise. The ValidateJWT middleware
+ * doesn't error in the case that the JWT/identity is not provided,
+ * instead passing an undefined identity value to the handler (which
+ * may be what is needed if handler must branch on the presence or
+ * absence of the identity).
  *
- * This middleware throws if the account is not defined on the context
- * or is not valid.
+ * This middleware throws if the identity is not defined on the
+ * context or is not valid.
  */
-export const RequireAccount: BaseMiddlewareFunction<{
-  accountURN?: AccountURN
+export const RequireIdentity: BaseMiddlewareFunction<{
+  identityURN?: IdentityURN
 }> = ({ ctx, next }) => {
-  if (!ctx?.accountURN) {
-    throw new Error(`missing account`)
+  if (!ctx?.identityURN) {
+    throw new Error(`missing identity`)
   }
 
-  if (!AccountURNSpace.is(ctx?.accountURN)) {
-    throw new Error(`invalid account: ${ctx?.accountURN}`)
+  if (!IdentityURNSpace.is(ctx?.identityURN)) {
+    throw new Error(`invalid identity: ${ctx?.identityURN}`)
   }
 
   return next({

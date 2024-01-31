@@ -12,6 +12,7 @@ defaults:
 jobs:
   build-publish-test-profile-next:
     runs-on: ubuntu-latest
+    environment: next
     steps:
       - uses: actions/checkout@v2
 
@@ -29,8 +30,6 @@ jobs:
             node_modules
             .yarn
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
         run: yarn install
@@ -41,10 +40,11 @@ jobs:
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
+          wranglerVersion: '3.2.0'
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'apps/profile'
-          command: publish --env next
+          command: publish --config wrangler.next.toml --env next
           environment: 'next'
           secrets: |
             SECRET_SESSION_KEY
@@ -56,7 +56,7 @@ jobs:
         env:
           SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_TEST }}
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_TEST }}
-          PROFILE_CLIENT_ID: ${{ secrets.INTERNAL_PROFILE_OAUTH_CLIENT_ID_NEXT }}
+          PROFILE_CLIENT_ID: ${{ vars.INTERNAL_PROFILE_OAUTH_CLIENT_ID_NEXT }}
           PROFILE_CLIENT_SECRET: ${{ secrets.SECRET_PROFILE_OAUTH_CLIENT_SECRET_NEXT }}
           APIKEY_ALCHEMY_ETH: ${{ secrets.APIKEY_ALCHEMY_GALAXY_MAINNET }}
           APIKEY_ALCHEMY_POLYGON: ${{ secrets.APIKEY_ALCHEMY_POLYGON_MAINNET }}

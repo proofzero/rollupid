@@ -8,16 +8,19 @@ export default {
 const Template = () => (
   <LoginsPanel
     authorizedProfiles={[
-      { name: 'Eve', timestamp: 1672549200000, accountURN: '' },
+      { name: 'Eve',
+        timestamp: 1672549200000,
+        identityURN: 'urn:rollupid:identity/Eve',
+      },
       {
         name: 'Bob',
         timestamp: 1672549200000 + 1000,
-        accountURN: '',
+        identityURN: 'urn:rollupid:identity/Bob',
       },
       {
         name: 'Sam',
         timestamp: 1672549200000 + 2000,
-        accountURN: '',
+        identityURN: 'urn:rollupid:identity/Sam',
       },
     ]}
   />

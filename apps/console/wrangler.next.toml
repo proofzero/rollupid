@@ -1,0 +1,34 @@
+name = "console"
+main = "./build/index.js"
+compatibility_date = "2022-04-05"
+compatibility_flags = ["streams_enable_constructors"]
+logpush = true
+workers_dev = false
+
+[build]
+command = "yarn build"
+
+[site]
+bucket = "./public"
+
+[env.next]
+routes = [
+  { pattern = "console-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+]
+
+services = [
+  { binding = "Core", service = "core-next" },
+  { binding = "Images", service = "images-next" },
+]
+
+[env.next.vars]
+PASSPORT_URL = "https://passport-next.rollup.id"
+COOKIE_DOMAIN = "rollup.id"
+STORAGE_NAMESPACE = "console"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
+PROFILE_APP_URL = "https://my-next.rollup.id"
+WALLET_CONNECT_PROJECT_ID = "7bce942e261433eb70c2a72d555dd61f"
+CONSOLE_URL = "https://console-next.rollup.id"
+POSTHOG_API_KEY = "phc_JsZaA3PKO8jNF6gJ7HusRN3C7yzp56JakJJZfNRI9n7"
+POSTHOG_PROXY_HOST = "https://analytics.rollup.id"
+STRIPE_PUBLISHABLE_KEY = "pk_test_51NFemUKJnr9qdtTa8eIGrDR1QtpUTAwewEejO13AAnugHFAAhOWbSWKah4l66gGKs2BO6ITlax5lftx337yedqMb00aWdwi16G"

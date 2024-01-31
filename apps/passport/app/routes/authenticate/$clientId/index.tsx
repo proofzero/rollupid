@@ -1,5 +1,4 @@
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
-import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import {
   Form,
   useLoaderData,
@@ -8,38 +7,50 @@ import {
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { redirect, json } from '@remix-run/cloudflare'
 
 import { getAuthzCookieParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { createConfig } from 'wagmi'
-import { getDefaultConfig } from 'connectkit'
 import Authentication, {
-  AppProfile,
   AuthenticationScreenDefaults,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import {
+  getErrorCause,
+  getRollupReqFunctionErrorWrapper,
+} from '@proofzero/utils/errors'
+import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
+import { BadRequestError } from '@proofzero/errors'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import createCoreClient from '@proofzero/platform-clients/core'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  obfuscateAlias,
+} from '@proofzero/utils'
+import _ from 'lodash'
 
-const config = createConfig(
-  getDefaultConfig({
-    appName: 'Rollup',
-    autoConnect: true,
-    walletConnectProjectId:
-      // @ts-ignore
-      typeof window !== 'undefined' && window.ENV.WALLET_CONNECT_PROJECT_ID,
-    alchemyId:
-      // @ts-ignore
-      typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
-  })
+const LazyAuth = lazy(() =>
+  import('../../../web3/lazyAuth').then((module) => ({
+    default: module.LazyAuth,
+  }))
 )
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, params }) => {
+  async ({ request, params, context }) => {
+    if (
+      request.cf.botManagement.score <= 30 &&
+      !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+    ) {
+      return null
+    }
     const url = new URL(request.url)
 
     let displayKeys = AuthenticationScreenDefaults.knownKeys
@@ -54,10 +65,51 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       displayKeys = hints
     }
 
+    const authzParams = await getAuthzCookieParams(
+      request,
+      context.env,
+      params.clientId
+    )
+
+    let invitationData
+    if (authzParams.rollup_action?.startsWith('groupconnect')) {
+      const groupID = authzParams.rollup_action.split('_')[1]
+      const invitationCode = authzParams.rollup_action.split('_')[2]
+
+      const identityGroupURN = IdentityGroupURNSpace.urn(
+        groupID
+      ) as IdentityGroupURN
+
+      const traceHeader = generateTraceContextHeaders(context.traceSpan)
+      const coreClient = createCoreClient(context.env.Core, {
+        ...getAuthzHeaderConditionallyFromToken(undefined),
+        ...traceHeader,
+      })
+
+      const invDetails =
+        await coreClient.identity.getIdentityGroupMemberInvitationDetails.query(
+          {
+            invitationCode,
+            identityGroupURN,
+          }
+        )
+
+      invitationData = {
+        groupName: invDetails.identityGroupName,
+        identifier: obfuscateAlias(
+          invDetails.identifier,
+          invDetails.accountType
+        ),
+        accountType: invDetails.accountType,
+        inviterAlias: invDetails.inviter,
+      }
+    }
+
     return json({
       clientId: params.clientId,
       displayKeys,
       authnQueryParams: new URL(request.url).searchParams.toString(),
+      invitationData,
     })
   }
 )
@@ -83,14 +135,28 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export default () => {
-  const { appProps, rollup_action } = useOutletContext<{
-    appProps?: AppProfile
-    rollup_action?: string
-  }>()
-
-  const { clientId, displayKeys, authnQueryParams } = useLoaderData()
-
+const InnerComponent = ({
+  transitionState,
+  appProps,
+  rollup_action,
+  displayKeys,
+  clientId,
+  authnQueryParams,
+  invitationData,
+}: {
+  transitionState: string
+  appProps?: GetAppPublicPropsResult
+  rollup_action?: string
+  displayKeys?: any
+  clientId: string
+  authnQueryParams: string
+  invitationData?: {
+    inviterAlias: string
+    groupName: string
+    identifier: string
+    accountType: string
+  }
+}) => {
   const [signData, setSignData] = useState<{
     nonce: string | undefined
     state: string | undefined
@@ -106,16 +172,9 @@ export default () => {
 
   const iconURL = appProps?.iconURL
 
-  const transition = useTransition()
   const submit = useSubmit()
 
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if (transition.state === 'idle') {
-      setLoading(false)
-    }
-  }, [transition.state])
 
   useEffect(() => {
     const url = new URL(window.location.href)
@@ -128,40 +187,57 @@ export default () => {
     }
 
     history.replaceState(null, '', url.toString())
-  })
+  }, [])
 
-  const generic = Boolean(rollup_action)
+  const generic = Boolean(rollup_action) && !rollup_action?.startsWith('group_')
 
   return (
-    <>
-      {transition.state !== 'idle' && <Loader />}
+    <Authentication
+      logoURL={iconURL}
+      Header={
+        <>
+          {generic && (
+            <>
+              <Text
+                size="xl"
+                weight="semibold"
+                className="text-[#2D333A] dark:text-white mt-6 mb-8"
+              >
+                Connect Account
+              </Text>
 
-      <Authentication
-        logoURL={iconURL}
-        appProfile={appProps}
-        Header={
-          <>
-            {generic && (
-              <>
-                <Text
-                  size="xl"
-                  weight="semibold"
-                  className="text-[#2D333A] mt-6 mb-8"
-                >
-                  Connect Account
+              {invitationData && rollup_action?.startsWith('groupconnect_') && (
+                <Text className="text-gray-600 mb-8">
+                  To continue please connect your <br />
+                  <Text
+                    type="span"
+                    weight="bold"
+                    className="text-orange-600"
+                  >{`${_.upperFirst(invitationData.accountType)} Account: ${
+                    invitationData.identifier
+                  }`}</Text>
                 </Text>
-              </>
-            )}
+              )}
+            </>
+          )}
 
-            {!generic && (
-              <>
-                <Avatar
-                  src={iconURL ?? AuthenticationScreenDefaults.defaultLogoURL}
-                  size="sm"
-                ></Avatar>
+          {!generic && (
+            <>
+              <Avatar
+                src={iconURL ?? AuthenticationScreenDefaults.defaultLogoURL}
+                size="sm"
+              ></Avatar>
+
+              {!rollup_action?.startsWith('groupconnect') && (
                 <div className={'flex flex-col items-center gap-2'}>
-                  <h1 className={'font-semibold text-xl'}>
-                    {appProps?.name
+                  <h1
+                    className={
+                      'font-semibold text-xl dark:text-white text-center'
+                    }
+                  >
+                    {appProps?.appTheme?.heading
+                      ? appProps.appTheme.heading
+                      : appProps?.name
                       ? `Login to ${appProps?.name}`
                       : AuthenticationScreenDefaults.defaultHeading}
                   </h1>
@@ -172,77 +248,123 @@ export default () => {
                     {AuthenticationScreenDefaults.defaultSubheading}
                   </h2>
                 </div>
-              </>
-            )}
-          </>
-        }
-        Actions={
-          generic ? (
-            <>
-              <div className="flex flex-1 items-end">
-                <Button
-                  btnSize="l"
-                  btnType="secondary-alt"
-                  className="w-full hover:bg-gray-100"
-                  onClick={() => navigate('/authenticate/cancel')}
-                >
-                  Cancel
-                </Button>
-              </div>
+              )}
             </>
-          ) : undefined
-        }
-        displayKeys={displayKeys}
-        mapperArgs={{
-          clientId,
-          wagmiConfig: config,
-          signData,
-          navigate,
-          FormWrapperEl: ({ children, provider }) => (
-            <Form
-              className="w-full"
-              action={`/connect/${provider}?${authnQueryParams}`}
-              method="post"
-              key={provider}
-            >
-              {children}
-            </Form>
-          ),
-          enableOAuthSubmit: true,
-          loading,
-          walletConnectCallback: async (address) => {
-            if (loading) return
-            // fetch nonce and kickoff sign flow
-            setLoading(true)
-            fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
-              .then((res) =>
-                res.json<{
-                  nonce: string
-                  state: string
-                  address: string
-                }>()
-              )
-              .then(({ nonce, state, address }) => {
-                setSignData({
-                  nonce,
-                  state,
-                  address,
-                  signature: undefined,
-                })
+          )}
+
+          {invitationData && rollup_action?.startsWith('group_') && (
+            <>
+              <Text className="text-center truncate max-w-xs">
+                <Text type="span" className="truncate" weight="bold">
+                  "{invitationData.inviterAlias}"
+                </Text>
+                <br />
+                has invited you to join group
+                <br />
+                <Text type="span" className="truncate" weight="bold">
+                  "{invitationData.groupName}""
+                </Text>
+              </Text>
+              <Text className="truncate max-w-xs">
+                To accept please authenticate with your <br />
+                <Text
+                  type="span"
+                  weight="bold"
+                  className="text-orange-600 truncate"
+                >{`${_.upperFirst(invitationData.accountType)} Account: ${
+                  invitationData.identifier
+                }`}</Text>
+              </Text>
+            </>
+          )}
+        </>
+      }
+      Actions={
+        generic ? (
+          <>
+            <div className="flex flex-1 items-end">
+              <Button
+                btnSize="l"
+                btnType="secondary-alt-skin"
+                className="w-full"
+                onClick={() => navigate('/authenticate/cancel')}
+              >
+                <Text className="dark:text-white">Cancel</Text>
+              </Button>
+            </div>
+          </>
+        ) : undefined
+      }
+      displayKeys={
+        appProps?.appTheme?.providers
+          ?.filter((p) => p.enabled)
+          ?.filter((p) => displayKeys.includes(p.key))
+          .map((p) => p.key) ?? displayKeys
+      }
+      mapperArgs={{
+        signMessageTemplate:
+          appProps?.appTheme?.signMessageTemplate ??
+          AuthenticationScreenDefaults.defaultSignMessage,
+        clientId,
+        signData,
+        navigate,
+        authnQueryParams,
+        loading: loading || transitionState !== 'idle',
+        walletConnectCallback: async (address) => {
+          if (loading) return
+          // fetch nonce and kickoff sign flow
+          setLoading(true)
+          try {
+            if (window.navigator.onLine != true) {
+              throw new BadRequestError({
+                message:
+                  'You seem to be offline. Please connect to the internet and try again.',
               })
-              .catch(() => {
-                toast(ToastType.Error, {
-                  message:
-                    'Could not fetch nonce for signing authentication message',
-                })
-              })
-          },
-          walletSignCallback: (address, signature, nonce, state) => {
-            console.debug('signing complete')
+            }
+
+            const res = await fetch(`/connect/${address}/sign`, {
+              method: 'GET',
+            }) // NOTE: note using fetch because it messes with wagmi state
+
+            const resJson = await res.json<{
+              nonce: string
+              state: string
+              address: string
+            }>()
+
+            if (!res.ok) {
+              throw getErrorCause(resJson)
+            }
+
             setSignData({
-              ...signData,
-              signature,
+              nonce: resJson.nonce,
+              state: resJson.state,
+              address: resJson.address,
+              signature: undefined,
             })
+          } catch (ex) {
+            toast(ToastType.Error, {
+              message:
+                ex.message ??
+                'Could not complete authentication. Please return to application and try again.',
+            })
+          }
+          setLoading(false)
+        },
+        walletSignCallback: (address, signature, nonce, state) => {
+          console.debug('signing complete')
+          setSignData({
+            ...signData,
+            signature,
+          })
+          try {
+            if (window.navigator.onLine != true) {
+              throw new BadRequestError({
+                message:
+                  'You seem to be offline. Please connect to the internet and try again.',
+              })
+            }
+
             submit(
               { signature, nonce, state },
               {
@@ -250,24 +372,30 @@ export default () => {
                 action: `/connect/${address}/sign`,
               }
             )
-          },
-          walletConnectErrorCallback: (error) => {
-            console.debug('transition.state: ', transition.state)
-            if (transition.state !== 'idle' || !loading) {
-              return
-            }
-            if (error) {
-              console.error(error)
-              toast(ToastType.Error, {
-                message:
-                  'Failed to complete signing. Please try again or contact support.',
-              })
-              setLoading(false)
-            }
-          },
-        }}
-      />
-    </>
+          } catch (ex) {
+            toast(ToastType.Error, {
+              message:
+                ex.message ??
+                'Could not complete authentication. Please return to application and try again.',
+            })
+          }
+        },
+        walletConnectErrorCallback: (error) => {
+          console.debug('transition.state: ', transitionState)
+          if (transitionState !== 'idle' || !loading) {
+            return
+          }
+          if (error) {
+            console.error(error)
+            toast(ToastType.Error, {
+              message:
+                'Failed to complete signing. Please try again or contact support.',
+            })
+            setLoading(false)
+          }
+        },
+      }}
+    />
   )
 }
 
@@ -287,4 +415,34 @@ const getOAuthErrorMessage = (error: string): string => {
     default:
       return 'An unknown error occurred'
   }
+}
+
+export default () => {
+  const { appProps, rollup_action } = useOutletContext<{
+    appProps: GetAppPublicPropsResult
+    rollup_action?: string
+  }>()
+
+  const { clientId, displayKeys, authnQueryParams, invitationData } =
+    useLoaderData() ?? {}
+
+  const transition = useTransition()
+
+  return (
+    <>
+      <Suspense fallback="">
+        <LazyAuth autoConnect={true}>
+          <InnerComponent
+            transitionState={transition.state}
+            appProps={appProps!}
+            rollup_action={rollup_action!}
+            displayKeys={displayKeys}
+            clientId={clientId}
+            authnQueryParams={authnQueryParams}
+            invitationData={invitationData}
+          />
+        </LazyAuth>
+      </Suspense>
+    </>
+  )
 }

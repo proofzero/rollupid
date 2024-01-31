@@ -2,7 +2,12 @@ import { ToastType, toast } from '../atoms/toast'
 import { useEffect } from 'react'
 
 export default (
-  handledMessageTypes: string[] = ['SUCCESS', 'ALREADY_CONNECTED', 'CANCEL']
+  handledMessageTypes: string[] = [
+    'SUCCESS',
+    'ACCOUNT_CONNECT_ERROR',
+    'ALREADY_CONNECTED_ERROR',
+    'CANCEL'
+  ]
 ) => {
   useEffect(() => {
     const url = new URL(window.location.href)
@@ -18,10 +23,21 @@ export default (
               { duration: 2000 }
             )
             break
-          case 'ALREADY_CONNECTED':
+          case 'ACCOUNT_CONNECT_ERROR':
             toast(
               ToastType.Error,
-              { message: 'Account already connected' },
+              {
+                message: 'Could not connect this account to your identity.\
+               It may be connected to another identity.' },
+              { duration: 2000 }
+            )
+            break
+          case 'ALREADY_CONNECTED_ERROR':
+            toast(
+              ToastType.Error,
+              {
+                message: 'Account is already connected to your identity.'
+              },
               { duration: 2000 }
             )
             break

@@ -7,28 +7,25 @@ import {
   useTransition,
 } from '@remix-run/react'
 
-import { ResponseType } from '@proofzero/types/access'
-import {
-  getAccessClient,
-  getAccountClient,
-  getStarbaseClient,
-} from '~/platform.server'
+import { ResponseType } from '@proofzero/types/authorization'
+import { getCoreClient } from '~/platform.server'
 import {
   createAuthzParamsCookieAndAuthenticate,
   destroyAuthzCookieParamsSession,
   getAuthzCookieParams,
   getValidatedSessionContext,
+  isSupportedRollupAction,
 } from '~/session.server'
 import { validatePersonaData } from '@proofzero/security/persona'
 
 import {
   authzParamsMatch,
   createAuthzParamCookieAndCreate,
+  createNewSCWallet,
   getDataForScopes,
 } from '~/utils/authorize.server'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { JsonError } from '@proofzero/utils/errors'
 import { AuthorizationControlSelection } from '@proofzero/types/application'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
@@ -36,14 +33,19 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { DataForScopes } from '~/utils/authorize.server'
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
-import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
+import type { GetProfileOutputParams } from '@proofzero/platform/identity/src/jsonrpc/methods/getProfile'
 
-import type { AddressURN } from '@proofzero/urns/address'
 import type { PersonaData } from '@proofzero/types/application'
 
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
+import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
+import { Helmet } from 'react-helmet'
+import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
 export type UserProfile = {
   displayName: string
@@ -95,10 +97,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         message: 'The only prompt supported is "consent"',
       })
 
-    if (
-      rollup_action &&
-      !['connect', 'create', 'reconnect'].includes(rollup_action)
-    )
+    if (rollup_action && !isSupportedRollupAction(rollup_action))
       throw new BadRequestError({
         message:
           'only Rollup action supported are connect, create, and reconnect ',
@@ -127,6 +126,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       }
 
       await createAuthzParamsCookieAndAuthenticate(
+        request,
         context.authzQueryParams,
         context.env
       )
@@ -136,6 +136,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (lastCP) {
       if (!authzParamsMatch(lastCP, context.authzQueryParams)) {
         await createAuthzParamsCookieAndAuthenticate(
+          request,
           context.authzQueryParams,
           context.env
         )
@@ -156,12 +157,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    const { jwt, accountUrn } = await getValidatedSessionContext(
+    const { jwt, identityURN } = await getValidatedSessionContext(
       request,
       context.authzQueryParams,
       context.env,
       context.traceSpan
     )
+    const coreClient = getCoreClient({ context, jwt })
 
     //Special case for console and passport - we just redirect
     if (['console', 'passport'].includes(clientId)) {
@@ -176,10 +178,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     //Scope validation
-    const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
     const [scopeMeta, appPublicProps] = await Promise.all([
-      sbClient.getScopes.query(),
-      sbClient.getAppPublicProps.query({
+      coreClient.starbase.getScopes.query(),
+      coreClient.starbase.getAppPublicProps.query({
         clientId: clientId as string,
       }),
     ])
@@ -226,15 +227,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       )
     ) {
       const responseType = ResponseType.Code
-      const accessClient = getAccessClient(context.env, context.traceSpan)
-      const preauthorizeRes = await accessClient.preauthorize.mutate({
-        account: accountUrn,
-        responseType,
-        clientId,
-        redirectUri,
-        scope: scope,
-        state,
-      })
+      const preauthorizeRes =
+        await coreClient.authorization.preauthorize.mutate({
+          identity: identityURN,
+          responseType,
+          clientId,
+          redirectUri,
+          scope: scope,
+          state,
+        })
 
       if (preauthorizeRes.preauthorized) {
         const redirectParams = new URLSearchParams({
@@ -252,22 +253,25 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         })
       } //else we present the authz screen below
     }
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const profile = await accountClient.getProfile.query({
-      account: accountUrn,
-    })
 
-    const dataForScopes = await getDataForScopes(
-      scope,
-      accountUrn,
-      jwt,
-      context.env,
-      context.traceSpan
-    )
+    const [profile, personaData, dataForScopes] = await Promise.all([
+      coreClient.identity.getProfile.query({
+        identity: identityURN,
+      }),
+      coreClient.authorization.getPersonaData.query({
+        identityURN,
+        clientId,
+      }),
+      getDataForScopes(scope, identityURN, jwt, context.env, context.traceSpan),
+    ])
+
+    if (personaData) {
+      dataForScopes.personaData = personaData
+    }
 
     if (!profile) {
       throw new InternalServerError({
-        message: 'No profile found for this account',
+        message: 'No profile found for this identity',
       })
     }
 
@@ -292,7 +296,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const { accountUrn } = await getValidatedSessionContext(
+  const { jwt, identityURN } = await getValidatedSessionContext(
     request,
     context.authzQueryParams,
     context.env,
@@ -318,7 +322,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const state = form.get('state') as string
   const clientId = form.get('client_id') as string
   if (
-    !accountUrn ||
+    !identityURN ||
     !responseType ||
     !redirectUri ||
     !scope ||
@@ -328,19 +332,35 @@ export const action: ActionFunction = async ({ request, context }) => {
     throw json({ message: 'Missing required fields' }, 400)
   }
 
+  const createSCWallet = form.get('createSCWallet') as string
+
+  const coreClient = getCoreClient({ context, jwt })
+
+  if (createSCWallet?.length) {
+    const nickname = JSON.parse(createSCWallet).nickname
+    const profile = await coreClient.identity.getProfile.query({
+      identity: identityURN,
+    })
+
+    const { accountURN } = await createNewSCWallet({
+      nickname,
+      primaryAccountURN: profile?.primaryAccountURN!,
+      env: context.env,
+      traceSpan: context.traceSpan,
+    })
+
+    personaData.erc_4337 = [AccountURNSpace.getBaseURN(accountURN)]
+  }
+
   await validatePersonaData(
-    accountUrn,
+    identityURN,
     personaData,
-    {
-      addressFetcher: context.env.Address,
-      accountFetcher: context.env.Account,
-    },
+    context.env.Core,
     context.traceSpan
   )
 
-  const accessClient = getAccessClient(context.env, context.traceSpan)
-  const authorizeRes = await accessClient.authorize.mutate({
-    account: accountUrn,
+  const authorizeRes = await coreClient.authorization.authorize.mutate({
+    identity: identityURN,
     responseType,
     clientId,
     redirectUri,
@@ -387,17 +407,48 @@ export default function Authorize() {
     requestedScope,
     connectedAccounts,
     connectedSmartContractWallets,
-  } = dataForScopes
+  } = dataForScopes as DataForScopes
 
   const [persona] = useState<PersonaData>(personaData!)
 
-  const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
+  const [selectedEmail, setSelectedEmail] = useState<
+    DropdownSelectListItem | undefined
+  >(() => {
+    let selected
+    if (connectedEmails && connectedEmails.length && persona?.email) {
+      selected = connectedEmails.find((email) => email.value === persona.email)
+    } else {
+      // sorted in edges in  by date descending order
+      selected = connectedEmails?.[connectedEmails.length - 1]
+    }
+    return selected
+  })
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
-    Array<AddressURN> | Array<AuthorizationControlSelection>
-  >([])
-  const [selectedSCWallets, setSelectedSCWallets] = useState<Array<AddressURN>>(
-    []
-  )
+    Array<DropdownSelectListItem> | Array<AuthorizationControlSelection>
+  >(() => {
+    if (persona.connected_accounts === AuthorizationControlSelection.ALL) {
+      return [AuthorizationControlSelection.ALL]
+    } else {
+      return connectedAccounts?.length
+        ? connectedAccounts.filter((acc) =>
+            persona.connected_accounts?.includes(acc.value)
+          )
+        : []
+    }
+  })
+  const [selectedSCWallets, setSelectedSCWallets] = useState<
+    Array<DropdownSelectListItem> | Array<AuthorizationControlSelection>
+  >(() => {
+    if (persona.erc_4337 === AuthorizationControlSelection.ALL) {
+      return [AuthorizationControlSelection.ALL]
+    } else {
+      return connectedSmartContractWallets?.length
+        ? connectedSmartContractWallets.filter((acc) =>
+            persona.erc_4337?.includes(acc.value)
+          )
+        : []
+    }
+  })
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
@@ -406,7 +457,7 @@ export default function Authorize() {
   const navigate = useNavigate()
   const transition = useTransition()
 
-  useConnectResult(['ALREADY_CONNECTED', 'CANCEL'])
+  useConnectResult()
 
   const cancelCallback = () => {
     const redirectURL = new URL(redirectUri)
@@ -432,7 +483,7 @@ export default function Authorize() {
     }
 
     if (requestedScope.includes('email') && selectedEmail) {
-      personaData.email = selectedEmail.addressURN
+      personaData.email = selectedEmail.value
     }
 
     if (
@@ -442,12 +493,30 @@ export default function Authorize() {
       if (selectedConnectedAccounts[0] === AuthorizationControlSelection.ALL) {
         personaData.connected_accounts = AuthorizationControlSelection.ALL
       } else {
-        personaData.connected_accounts = selectedConnectedAccounts
+        personaData.connected_accounts = selectedConnectedAccounts.map(
+          (account) => (account as DropdownSelectListItem).value
+        )
       }
     }
 
-    if (requestedScope.includes('erc_4337') && selectedSCWallets) {
-      personaData.erc_4337 = selectedSCWallets
+    if (requestedScope.includes('erc_4337')) {
+      if (selectedSCWallets?.length > 0) {
+        if (selectedSCWallets[0] === AuthorizationControlSelection.ALL) {
+          personaData.erc_4337 = AuthorizationControlSelection.ALL
+        } else {
+          personaData.erc_4337 = selectedSCWallets.map(
+            (wallet) => (wallet as DropdownSelectListItem).value
+          )
+        }
+      } else {
+        form.append(
+          'createSCWallet',
+          JSON.stringify({
+            check: true,
+            nickname: appProfile.name,
+          })
+        )
+      }
     }
 
     // TODO: Everything should be a form field now handled by javascript
@@ -459,99 +528,141 @@ export default function Authorize() {
     submit(form, { method: 'post' })
   }
 
-  const scopesToDisplay = [...requestedScope].filter((scope) => {
-    return scopeMeta.scopes[scope].hidden !== true
-  })
-  if (
-    requestedScope.some((scope) => {
-      return scopeMeta.scopes[scope].hidden === true
-    })
-  ) {
-    scopeMeta.scopes['system_identifiers'] = {
-      name: 'System Identifiers',
-      description:
-        "Read account's system identifiers and other non-personally identifiable information",
-      class: 'implied',
-    }
-    scopesToDisplay.unshift('system_identifiers')
-  }
+  const { dark } = useContext(ThemeContext)
 
   return (
-    <div className={'flex flex-row h-[100dvh] justify-center items-center'}>
-      <div
-        className={
-          'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
-        }
-      >
-        <img src={sideGraphics} alt="Background graphics" />
-      </div>
-      <div className={'basis-full basis-full lg:basis-3/5'}>
-        <Authorization
-          userProfile={{
-            pfpURL: userProfile.pfp.image,
-          }}
-          appProfile={{
-            name: appProfile.name,
-            iconURL: appProfile.iconURL,
-            privacyURL: appProfile.privacyURL!,
-            termsURL: appProfile.termsURL!,
-          }}
-          requestedScope={requestedScope}
-          scopeMeta={scopeMeta}
-          transitionState={transition.state}
-          connectedSmartContractWallets={connectedSmartContractWallets ?? []}
-          addNewSmartWalletCallback={() => {
-            const qp = new URLSearchParams()
-            qp.append('scope', requestedScope.join(' '))
-            qp.append('state', state)
-            qp.append('client_id', clientId)
-            qp.append('redirect_uri', redirectOverride)
-            qp.append('rollup_action', 'create')
-            qp.append('create_type', 'wallet')
-            if (prompt) qp.append('prompt', prompt)
+    <>
+      <Helmet>
+        <style type="text/css">{`
+            :root {
+                ${getRGBColor(
+                  dark
+                    ? appProfile?.appTheme?.color?.dark ??
+                        AuthenticationScreenDefaults.color.dark
+                    : appProfile?.appTheme?.color?.light ??
+                        AuthenticationScreenDefaults.color.light,
+                  'primary'
+                )}
+                ${getRGBColor(
+                  getTextColor(
+                    dark
+                      ? appProfile?.appTheme?.color?.dark ??
+                          AuthenticationScreenDefaults.color.dark
+                      : appProfile?.appTheme?.color?.light ??
+                          AuthenticationScreenDefaults.color.light
+                  ),
+                  'primary-contrast-text'
+                )}
+             {
+         `}</style>
+      </Helmet>
 
-            return navigate(`/authorize?${qp.toString()}`)
-          }}
-          selectSmartWalletCallback={setSelectedSCWallets}
-          connectedEmails={connectedEmails ?? []}
-          addNewEmailCallback={() => {
-            const qp = new URLSearchParams()
-            qp.append('scope', requestedScope.join(' '))
-            qp.append('state', state)
-            qp.append('client_id', clientId)
-            qp.append('redirect_uri', redirectOverride)
-            qp.append('rollup_action', 'connect')
-            qp.append('login_hint', 'email microsoft google apple')
-            if (prompt) qp.append('prompt', prompt)
-
-            return navigate(`/authorize?${qp.toString()}`)
-          }}
-          selectEmailCallback={setSelectedEmail}
-          connectedAccounts={connectedAccounts ?? []}
-          addNewAccountCallback={() => {
-            const qp = new URLSearchParams()
-            qp.append('scope', requestedScope.join(' '))
-            qp.append('state', state)
-            qp.append('client_id', clientId)
-            qp.append('redirect_uri', redirectOverride)
-            qp.append('rollup_action', 'connect')
-            if (prompt) qp.append('prompt', prompt)
-
-            return navigate(`/authorize?${qp.toString()}`)
-          }}
-          selectAccountsCallback={setSelectedConnectedAccounts}
-          cancelCallback={cancelCallback}
-          authorizeCallback={authorizeCallback}
-          disableAuthorize={
-            // TODO: make generic!
-            (requestedScope.includes('email') &&
-              (!connectedEmails?.length || !selectedEmail)) ||
-            (requestedScope.includes('connected_accounts') &&
-              !selectedConnectedAccounts?.length) ||
-            (requestedScope.includes('erc_4337') && !selectedSCWallets.length)
+      <div className={`${dark ? 'dark' : ''}`}>
+        <div
+          className={
+            'flex flex-row h-[100dvh] justify-center items-center bg-[#F9FAFB] dark:bg-gray-900'
           }
-        />
+        >
+          <div
+            className={
+              'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
+            }
+            style={{
+              backgroundImage: `url(${
+                appProfile?.appTheme?.graphicURL ?? sideGraphics
+              })`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          ></div>
+          <div className={'basis-full basis-full lg:basis-3/5'}>
+            <Authorization
+              userProfile={{
+                pfpURL: userProfile.pfp.image,
+              }}
+              appProfile={{
+                name: appProfile.name,
+                iconURL: appProfile.iconURL,
+                privacyURL: appProfile.privacyURL!,
+                termsURL: appProfile.termsURL!,
+              }}
+              requestedScope={requestedScope}
+              scopeMeta={scopeMeta}
+              transitionState={transition.state}
+              connectedSmartContractWallets={
+                connectedSmartContractWallets ?? []
+              }
+              selectedSCWallets={selectedSCWallets}
+              addNewSmartWalletCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'create')
+                qp.append('create_type', 'wallet')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectSmartWalletsCallback={setSelectedSCWallets}
+              selectAllSmartWalletsCallback={setSelectedSCWallets}
+              connectedEmails={
+                connectedEmails.map((email) => {
+                  // Substituting subtitle with icon
+                  // on the client side
+                  return {
+                    icon: getEmailIcon(email.subtitle!),
+                    title: email.title,
+                    selected: email.selected,
+                    value: email.value,
+                  }
+                }) ?? []
+              }
+              addNewEmailCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'connect')
+                qp.append('login_hint', 'email microsoft google apple')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectEmailCallback={setSelectedEmail}
+              selectedEmail={selectedEmail}
+              connectedAccounts={connectedAccounts ?? []}
+              selectedConnectedAccounts={selectedConnectedAccounts}
+              addNewAccountCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'connect')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectAccountsCallback={setSelectedConnectedAccounts}
+              selectAllAccountsCallback={setSelectedConnectedAccounts}
+              cancelCallback={cancelCallback}
+              authorizeCallback={authorizeCallback}
+              disableAuthorize={
+                // TODO: make generic!
+                (requestedScope.includes('email') &&
+                  (!connectedEmails?.length || !selectedEmail?.value)) ||
+                (requestedScope.includes('connected_accounts') &&
+                  !selectedConnectedAccounts?.length)
+              }
+              radius={appProfile.appTheme?.radius}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

@@ -1,5 +1,5 @@
-import { json, redirect } from '@remix-run/cloudflare'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import { redirect } from '@remix-run/cloudflare'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -18,6 +18,7 @@ import type { LoaderData as OutletContextData } from '~/root'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import { usePostHog } from 'posthog-js/react'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -27,14 +28,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!clientName)
       throw new BadRequestError({ message: 'App name is required' })
 
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
 
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
     try {
-      const { clientId } = await starbaseClient.createApp.mutate({ clientName })
+      const { clientId } = await coreClient.starbase.createApp.mutate({
+        clientName,
+      })
       console.log({ clientId })
       return redirect(`/apps/${clientId}`)
     } catch (error) {
@@ -48,6 +51,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
 export default function CreateNewApp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const posthog = usePostHog()
 
   const { apps, avatarUrl, PASSPORT_URL, displayName } =
     useOutletContext<OutletContextData>()

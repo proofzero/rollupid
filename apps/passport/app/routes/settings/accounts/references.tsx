@@ -1,8 +1,10 @@
 import { BadRequestError } from '@proofzero/errors'
-import { ReferenceType } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressReferenceTypes'
 import type { ActionFunction } from '@remix-run/cloudflare'
-import { AddressUsageDisconnectModel } from '~/components/settings/accounts/DisconnectModal'
-import { getAddressClient } from '~/platform.server'
+
+import { ReferenceType } from '@proofzero/platform.account/src/types'
+
+import { AccountUsageDisconnectModel } from '~/components/settings/accounts/DisconnectModal'
+import { getCoreClient } from '~/platform.server'
 import {
   getDefaultAuthzParams,
   getValidatedSessionContext,
@@ -19,33 +21,35 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     )
 
     const formData = await request.formData()
-    const addressURN = formData.get('addressURN') as string
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
+    const accountURN = formData.get('accountURN') as string
+    const coreClient = getCoreClient({ context, accountURN })
 
-    const references = await addressClient.getAddressReferenceTypes.query()
-    const mappedReferences: AddressUsageDisconnectModel[] = references.map(
+    const references = await coreClient.account.getAccountReferenceTypes.query()
+    const mappedReferences: AccountUsageDisconnectModel[] = references.map(
       (u: ReferenceType) => {
         switch (u) {
           case ReferenceType.Authorization:
             return {
-              message: 'Address is being used for app(s) authorizations.',
+              message: 'Account is being used for app(s) authorizations.',
               external: false,
               path: '/settings/applications',
             }
           case ReferenceType.DevNotificationsEmail:
             return {
               message:
-                'Address is being used as contact in the Developer Console.',
+                'Account is being used as contact in the Developer Console.',
               external: true,
               path: `${context.env.CONSOLE_APP_URL}`,
             }
+          case ReferenceType.BillingEmail:
+            return {
+              message: 'Account is being used as billing email.',
+              external: true,
+              path: `${context.env.CONSOLE_APP_URL}/billing`,
+            }
           default:
             throw new BadRequestError({
-              message: `Unknown address reference type: ${u}`,
+              message: `Unknown account reference type: ${u}`,
             })
         }
       }

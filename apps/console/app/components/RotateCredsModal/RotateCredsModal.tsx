@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import dangerVector from '../../images/danger.svg'
+import { HiOutlineX } from 'react-icons/hi'
 
 export type RotateCredsModalProps = {
   isOpen: boolean
@@ -18,17 +18,28 @@ export const RotateCredsModal = ({
   rotateCallback,
 }: RotateCredsModalProps) => {
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => closeCallback()}>
+    <Modal isOpen={isOpen} handleClose={() => closeCallback()}>
       <div
-        className={`w-[62vw] transform rounded-lg  bg-white px-4 pt-5 pb-4 
-         text-left shadow-xl transition-all sm:p-6 overflow-y-auto flex items-start space-x-4`}
+        className={`w-[62vw] rounded-lg  bg-white p-4
+         text-left transition-all sm:p-5 overflow-y-auto flex items-start space-x-4`}
       >
-        <img src={dangerVector} />
+        <img src={dangerVector} alt="danger" />
 
         <div className="flex-1">
-          <Text size="lg" weight="medium" className="text-gray-900 mb-2">
-            Roll Key
-          </Text>
+          <div className="flex flex-row items-center justify-between w-full mb-2">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Roll Key
+            </Text>
+            <div
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                closeCallback()
+              }}
+            >
+              <HiOutlineX />
+            </div>
+          </div>
 
           <section className="mb-4">
             <Text size="sm" weight="normal" className="text-gray-500">

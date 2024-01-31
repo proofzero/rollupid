@@ -1,0 +1,35 @@
+name = "console"
+
+workers_dev = false
+main = "./build/index.js"
+compatibility_date = "2022-04-05"
+compatibility_flags = ["streams_enable_constructors"]
+logpush = true
+
+[build]
+command = "yarn build"
+
+[site]
+bucket = "./public"
+
+[env.current]
+routes = [
+  { pattern = "console.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+]
+
+services = [
+  { binding = "Core", service = "core-current" },
+  { binding = "Images", service = "images-current" },
+]
+
+[env.current.vars]
+PASSPORT_URL = "https://passport.rollup.id"
+COOKIE_DOMAIN = "rollup.id"
+STORAGE_NAMESPACE = "console"
+PROFILE_APP_URL = "https://my.rollup.id"
+WALLET_CONNECT_PROJECT_ID = "6f2ebc8aa6a1d5c4d4ac1e700294e35f"
+CONSOLE_URL = "https://console.rollup.id"
+POSTHOG_API_KEY = "phc_QGmYrKfXcyIAUBBTX3NBDJjNg2MX24ijFemeUuykzWr"
+POSTHOG_PROXY_HOST = "https://analytics.rollup.id"
+STRIPE_PUBLISHABLE_KEY = "pk_live_51NFemUKJnr9qdtTaw2gOGoi2rKzXWKtdgO29fuDshACQFGyNIOddSiuW8wUqnKPrW5UMNIA5UesxuYanFTTcQku300oaaqcr8t"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "AW-11277204852"

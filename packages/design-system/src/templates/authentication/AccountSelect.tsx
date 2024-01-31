@@ -6,8 +6,9 @@ import { Text } from '../../atoms/text/Text'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
 
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
-import { AppProfile, AuthenticationScreenDefaults } from './Authentication'
+import { AuthenticationScreenDefaults } from './Authentication'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
+import { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 type UserProfile = {
   pfpURL: string
@@ -17,7 +18,7 @@ type UserProfile = {
 export type AccountSelectProps = {
   logoURL?: string
   userProfile: UserProfile
-  appProfile: AppProfile
+  appProfile: GetAppPublicPropsResult
   onAuth: () => void
   onSignOut: () => void
   onChooseOther: () => void
@@ -27,24 +28,24 @@ export default ({
   logoURL = AuthenticationScreenDefaults.defaultLogoURL,
   userProfile,
   appProfile,
-  onAuth = () => { },
-  onSignOut = () => { },
-  onChooseOther = () => { },
+  onAuth = () => {},
+  onSignOut = () => {},
+  onChooseOther = () => {},
 }: AccountSelectProps) => {
   return (
     <div className="relative">
       <div
         className={`relative flex shrink grow-0 flex-col items-center gap-4
         mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh]
-        w-full lg:w-[418px] lg:rounded-lg overflow-auto`}
+        w-full lg:w-[418px] lg:rounded-lg overflow-auto dark:bg-[#1F2937] 
+        border border-[#D1D5DB] dark:border-gray-600`}
         style={{
-          border: '1px solid #D1D5DB',
           boxSizing: 'border-box',
         }}
       >
         <Avatar src={logoURL} size="sm"></Avatar>
         <div className={'flex flex-col items-center gap-2'}>
-          <Text size="xl" weight="semibold">
+          <Text size="xl" weight="semibold" className="dark:text-white">
             Choose an account
           </Text>
 
@@ -55,7 +56,7 @@ export default ({
                 href={appProfile.websiteURL}
                 target="_blank"
                 rel="noreferrer"
-                className="text-indigo-500"
+                className="text-skin-primary"
               >
                 {appProfile.name}
               </a>
@@ -95,13 +96,12 @@ export default ({
           </div>
 
           <div className="my-1 flex flex-row items-center justify-center space-x-3">
-            <hr className="h-px w-16 bg-gray-500" />
-            <Text>or</Text>
-            <hr className="h-px w-16 bg-gray-500" />
+            <hr className="h-px w-16 bg-gray-500 dark:border-gray-600" />
+            <Text className="text-gray-500">or</Text>
+            <hr className="h-px w-16 bg-gray-500 dark:border-gray-600" />
           </div>
 
           <AuthButton text="Choose other account" onClick={onChooseOther} />
-
         </div>
 
         <div className="mt-14 flex justify-center items-center space-x-2">

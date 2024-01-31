@@ -10,11 +10,12 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import type { FetcherWithComponents } from '@remix-run/react'
 
 import warn from '~/assets/warning.svg'
-import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
 import { FiExternalLink } from 'react-icons/fi'
+import { HiOutlineX } from 'react-icons/hi'
 
-export type AddressUsageDisconnectModel = {
+export type AccountUsageDisconnectModel = {
   message: string
   external: boolean
   path: string
@@ -26,7 +27,7 @@ export default ({
   setIsOpen,
   id,
   data,
-  primaryAddressURN,
+  primaryAccountURN,
 }: {
   fetcher: FetcherWithComponents<any>
   isOpen: boolean
@@ -36,41 +37,46 @@ export default ({
     title: string
     type: string
   }
-  primaryAddressURN: AddressURN
+  primaryAccountURN: AccountURN
 }) => {
-  const primaryAddressBaseURN = AddressURNSpace.getBaseURN(primaryAddressURN)
+  const primaryAccountBaseURN = AccountURNSpace.getBaseURN(primaryAccountURN)
   const localFetcher = useFetcher()
 
   useEffect(() => {
-    if (!isOpen || id === primaryAddressBaseURN) {
+    if (!isOpen || id === primaryAccountBaseURN) {
       return
     }
 
     localFetcher.submit(
       {
-        addressURN: id,
+        accountURN: id,
       },
       {
         method: 'post',
         action: '/settings/accounts/references',
       }
     )
-  }, [id, primaryAddressBaseURN, isOpen])
+  }, [id, primaryAccountBaseURN, isOpen])
 
   const canDisconnect =
-    id !== primaryAddressBaseURN && localFetcher.data?.length === 0
+    id !== primaryAccountBaseURN && localFetcher.data?.length === 0
 
   return localFetcher.state !== 'idle' ? (
     <Loader />
   ) : (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
-        className={`max-w-full w-[512px] relative transform rounded-lg bg-white text-left shadow-xl transition-all overflow-y-auto`}
+        className={`max-w-full w-[512px] relative bg-white text-left
+        transition-all rounded-lg overflow-y-auto flex flex-col`}
       >
         <div className="flex flex-row space-x-4 p-6">
           <img src={warn} alt="Not Found" />
 
-          <div className="flex-1">
+          <div
+            className={`flex-1 flex flex-row ${
+              canDisconnect ? 'items-center' : 'items-start'
+            } justify-between`}
+          >
             {canDisconnect && (
               <Text size="lg" weight="medium" className="text-gray-900">
                 Disconnect account
@@ -78,7 +84,7 @@ export default ({
             )}
 
             {!canDisconnect && (
-              <>
+              <div className="flex flex-col">
                 <Text size="lg" weight="medium" className="text-gray-900">
                   You can't disconnect this account
                 </Text>
@@ -86,8 +92,17 @@ export default ({
                 <Text size="sm" weight="normal" className="text-gray-500 mt-2">
                   You can’t disconnect this account because:
                 </Text>
-              </>
+              </div>
             )}
+            <button
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                setIsOpen(false)
+              }}
+            >
+              <HiOutlineX />
+            </button>
           </div>
         </div>
 
@@ -106,7 +121,7 @@ export default ({
 
           {!canDisconnect && (
             <ul className="mb-6">
-              {primaryAddressBaseURN === id && (
+              {primaryAccountBaseURN === id && (
                 <>
                   <div className="w-full border-b border-gray-200"></div>
                   <li className="py-3 px-6">
@@ -118,9 +133,9 @@ export default ({
                 </>
               )}
 
-              {primaryAddressBaseURN !== id &&
+              {primaryAccountBaseURN !== id &&
                 localFetcher.data?.length > 0 &&
-                localFetcher.data.map((aum: AddressUsageDisconnectModel) => (
+                localFetcher.data.map((aum: AccountUsageDisconnectModel) => (
                   <>
                     <div className="w-full border-b border-gray-200"></div>
                     <li className="flex flex-row py-3 px-6">

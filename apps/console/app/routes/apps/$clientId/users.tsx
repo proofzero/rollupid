@@ -2,16 +2,16 @@ import { Await, useLoaderData, useNavigate } from '@remix-run/react'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import { defer, json } from '@remix-run/cloudflare'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { Suspense } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import type {
-  AuthorizedAccountsOutput,
+  AuthorizedIdentitiesOutput,
   AuthorizedUser,
 } from '@proofzero/platform/starbase/src/types'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
-import { AccountURNSpace } from '@proofzero/urns/account'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
 
 import { noLoginsSvg } from '~/components/Applications/LoginsPanel/LoginsPanel'
 import { User } from '~/components/Applications/Users/User'
@@ -28,14 +28,14 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 export const PAGE_LIMIT = 10
 
 export type UsersLoaderData = {
-  edgesResult?: Promise<AuthorizedAccountsOutput>
+  edgesResult?: Promise<AuthorizedIdentitiesOutput>
   PROFILE_APP_URL?: string
   error: any
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const srcUrl = new URL(request.url)
 
     try {
@@ -50,12 +50,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         throw new BadRequestError({ message: 'clientId is required' })
       }
 
-      const starbaseClient = createStarbaseClient(Starbase, {
+      const coreClient = createCoreClient(context.env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(context.traceSpan),
       })
 
-      const edgesResult = starbaseClient.getAuthorizedAccounts.query({
+      const edgesResult = coreClient.starbase.getAuthorizedIdentities.query({
         client,
         opt: {
           offset,
@@ -65,7 +65,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       return defer<UsersLoaderData>({
         edgesResult,
-        PROFILE_APP_URL,
+        PROFILE_APP_URL: context.env.PROFILE_APP_URL,
         error: null,
       })
     } catch (ex: any) {
@@ -109,7 +109,7 @@ const Users = () => {
         fallback={
           <div
             className="flex bg-white justify-center items-center h-full
-rounded-lg border shadow"
+rounded-lg border"
           >
             <Spinner />
           </div>
@@ -124,15 +124,15 @@ rounded-lg border shadow"
               edgesResult.metadata.offset = 0
             }
             const authorizedProfiles = edgesResult
-            edgesResult.accounts.forEach((account: AuthorizedUser) => {
-              const decodedAccountURN = AccountURNSpace.decode(
-                account.accountURN
+            edgesResult.identities.forEach((identity: AuthorizedUser) => {
+              const decodedIdentityURN = IdentityURNSpace.decode(
+                identity.identityURN
               )
 
-              // Keys are decoded accountURNs
-              Users.set(decodedAccountURN, {
-                name: account.name!,
-                date: new Date(account.timestamp).toLocaleString('default', {
+              // Keys are decoded identityURNs
+              Users.set(decodedIdentityURN, {
+                name: identity.name!,
+                date: new Date(identity.timestamp).toLocaleString('default', {
                   day: '2-digit',
                   month: 'short',
                   year: 'numeric',
@@ -140,7 +140,7 @@ rounded-lg border shadow"
                   minute: '2-digit',
                   second: '2-digit',
                 }),
-                imageURL: account.imageURL!,
+                imageURL: identity.imageURL!,
               })
             })
 
@@ -155,7 +155,7 @@ rounded-lg border shadow"
                 {!Users.size ? (
                   <div
                     className="flex flex-col bg-white
-        shadow rounded-lg border justify-center items-center min-h-[360px] h-[90%]"
+        rounded-lg border justify-center items-center min-h-[360px] h-[90%]"
                   >
                     {noLoginsSvg}
 

@@ -1,5 +1,7 @@
 import { Menu, Transition } from '@headlessui/react'
+import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { ServicePlanType } from '@proofzero/types/billing'
 import { Fragment } from 'react'
 import { HiDotsVertical, HiOutlineCog } from 'react-icons/hi'
 import { HiOutlineTrash } from 'react-icons/hi2'
@@ -39,8 +41,14 @@ export type ApplicationListItemProps = {
   createdTimestamp?: number
   icon?: string
   published?: boolean
+  hasCustomDomain: boolean
+  appPlan: ServicePlanType
   navigate?: (clientId: string) => void
-  onDeleteApplication?: (clientId: string, appName: string) => void
+  onDeleteApplication?: (
+    clientId: string,
+    appName: string,
+    hasCustomDomain: boolean
+  ) => void
 }
 export const ApplicationListItem = ({
   id,
@@ -48,8 +56,10 @@ export const ApplicationListItem = ({
   createdTimestamp,
   icon,
   published,
+  hasCustomDomain,
   onDeleteApplication,
   navigate,
+  appPlan,
 }: ApplicationListItemProps) => (
   <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
     <section>
@@ -69,6 +79,11 @@ export const ApplicationListItem = ({
           </div>
         </Text>
         <ApplicationListItemPublishedState published={published} />
+        {appPlan !== ServicePlanType.FREE ? (
+          <Pill className="border rounded-3xl py-none">
+            <Text size="xs">{appPlan}</Text>
+          </Pill>
+        ) : null}
       </div>
 
       <Text size="sm" weight="normal" className="text-gray-400">
@@ -129,7 +144,7 @@ export const ApplicationListItem = ({
                 hover:rounded-[6px] hover:bg-gray-100 "
                 onClick={() => {
                   if (onDeleteApplication) {
-                    onDeleteApplication(id, name ?? '')
+                    onDeleteApplication(id, name ?? '', hasCustomDomain)
                   }
                 }}
               >

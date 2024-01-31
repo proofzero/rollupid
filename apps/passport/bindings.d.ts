@@ -1,25 +1,23 @@
-import { TraceSpan } from '@proofzero/platform-middleware/trace'
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 export const seviceBindings = true
 
 declare global {
   interface Env {
-    Address: Fetcher
-    Account: Fetcher
+    Core: Fetcher
     Galaxy: Fetcher
-    Access: Fetcher
-    Starbase: Fetcher
     Images: Fetcher
 
+    DEFAULT_HOSTS: string[]
+    COOKIE_DOMAIN: string
     SECRET_SESSION_KEY: string
     SECRET_SESSION_SALT: string
-    COOKIE_DOMAIN: string
     PROFILE_APP_URL: string
     CONSOLE_APP_URL: string
     PASSPORT_REDIRECT_URL: string
     APIKEY_ALCHEMY_PUBLIC: string
-    REMIX_DEV_SERVER_WS_PORT: number
     WALLET_CONNECT_PROJECT_ID: string
+    REMIX_DEV_SERVER_WS_PORT: number
 
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
 
@@ -46,6 +44,11 @@ declare global {
     INTERNAL_DISCORD_OAUTH_CLIENT_ID: string
     SECRET_DISCORD_OAUTH_CLIENT_SECRET: string
     INTERNAL_DISCORD_OAUTH_CALLBACK_URL: string
+
+    POSTHOG_API_KEY: string
+    POSTHOG_PROXY_HOST: string
+    //Needed to make Remix work with Cloudflare module workers
+    __STATIC_CONTENT: string
   }
 
   interface AuthzParams {

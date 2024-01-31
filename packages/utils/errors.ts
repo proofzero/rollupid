@@ -50,7 +50,12 @@ export function getRollupReqFunctionErrorWrapper(
       const traceparent = context.traceSpan
         ? (context.traceSpan as TraceSpan).getTraceParent()
         : 'No trace information'
-      const result = { ...otherProps, message: error.message, traceparent }
+      const result = {
+        ...otherProps,
+        message: error.message,
+        originalError: e,
+        traceparent,
+      }
       console.error(result)
       throw JsonError(e, traceparent)
     }

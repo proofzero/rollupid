@@ -12,6 +12,7 @@ defaults:
 jobs:
   build-publish-test-galaxy-next:
     runs-on: ubuntu-latest
+    environment: next
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
@@ -30,8 +31,6 @@ jobs:
             node_modules
             .yarn
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
         run: yarn install
@@ -45,8 +44,9 @@ jobs:
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
+          wranglerVersion: '3.2.0'
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/galaxy'
-          command: publish --env next
+          command: publish --config wrangler.next.toml --env next
           environment: 'next'

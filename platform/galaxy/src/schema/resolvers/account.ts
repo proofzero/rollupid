@@ -1,187 +1,217 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
-import createAccountClient from '@proofzero/platform-clients/account'
-import createAddressClient from '@proofzero/platform-clients/address'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-
-import {
-  setupContext,
-  isAuthorized,
-  validateApiKey,
-  logAnalytics,
-  getConnectedAddresses,
-  temporaryConvertToPublic,
-  requestLogging,
-} from './utils'
+import createCoreClient from '@proofzero/platform-clients/core'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
 import { Resolvers } from './typedefs'
-import { GraphQLError } from 'graphql'
-import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
-import { ResolverContext } from './common'
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import type { AccountURN } from '@proofzero/urns/account'
 import {
-  generateTraceContextHeaders,
-  TraceSpan,
-} from '@proofzero/packages/platform-middleware/trace'
+  validateApiKey,
+  setupContext,
+  isAuthorized,
+  requestLogging,
+  parseJwt,
+} from './utils'
+
+import {
+  AppAPIKeyHeader,
+  PlatformAccountURNHeader,
+} from '@proofzero/types/headers'
+import { EDGE_ACCOUNT } from '@proofzero/platform.account/src/constants'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+
+import { ResolverContext } from './common'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { GraphQLError } from 'graphql'
+import { PersonaData } from '@proofzero/types/application'
+import { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import { generateSmartWalletAccountUrn } from '@proofzero/platform.account/src/utils'
 
 const accountResolvers: Resolvers = {
   Query: {
-    profile: async (
-      _parent: any,
-      { targetAccountURN }: { targetAccountURN?: AccountURN },
-      { env, accountURN, jwt, traceSpan }: ResolverContext
+    identityFromAlias: async (
+      _parent,
+      { provider, alias }: { provider: string; alias: string },
+      { env, traceSpan }: ResolverContext
     ) => {
-      console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
+      const coreClient = createCoreClient(env.Core, {
+        ...generateTraceContextHeaders(traceSpan),
+      })
+      const identityURN = await coreClient.account.getIdentityByAlias.query({
+        alias,
+        provider,
+      })
 
-      const finalAccountURN = targetAccountURN || accountURN
+      return identityURN
+    },
 
-      const accountClient = createAccountClient(env.Account, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
+    accountProfile: async (
+      _parent: any,
+      { accountURN }: { accountURN: AccountURN },
+      { env, traceSpan }: ResolverContext
+    ) => {
+      const coreClient = createCoreClient(env.Core, {
+        [PlatformAccountURNHeader]: accountURN,
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      let accountProfile = await accountClient.getProfile.query({
-        account: finalAccountURN,
-      })
+      const accountProfile = await coreClient.account.getAccountProfile.query()
 
       return accountProfile
     },
 
-    authorizedApps: async (
+    accountProfiles: async (
       _parent: any,
-      {},
-      { env, accountURN, jwt, traceSpan }: ResolverContext
+      { accountURNList }: { accountURNList: AccountURN[] },
+      { env, traceSpan }: ResolverContext
     ) => {
-      const accountClient = createAccountClient(env.Account, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
-      })
+      const profiles = await Promise.all(
+        accountURNList.map(async (urn) => {
+          const coreClient = createCoreClient(env.Core, {
+            [PlatformAccountURNHeader]: urn,
+            ...generateTraceContextHeaders(traceSpan),
+          })
 
-      const apps = await accountClient.getAuthorizedApps.query({
-        account: accountURN,
-      })
-
-      const starbaseClient = createStarbaseClient(env.Starbase, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
-      })
-
-      const mappedApps = await Promise.all(
-        apps.map(async (a) => {
-          const { name, iconURL } =
-            await starbaseClient.getAppPublicProps.query({
-              clientId: a.clientId,
-            })
-
-          return {
-            clientId: a.clientId,
-            icon: iconURL,
-            title: name,
-            timestamp: a.timestamp,
-          }
+          return coreClient.account.getAccountProfile.query()
         })
       )
-
-      return mappedApps
-    },
-
-    connectedAddresses: async (
-      _parent: any,
-      { targetAccountURN }: { targetAccountURN?: AccountURN },
-      { env, accountURN, jwt, traceSpan }: ResolverContext
-    ) => {
-      const finalAccountURN = targetAccountURN || accountURN
-
-      const addresses = await getConnectedAddresses({
-        accountURN: finalAccountURN,
-        Account: env.Account,
-        jwt,
-        traceSpan,
-      })
-
-      return addresses
+      return profiles
     },
   },
   Mutation: {
-    disconnectAddress: async (
+    updateAccountNickname: async (
       _parent: any,
-      { addressURN }: { addressURN: AddressURN },
-      { accountURN, env, jwt, traceSpan }: ResolverContext
+      { nickname, accountURN },
+      { env, traceSpan }: ResolverContext
     ) => {
-      if (!AddressURNSpace.is(addressURN)) {
-        throw new GraphQLError(
-          'Invalid addressURN format. Base address URN expected.'
-        )
-      }
-
-      const addresses = await getConnectedAddresses({
-        accountURN,
-        Account: env.Account,
-        jwt,
-        traceSpan,
-      })
-
-      const addressURNList = addresses?.map((a) => a.baseUrn) ?? []
-      if (!addressURNList.includes(addressURN)) {
-        throw new GraphQLError('Calling account is not address owner')
-      }
-
-      if (addressURNList.length === 1) {
-        throw new GraphQLError('Cannot disconnect last address')
-      }
-
-      const addressClient = createAddressClient(env.Address, {
-        [PlatformAddressURNHeader]: addressURN,
+      const coreClient = createCoreClient(env.Core, {
+        [PlatformAccountURNHeader]: accountURN,
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      await addressClient.deleteAddressNode.mutate({
-        accountURN,
+      await coreClient.account.setNickname.query({
+        nickname,
       })
 
       return true
     },
-  },
-  PFP: {
-    __resolveType: (obj: any) => {
-      if (obj.isToken) {
-        return 'NFTPFP'
+    updateConnectedAccountsProperties: async (
+      _parent: any,
+      { accountURNList },
+      { env, jwt, identityURN }: ResolverContext
+    ) => {
+      const accountUrnEdges = accountURNList.map((a, i) => {
+        // use the account urn space to construct a new urn with qcomps
+        const parsed = AccountURNSpace.parse(a.accountURN).decoded
+        const fullAccountURN = AccountURNSpace.componentizedUrn(
+          parsed,
+          undefined,
+          {
+            hidden: new Boolean(!!a.public).toString(),
+            order: i.toString(),
+          }
+        )
+
+        return {
+          src: identityURN,
+          dst: fullAccountURN,
+          tag: EDGE_ACCOUNT,
+        }
+      })
+
+      return true
+    },
+    registerSessionKey: async (
+      _parent: any,
+      {
+        sessionPublicKey,
+        smartContractWalletAddress,
+      }: {
+        sessionPublicKey: string
+        smartContractWalletAddress: string
+      },
+      { env, jwt, traceSpan, identityURN, clientId, apiKey }: ResolverContext
+    ) => {
+      const coreClient = createCoreClient(env.Core, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+        [AppAPIKeyHeader]: apiKey,
+      })
+
+      const [userInfo, paymaster]: [PersonaData, PaymasterType] =
+        await Promise.all([
+          coreClient.authorization.getUserInfo.query({ access_token: jwt }),
+          coreClient.starbase.getPaymaster.query({ clientId }),
+        ])
+
+      if (
+        !userInfo ||
+        !userInfo.erc_4337.some(
+          (scWallet: { nickname: string; address: string }) =>
+            scWallet.address === smartContractWalletAddress
+        )
+      ) {
+        throw new GraphQLError('Invalid smart contract wallet address.')
       }
-      return 'StandardPFP'
+
+      try {
+        const sessionKey = await coreClient.account.registerSessionKey.mutate({
+          paymaster,
+          smartContractWalletAddress,
+          sessionPublicKey,
+        })
+
+        const appData = await coreClient.authorization.getAppData.query({
+          clientId,
+        })
+
+        const smartWalletSessionKeys = appData?.smartWalletSessionKeys || []
+        const { baseAccountURN } = generateSmartWalletAccountUrn(
+          smartContractWalletAddress,
+          '' // empty string because we only need a base urn
+        )
+
+        smartWalletSessionKeys.push({
+          urn: baseAccountURN,
+          publicSessionKey: sessionPublicKey,
+        })
+
+        await coreClient.authorization.setAppData.mutate({
+          clientId,
+          appData: {
+            smartWalletSessionKeys,
+          },
+        })
+
+        return sessionKey
+      } catch (e) {
+        throw new GraphQLError('Failed to register session key.')
+      }
     },
   },
 }
 
-const ProfileResolverComposition = {
-  'Query.profile': [
-    requestLogging(),
-    setupContext(),
-    validateApiKey(),
-    logAnalytics(),
-  ],
-  'Query.authorizedApps': [
-    requestLogging(),
-    setupContext(),
-    validateApiKey(),
-    logAnalytics(),
-  ],
-  'Query.connectedAddresses': [
-    requestLogging(),
-    setupContext(),
-    validateApiKey(),
-    logAnalytics(),
-    temporaryConvertToPublic(),
-  ],
-
-  'Mutation.disconnectAddress': [
+// TODO: add account middleware
+const AccountResolverComposition = {
+  'Query.account': [requestLogging(), setupContext(), validateApiKey()],
+  'Query.accountProfile': [requestLogging(), setupContext(), validateApiKey()],
+  'Query.accountProfiles': [requestLogging(), setupContext(), validateApiKey()],
+  'Mutation.updateAccountNickname': [
     requestLogging(),
     setupContext(),
     validateApiKey(),
     isAuthorized(),
-    logAnalytics(),
+  ],
+  'Mutation.updateConnectedAccountsProperties': [
+    requestLogging(),
+    setupContext(),
+    validateApiKey(),
+    isAuthorized(),
+  ],
+  'Mutation.registerSessionKey': [
+    requestLogging(),
+    setupContext(),
+    validateApiKey(),
   ],
 }
 
-export default composeResolvers(accountResolvers, ProfileResolverComposition)
+export default composeResolvers(accountResolvers, AccountResolverComposition)

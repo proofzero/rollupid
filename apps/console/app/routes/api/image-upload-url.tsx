@@ -7,8 +7,8 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    await requireJWT(request)
-    const imageClient = createImageClient(Images, {
+    await requireJWT(request, context.env)
+    const imageClient = createImageClient(context.env.Images, {
       headers: generateTraceContextHeaders(context.traceSpan),
     })
     try {

@@ -1,8 +1,14 @@
 import { z } from 'zod'
-import { Context } from '../context'
-import { getApplicationNodeByClientId } from '../../nodes/application'
+
+import { router } from '@proofzero/platform.core'
+
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+
+import { Context } from '../context'
+import { getApplicationNodeByClientId } from '../../nodes/application'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -38,7 +44,8 @@ export const publishApp = async ({
   if (!hasClientSecret)
     throw new Error('Client Secret must be set to publish app')
 
-  const { edges } = await ctx.edges.getEdges.query({
+  const caller = router.createCaller(ctx)
+  const { edges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: appURN },
       tag: EDGE_HAS_REFERENCE_TO,
@@ -50,6 +57,15 @@ export const publishApp = async ({
   }
 
   await appDO.class.publish(input.published)
+
+  await createAnalyticsEvent({
+    distinctId: ctx.identityURN as IdentityURN,
+    eventName: input.published
+      ? 'identity_published_app'
+      : 'identity_unpublished_app',
+    apiKey: ctx.POSTHOG_API_KEY,
+    properties: { $groups: { app: input.clientId } },
+  })
 
   return {
     published: true,

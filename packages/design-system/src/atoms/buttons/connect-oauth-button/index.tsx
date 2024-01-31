@@ -1,11 +1,11 @@
 import React from 'react'
 import discordIcon from '../../../assets/social_icons/discord.svg'
-import googleIcon from '../../../assets/social_icons/google.svg'
-import microsoftIcon from '../../../assets/social_icons/microsoft.svg'
 import twitterIcon from '../../../assets/social_icons/twitter.svg'
 import { Button } from '../Button'
 import { Text } from '../../text/Text'
 
+import { WrappedSVG as GoogleSVG } from '../../providers/Google'
+import { WrappedSVG as MicrosoftSVG } from '../../providers/Microsoft'
 import { WrappedSVG as AppleSVG } from '../../providers/Apple'
 import { WrappedSVG as GitHubSVG } from '../../providers/Github'
 
@@ -25,8 +25,8 @@ const providerIconDict: { [key in OAuthProvider]: JSX.Element } = {
   apple: AppleSVG,
   discord: providerImgBuildHelper('discord', discordIcon),
   github: GitHubSVG,
-  google: providerImgBuildHelper('google', googleIcon),
-  microsoft: providerImgBuildHelper('microsoft', microsoftIcon),
+  google: GoogleSVG,
+  microsoft: MicrosoftSVG,
   twitter: providerImgBuildHelper('twitter', twitterIcon),
 }
 
@@ -35,10 +35,12 @@ type ConnectOAuthButtonProps = {
   fullSize?: boolean
   displayContinueWith?: boolean
   submit?: boolean
+  onClick?: () => unknown
 }
 
 const ConnectOAuthButton = ({
   provider,
+  onClick,
   fullSize = true,
   displayContinueWith = false,
   submit = false,
@@ -46,16 +48,16 @@ const ConnectOAuthButton = ({
   return (
     <Button
       className={
-        'button w-full dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100'
+        'button w-full dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
       }
-      btnType={'secondary-alt'}
+      btnType={'secondary-alt-skin'}
       isSubmit={submit}
       role={provider}
+      onClick={onClick}
     >
       <div
-        className={`flex ${
-          fullSize ? '' : 'justify-center'
-        }  items-center w-full space-x-3 h-[36px]`}
+        className={`flex ${fullSize ? '' : 'justify-center'
+          }  items-center w-full space-x-3 h-[36px]`}
       >
         {providerIconDict[provider]}
 

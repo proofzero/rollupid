@@ -26,9 +26,11 @@ export const checkApiKey = async ({
   const clientId = ApplicationURNSpace.parse(jwtSub).decoded
 
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
-  const valid = await appDO.class.validateApiKey(input.apiKey)
 
-  return {
-    valid,
+  try {
+    await appDO.class.verify(input.apiKey)
+    return { valid: await appDO.class.validateApiKey(input.apiKey) }
+  } catch (e) {
+    return { valid: false }
   }
 }

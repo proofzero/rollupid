@@ -2,7 +2,7 @@ import { initTRPC } from '@trpc/server'
 
 import { errorFormatter } from '@proofzero/utils/trpc'
 
-import { Context } from './context'
+import type { Context } from './context'
 import { LogUsage } from '@proofzero/platform-middleware/log'
 import {
   createApp,
@@ -58,14 +58,17 @@ import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { OwnAppsMiddleware } from './ownAppsMiddleware'
 import {
   getAppPublicProps,
+  getAppPublicPropsBatch,
+  GetAppPublicPropsBatchInput,
+  GetAppPublicPropsBatchOutput,
   GetAppPublicPropsInput,
   GetAppPublicPropsOutput,
 } from './methods/getAppPublicProps'
-import { getAuthorizedAccounts } from './methods/getAuthorizedAccounts'
+import { getAuthorizedIdentities } from './methods/getAuthorizedIdentities'
 import {
-  GetAuthorizedAccountsMethodInput,
-  GetAuthorizedAccountsMethodOutput,
-} from './methods/getAuthorizedAccounts'
+  GetAuthorizedIdentitiesMethodInput,
+  GetAuthorizedIdentitiesMethodOutput,
+} from './methods/getAuthorizedIdentities'
 import {
   getAppContactAddress,
   GetAppContactAddressInput,
@@ -108,10 +111,26 @@ import {
   getEmailOTPTheme,
   GetEmailOTPThemeOutput,
 } from './methods/getEmailOTPTheme'
+import { getOgTheme, GetOgThemeOutput } from './methods/getOgTheme'
 import {
   setEmailOTPTheme,
   SetEmailOTPThemeInput,
 } from './methods/setEmailOTPTheme'
+import { setOgTheme, SetOgThemeInput } from './methods/setOgTheme'
+import { setAppPlan, SetAppPlanInput } from './methods/setAppPlan'
+import {
+  DeleteSubscriptionPlansInput,
+  deleteSubscriptionPlans,
+} from './methods/deleteSubscriptionPlans'
+import {
+  reconcileAppSubscriptions,
+  ReconcileAppSubscriptionsInputSchema,
+} from './methods/reconcileAppSubscriptions'
+import {
+  getAppPlan,
+  GetAppPlanInputSchema,
+  GetAppPlanOutputSchema,
+} from './methods/getAppPlan'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -176,15 +195,15 @@ export const appRouter = t.router({
     .input(GetAppProfileInput)
     .output(GetAppProfileOutput)
     .query(getAppProfile),
-  getAuthorizedAccounts: t.procedure
+  getAuthorizedIdentities: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .use(OwnAppsMiddleware)
-    .input(GetAuthorizedAccountsMethodInput)
-    .output(GetAuthorizedAccountsMethodOutput)
-    .query(getAuthorizedAccounts),
+    .input(GetAuthorizedIdentitiesMethodInput)
+    .output(GetAuthorizedIdentitiesMethodOutput)
+    .query(getAuthorizedIdentities),
   listApps: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
@@ -224,6 +243,12 @@ export const appRouter = t.router({
     .input(GetAppPublicPropsInput)
     .output(GetAppPublicPropsOutput)
     .query(getAppPublicProps),
+  getAppPublicPropsBatch: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppPublicPropsBatchInput)
+    .output(GetAppPublicPropsBatchOutput)
+    .query(getAppPublicPropsBatch),
   publishApp: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
@@ -312,6 +337,43 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(SetEmailOTPThemeInput)
     .mutation(setEmailOTPTheme),
+  setAppPlan: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(SetAppPlanInput)
+    .mutation(setAppPlan),
+  getAppPlan: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppPlanInputSchema)
+    .output(GetAppPlanOutputSchema)
+    .query(getAppPlan),
+  setOgTheme: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(SetOgThemeInput)
+    .mutation(setOgTheme),
+  getOgTheme: t.procedure
+    .use(Analytics)
+    .input(AppClientIdParamSchema)
+    .output(GetOgThemeOutput)
+    .query(getOgTheme),
+  deleteSubscriptionPlans: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(DeleteSubscriptionPlansInput)
+    .mutation(deleteSubscriptionPlans),
+  reconcileAppSubscriptions: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(ReconcileAppSubscriptionsInputSchema)
+    .mutation(reconcileAppSubscriptions),
 })
 
 export type StarbaseRouter = typeof appRouter

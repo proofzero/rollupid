@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppObjectSchema } from '../validators/app'
@@ -36,5 +37,6 @@ export const updateApp = async ({
   appDO.class.update(input.updates)
 
   //TODO: Make this asynchronous so user doesn't have to wait for the second IO hop
-  await ctx.edges.updateNode.mutate({ urnOfNode: appURN })
+  const caller = router.createCaller(ctx)
+  await caller.edges.updateNode({ urnOfNode: appURN })
 }

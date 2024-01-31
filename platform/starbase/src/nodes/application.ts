@@ -8,9 +8,13 @@ import {
   importJWK,
   JWK,
   jwtVerify,
+  JWTVerifyResult,
   KeyLike,
   SignJWT,
 } from 'jose'
+
+import type { Environment } from '@proofzero/platform.core'
+
 import {
   CUSTOM_DOMAIN_CHECK_INTERVAL,
   CUSTOM_DOMAIN_CHECK_PERIOD,
@@ -21,17 +25,19 @@ import type {
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
-  Environment,
 } from '../types'
 import {
   AppTheme,
   EmailOTPTheme,
+  OGTheme,
   PaymasterType,
 } from '../jsonrpc/validators/app'
 import { InternalServerError } from '@proofzero/errors'
 
 import type { CustomDomain } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
+import { getDNSRecordValue } from '@proofzero/utils'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -61,7 +67,7 @@ const JWT_OPTIONS = {
   },
 }
 
-export default class StarbaseApp extends DOProxy {
+export default class StarbaseApplication extends DOProxy {
   declare state: DurableObjectState
   declare env: Environment
 
@@ -125,6 +131,8 @@ export default class StarbaseApp extends DOProxy {
       'createdTimestamp',
       'termsURL',
       'privacyURL',
+      'customDomain',
+      'appPlan',
     ]
     const appObj = await this.state.storage.get(keysWeWant)
     const result = Object.fromEntries(appObj) as AppDetails
@@ -177,16 +185,14 @@ export default class StarbaseApp extends DOProxy {
     return apiKey
   }
 
-  async verify(apiKey: string): Promise<boolean> {
+  async verify(apiKey: string): Promise<JWTVerifyResult | undefined> {
     const { alg } = JWT_OPTIONS
     const { publicKey: key } = await this.getJWTSigningKeyPair()
     const options = { algorithms: [alg] }
     try {
-      await jwtVerify(apiKey, key, options)
-      return true
+      return jwtVerify(apiKey, key, options)
     } catch (e) {
       console.error('Error verifying API key validity.', e)
-      return false
     }
   }
 
@@ -215,9 +221,8 @@ export default class StarbaseApp extends DOProxy {
   }
 
   async validateApiKey(apiKey: string): Promise<boolean> {
-    const validJWTForClient = await this.verify(apiKey)
     const storedKey = await this.state.storage.get('apiKey')
-    return validJWTForClient && apiKey === storedKey
+    return apiKey === storedKey
   }
 
   async hasClientSecret(): Promise<boolean> {
@@ -270,13 +275,19 @@ export default class StarbaseApp extends DOProxy {
       stored.id
     )
 
+    for (const dnsRec of stored.dns_records) {
+      dnsRec.value = await getDNSRecordValue(dnsRec.name, dnsRec.record_type)
+    }
+    customDomain.dns_records = stored.dns_records
     customDomain.ownership_verification = stored.ownership_verification
     customDomain.ssl.validation_records = stored.ssl.validation_records
+
     await storage.put({ customDomain })
 
     if (
       customDomain.status === 'active' &&
-      customDomain.ssl.status === 'active'
+      customDomain.ssl.status === 'active' &&
+      stored.dns_records.every((rec) => rec.value?.includes(rec.expected_value))
     )
       return this.unsetCustomDomainAlarm()
 
@@ -302,13 +313,33 @@ export default class StarbaseApp extends DOProxy {
   async setEmailOTPTheme(theme: EmailOTPTheme): Promise<void> {
     return this.state.storage.put('emailOTPTheme', theme)
   }
+
+  async getOgTheme(): Promise<OGTheme | undefined> {
+    return this.state.storage.get<OGTheme>('ogTheme')
+  }
+
+  async setOgTheme(theme: OGTheme): Promise<void> {
+    return this.state.storage.put('ogTheme', theme)
+  }
+
+  async getAppPlan(): Promise<ServicePlanType | undefined> {
+    return this.state.storage.get<ServicePlanType>('appPlan')
+  }
+
+  async setAppPlan(planType: ServicePlanType): Promise<void> {
+    return this.state.storage.put('appPlan', planType)
+  }
+
+  async deleteAppPlan(): Promise<boolean> {
+    return this.state.storage.delete('appPlan')
+  }
 }
 
 export const getApplicationNodeByClientId = async (
   clientId: string,
   durableObject: DurableObjectNamespace
 ) => {
-  const proxy = StarbaseApp.wrap(durableObject)
+  const proxy = StarbaseApplication.wrap(durableObject)
   const appDO = proxy.getByName(clientId)
   return appDO
 }

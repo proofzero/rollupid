@@ -1,47 +1,55 @@
 import {
-  CryptoAddressType,
-  EmailAddressType,
+  CryptoAccountType,
+  EmailAccountType,
   NodeType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
-import type { AddressURN } from '@proofzero/urns/address'
+  OAuthAccountType,
+} from '@proofzero/types/account'
+import type { AccountURN } from '@proofzero/urns/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { getGalaxyClient } from './clients'
-import { imageFromAddressType } from './icons'
+import { imageFromAccountType } from './icons'
 import type { FullProfile } from '../types'
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getValidGallery } from './alchemy'
-import { GetAddressProfilesQuery } from '@proofzero/galaxy-client'
+import { GetAccountProfilesQuery } from '@proofzero/galaxy-client'
 
-export const getAccountProfile = async (
+export const getIdentityProfile = async (
   {
-    accountURN,
+    identityURN,
     jwt,
   }: {
-    accountURN: AccountURN
+    identityURN: IdentityURN
     jwt?: string
   },
+  env: Env,
   traceSpan: TraceSpan
 ) => {
-  // note: jwt is only important for setting profile in profile account settings
-
-  const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
+  // note: jwt is only important for setting profile in profile identity settings
+  const profile = await env.ProfileKV.get<FullProfile>(identityURN, 'json')
 
   if (profile && profile.gallery)
-    profile.gallery = await getValidGallery({
-      gallery: profile.gallery,
-      accountURN,
-      traceSpan,
-    })
+    profile.gallery = await getValidGallery(
+      {
+        gallery: profile.gallery,
+        identityURN,
+      },
+      env,
+      traceSpan
+    )
 
   return profile
 }
 
-export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
+export const getAuthorizedApps = async (
+  jwt: string,
+  env: Env,
+  traceSpan: TraceSpan
+) => {
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
+    generateTraceContextHeaders(traceSpan),
+    env
   )
 
   const { authorizedApps } = await galaxyClient.getAuthorizedApps(
@@ -52,84 +60,102 @@ export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
   return authorizedApps
 }
 
-export const getAccountAddresses = async ({
-  jwt,
-  accountURN,
-  traceSpan,
-}: {
-  jwt?: string
-  accountURN?: AccountURN
+export const getIdentityAccounts = async (
+  {
+    jwt,
+    identityURN,
+  }: {
+    jwt?: string
+    identityURN?: IdentityURN
+  },
+  env: Env,
   traceSpan: TraceSpan
-}) => {
+) => {
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan!)
+    generateTraceContextHeaders(traceSpan!),
+    env
   )
-  const addressesRes = await galaxyClient.getConnectedAddresses(
-    { targetAccountURN: accountURN },
+
+  const accountsRes = await galaxyClient.getConnectedAccounts(
+    { targetIdentityURN: identityURN },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
-  return addressesRes.addresses || []
+  return accountsRes.accounts || []
 }
 
-export const getAccountCryptoAddresses = async ({
-  jwt,
-  accountURN,
-  traceSpan,
-}: {
-  jwt?: string
-  accountURN?: AccountURN
+export const getIdentityCryptoAddresses = async (
+  {
+    jwt,
+    identityURN,
+  }: {
+    jwt?: string
+    identityURN?: IdentityURN
+  },
+  env: Env,
   traceSpan: TraceSpan
-}) => {
-  const addresses = await getAccountAddresses({ jwt, accountURN, traceSpan })
+) => {
+  const accounts = await getIdentityAccounts(
+    { jwt, identityURN },
+    env,
+    traceSpan
+  )
 
   // TODO: need to type qc and rc
-  const cryptoAddresses =
-    addresses
-      .filter((e) => [NodeType.Crypto, NodeType.Vault].includes(e.rc.node_type))
-      .map((address) => address.qc.alias.toLowerCase() as string) ||
-    ([] as string[])
+  const cryptoAccounts =
+    accounts
+      .filter((e) => {
+        return (
+          [NodeType.Crypto, NodeType.Vault].includes(e.rc.node_type) &&
+          e.rc.addr_type === CryptoAccountType.ETH
+        )
+      })
+      .map((account) => {
+        return account.qc.alias.toLowerCase() as string
+      }) || ([] as string[])
 
-  return cryptoAddresses
+  return cryptoAccounts
 }
 
-export const getAddressProfiles = async (
+export const getAccountProfiles = async (
   jwt: string,
-  addressURNList: AddressURN[],
+  accountURNList: AccountURN[],
+  env: Env,
   traceSpan: TraceSpan
-): Promise<GetAddressProfilesQuery['addressProfiles']> => {
+): Promise<GetAccountProfilesQuery['accountProfiles']> => {
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
+    generateTraceContextHeaders(traceSpan),
+    env
   )
-  const addressProfilesRes = await galaxyClient.getAddressProfiles(
+  const accountProfilesRes = await galaxyClient.getAccountProfiles(
     {
-      addressURNList,
+      accountURNList,
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
-  const { addressProfiles } = addressProfilesRes
+  const { accountProfiles } = accountProfilesRes
 
-  return addressProfiles
+  return accountProfiles
 }
 
 export const getProfileTypeTitle = (type: string) => {
   switch (type) {
-    case CryptoAddressType.ETH:
+    case CryptoAccountType.ETH:
       return 'Ethereum'
-    case EmailAddressType.Email:
+    case EmailAccountType.Email:
       return 'Email'
-    case OAuthAddressType.Apple:
+    case OAuthAccountType.Apple:
       return 'Apple'
-    case OAuthAddressType.Discord:
+    case OAuthAccountType.Discord:
       return 'Discord'
-    case OAuthAddressType.GitHub:
+    case OAuthAccountType.GitHub:
       return 'GitHub'
-    case OAuthAddressType.Google:
+    case OAuthAccountType.Google:
       return 'Google'
-    case OAuthAddressType.Microsoft:
+    case OAuthAccountType.Microsoft:
       return 'Microsoft'
-    case OAuthAddressType.Twitter:
+    case OAuthAccountType.Twitter:
       return 'Twitter'
     default:
       return ''

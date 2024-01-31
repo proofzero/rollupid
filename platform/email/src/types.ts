@@ -31,6 +31,7 @@ export type EmailMessage = {
   from: EmailAddressComponents
   recipient: EmailAddressComponents
   content: EmailContent
+  customHostname?: string
 }
 
 export type EmailNotification = Omit<EmailMessage, 'from'>

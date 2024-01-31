@@ -7,12 +7,17 @@ import {
   sizeToSizesDict,
   typeToColorsDict,
 } from './common'
-import { ThemeContext } from '../../contexts/theme'
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = React.DetailedHTMLProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> & {
   btnSize?: ButtonSize
   btnType?: ButtonType
   isSubmit?: boolean
+  onClick?: (e?: any) => unknown
+  disabled?: boolean
+  className?: string
 }
 
 export function Button({
@@ -21,6 +26,7 @@ export function Button({
   btnType = 'primary',
   isSubmit,
   className,
+  onClick,
   children,
   ...rest
 }: ButtonProps) {
@@ -31,6 +37,7 @@ export function Button({
     <button
       type={isSubmit ? 'submit' : 'button'}
       disabled={disabled}
+      onClick={onClick}
       className={classNames(
         sizeClasses,
         disabled ? disabledColorClasses : colorClasses,

@@ -10,7 +10,7 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { TbInfoCircle } from 'react-icons/tb'
 import zerodevIcon from '~/assets/paymasters/zerodev.svg'
 
@@ -55,9 +55,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         message: 'Application Client ID is required for the requested route',
       })
     }
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     let errors: errorsType = {}
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -78,7 +78,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       errors.label = `Provider secret is required`
     }
     try {
-      await starbaseClient.setPaymaster.mutate({
+      await coreClient.starbase.setPaymaster.mutate({
         clientId: params.clientId,
         paymaster: { provider: paymaster, secret },
       })
@@ -214,10 +214,9 @@ export default () => {
                           key={personIdx}
                           className={({ active }) =>
                             `relative cursor-default select-none py-2 px-3
-                            ${
-                              active
-                                ? 'bg-gray-50 text-indigo-900'
-                                : 'text-gray-900'
+                            ${active
+                              ? 'bg-gray-50 text-indigo-900'
+                              : 'text-gray-900'
                             } }`
                           }
                           value={paymaster}
@@ -231,9 +230,8 @@ export default () => {
                                   className="w-6 h-6 mr-3"
                                 />
                                 <span
-                                  className={`truncate text-sm ${
-                                    selected ? 'font-medium' : 'font-normal'
-                                  }`}
+                                  className={`truncate text-sm ${selected ? 'font-medium' : 'font-normal'
+                                    }`}
                                 >
                                   {paymaster.name}
                                 </span>

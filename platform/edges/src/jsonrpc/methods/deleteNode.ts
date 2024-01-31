@@ -24,13 +24,5 @@ export const deleteNodeMethod = async ({
   const statement = remove.node(ctx.graph, nodeUrn)
   const deleted = await ctx.graph.db.batch([statement])
 
-  if (
-    deleted.length > 1 ||
-    (deleted.length === 1 && deleted[0].meta && deleted[0].meta.changes > 1)
-  )
-    //This should never happen, but adding just in case
-    throw new InternalServerError({
-      message: 'Node deletion returned more than one result.',
-    })
   return { deleted: deleted[0].meta.changes === 1 }
 }

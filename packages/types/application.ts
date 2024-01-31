@@ -1,3 +1,4 @@
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { z } from 'zod'
 
 //TODO: Will have to revise and integrated with Scope in next iteration
@@ -6,6 +7,7 @@ export const ClaimName = z.union([
   z.literal('openid'),
   z.literal('connected_accounts'),
   z.literal('erc_4337'),
+  z.literal('profile'),
 ])
 export type ClaimName = z.infer<typeof ClaimName>
 
@@ -22,3 +24,16 @@ export enum AuthorizationControlSelection {
 export const AuthorizationControlSelectionEnum = z.nativeEnum(
   AuthorizationControlSelection
 )
+
+export const AppData = z.object({
+  smartWalletSessionKeys: z
+    .array(
+      z.object({
+        urn: AccountURNInput,
+        publicSessionKey: z.string(),
+      })
+    )
+    .optional(),
+})
+
+export type AppDataType = z.infer<typeof AppData>

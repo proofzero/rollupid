@@ -1,41 +1,57 @@
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import { action as otpAction } from '~/routes/connect/email/otp'
 import { EmailOTPValidator } from '@proofzero/design-system/src/molecules/email-otp-validator'
 import {
   useActionData,
   useFetcher,
   useLoaderData,
-  useLocation,
   useNavigate,
   useOutletContext,
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-import { getAuthzCookieParams, getUserSession } from '~/session.server'
-import { getAddressClient } from '~/platform.server'
-import { authenticateAddress } from '~/utils/authenticate.server'
-import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
-import { useEffect, useState } from 'react'
+import {
+  getAuthzCookieParams,
+  getUserSession,
+  getValidatedSessionContext,
+} from '~/session.server'
+import { getCoreClient } from '~/platform.server'
+import {
+  authenticateAccount,
+  getAuthzRedirectURL,
+} from '~/utils/authenticate.server'
+import { useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import {
   BadRequestError,
   ERROR_CODES,
   HTTP_STATUS_CODES,
+  UnauthorizedError,
 } from '@proofzero/errors'
 import { Button, Text } from '@proofzero/design-system'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { generateEmailOTP } from '~/utils/emailOTP'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context, params }) => {
+  async ({ request, params }) => {
     const qp = new URL(request.url).searchParams
 
     const email = qp.get('email')
+    const state = qp.get('state')
     if (!email)
       throw new BadRequestError({ message: 'No address included in request' })
+    if (!state)
+      throw new BadRequestError({ message: 'No state included in request' })
 
     return json({
       email,
+      initialState: state,
       clientId: params.clientId,
     })
   }
@@ -44,26 +60,66 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const actionRes = await otpAction({ request, context, params })
-    const { addressURN, successfulVerification } = await actionRes.json()
+    const { accountURN, successfulVerification } = await actionRes.json()
 
     if (successfulVerification) {
       const appData = await getAuthzCookieParams(request, context.env)
-      const addressClient = getAddressClient(
-        addressURN,
-        context.env,
-        context.traceSpan
-      )
+      let coreClient = getCoreClient({ context, accountURN })
 
-      const { accountURN, existing } = await addressClient.resolveAccount.query(
-        {
-          jwt: await getUserSession(request, context.env, appData?.clientId),
-          force: !appData || appData.rollup_action !== 'connect',
+      if (appData?.rollup_action?.startsWith('groupemailconnect')) {
+        const { jwt } = await getValidatedSessionContext(
+          request,
+          context.authzQueryParams,
+          context.env,
+          context.traceSpan
+        )
+
+        if (!jwt) {
+          throw new UnauthorizedError({
+            message: 'No JWT in session context',
+          })
         }
-      )
 
-      return authenticateAddress(
-        addressURN,
+        coreClient = getCoreClient({
+          context,
+          jwt,
+        })
+
+        let result = undefined
+
+        const identityGroupID = appData.rollup_action.split('_')[1]
+        const identityGroupURN = IdentityGroupURNSpace.urn(
+          identityGroupID as string
+        ) as IdentityGroupURN
+
+        const { existing } =
+          await coreClient.identity.connectIdentityGroupEmail.mutate({
+            accountURN: accountURN,
+            identityGroupURN,
+          })
+
+        if (existing) {
+          result = 'ALREADY_CONNECTED_ERROR'
+        }
+
+        const redirectURL = getAuthzRedirectURL(appData, result)
+
+        return redirect(redirectURL)
+      }
+
+      const { identityURN, existing } =
+        await coreClient.account.resolveIdentity.query({
+          jwt: await getUserSession(request, context.env, appData?.clientId),
+          force:
+            !appData ||
+            (appData.rollup_action !== 'connect' &&
+              !appData.rollup_action?.startsWith('groupconnect')),
+          clientId: appData?.clientId,
+        })
+
+      return authenticateAccount(
         accountURN,
+        identityURN,
         appData,
         request,
         context.env,
@@ -81,62 +137,52 @@ export default () => {
     prompt?: string
   }>()
 
-  const { email, clientId } = useLoaderData()
+  const { email, initialState } = useLoaderData()
   const ad = useActionData()
   const submit = useSubmit()
   const navigate = useNavigate()
   const transition = useTransition()
-  const location = useLocation()
   const fetcher = useFetcher()
 
   const [errorMessage, setErrorMessage] = useState('')
-  const [state, setState] = useState('')
-  const [lastRegen, setLastRegen] = useState(Date.now())
+  const [state, setState] = useState(initialState)
 
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const resObj = await fetch('/connect/email/otp' + location.search)
-        const res = await resObj.json<{
-          message: string
-          state: string
-        }>()
-
-        if (resObj.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
-          setErrorMessage(res.message)
-        } else if (errorMessage.length) {
-          // In the case error was hit in last call
-          // here we want to reset the error message
-          setErrorMessage('')
-        }
-        setState(res.state)
-      } catch (e: any) {
-        setErrorMessage(e.message ? e.message : e.toString())
+  const generateAndValidateEmailOTP = async () => {
+    try {
+      const result = await generateEmailOTP(email)
+      if (result?.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
+        setErrorMessage(result.message)
+      } else if (errorMessage.length) {
+        // In the case error was hit in last call
+        // here we want to reset the error message
+        setErrorMessage('')
       }
-    })()
-  }, [errorMessage.length, lastRegen, location.search])
+      if (result?.state) {
+        setState(result.state)
+      }
+    } catch (e: any) {
+      setErrorMessage(e.message ? e.message : e.toString())
+    }
+  }
 
   return (
     <div
       className={
         'flex shrink flex-col items-center justify-center gap-4 mx-auto\
       bg-white p-6 h-[100dvh] lg:h-[580px] lg:max-h-[100dvh] w-full\
-       lg:w-[418px] lg:border-rounded-lg'
+       lg:w-[418px] lg:border-rounded-lg dark:bg-gray-800 border border-[#D1D5DB] dark:border-gray-600'
       }
       style={{
-        border: '1px solid #D1D5DB',
         boxSizing: 'border-box',
       }}
     >
-      {transition.state !== 'idle' && <Loader />}
-
       <EmailOTPValidator
         loading={transition.state !== 'idle' || fetcher.state !== 'idle'}
         email={email}
         state={state}
         invalid={ad?.error}
         requestRegeneration={async () => {
-          setLastRegen(Date.now())
+          await generateAndValidateEmailOTP()
         }}
         requestVerification={async (email, code, state) => {
           submit(
@@ -167,7 +213,7 @@ export default () => {
         <div className="flex flex-1 w-full items-end">
           <Button
             btnSize="l"
-            btnType="secondary-alt"
+            btnType="secondary-alt-skin"
             className="w-full hover:bg-gray-100"
             onClick={() => navigate('/authenticate/cancel')}
           >

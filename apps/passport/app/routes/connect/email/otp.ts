@@ -1,15 +1,15 @@
-import { EmailAddressType, NodeType } from '@proofzero/types/address'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { EmailAccountType, NodeType } from '@proofzero/types/account'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { JsonError } from '@proofzero/utils/errors'
 import { json } from '@remix-run/cloudflare'
-import { getAddressClient, getStarbaseClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { getAuthzCookieParams } from '~/session.server'
-import { SendOTPEmailThemeProps } from '@proofzero/platform/email/src/jsonrpc/methods/sendOTPEmail'
-import { BadRequestError } from '@proofzero/errors'
+import type { EmailThemeProps } from '@proofzero/platform/email/src/emailFunctions'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -20,62 +20,63 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       if (!email)
         throw new BadRequestError({ message: 'No address included in request' })
 
-      const addressURN = AddressURNSpace.componentizedUrn(
-        generateHashedIDRef(EmailAddressType.Email, email),
-        { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
+      const accountURN = AccountURNSpace.componentizedUrn(
+        generateHashedIDRef(EmailAccountType.Email, email.toLowerCase()),
+        { node_type: NodeType.Email, addr_type: EmailAccountType.Email },
         { alias: email, hidden: 'true' }
       )
 
-      const addressClient = getAddressClient(
-        addressURN,
-        context.env,
-        context.traceSpan
-      )
+      const coreClient = getCoreClient({ context, accountURN })
 
-      const { clientId } = await getAuthzCookieParams(request, context.env)
+      let clientId: string = ''
+      try {
+        const res = await getAuthzCookieParams(request, context.env)
+        clientId = res.clientId
+      } catch (ex) {
+        throw new InternalServerError({
+          message:
+            'Could not complete authentication. Please return to application and try again.',
+        })
+      }
 
-      const starbaseClient = getStarbaseClient(
-        undefined,
-        context.env,
-        context.traceSpan
-      )
-
-      let appProps, emailTheme, customDomain
+      let appPlan, appProps, emailTheme, customDomain
       if (clientId !== 'console' && clientId !== 'passport') {
-        ;[appProps, emailTheme, customDomain] = await Promise.all([
-          starbaseClient.getAppPublicProps.query({
+        ;[appPlan, appProps, emailTheme, customDomain] = await Promise.all([
+          coreClient.starbase.getAppPlan.query({
             clientId,
           }),
-          starbaseClient.getEmailOTPTheme.query({
+          coreClient.starbase.getAppPublicProps.query({
             clientId,
           }),
-          starbaseClient.getCustomDomain.query({
+          coreClient.starbase.getEmailOTPTheme.query({
+            clientId,
+          }),
+          coreClient.starbase.getCustomDomain.query({
             clientId,
           }),
         ])
       }
 
-      let themeProps: SendOTPEmailThemeProps | undefined
+      let themeProps: EmailThemeProps | undefined
       if (appProps) {
         themeProps = {
           privacyURL: appProps.privacyURL as string,
           termsURL: appProps.termsURL as string,
-          logoURL: emailTheme?.logoURL,
-          contactURL: emailTheme?.contact,
-          address: emailTheme?.address,
+          logoURL:
+            appPlan !== ServicePlanType.FREE ? emailTheme?.logoURL : undefined,
+          contactURL:
+            appPlan !== ServicePlanType.FREE ? emailTheme?.contact : undefined,
+          address:
+            appPlan !== ServicePlanType.FREE ? emailTheme?.address : undefined,
           appName: appProps.name,
         }
 
-        // Commented out because
-        // we need to figure out DKIM
-        // for custom domains
-        // https://github.com/proofzero/rollupid/issues/2326
-        // if (customDomain) {
-        //   themeProps.hostname = customDomain.hostname
-        // }
+        if (appPlan !== ServicePlanType.FREE && customDomain) {
+          themeProps.hostname = customDomain.hostname
+        }
       }
 
-      const state = await addressClient.generateEmailOTP.mutate({
+      const state = await coreClient.account.generateEmailOTP.mutate({
         email,
         themeProps,
       })
@@ -96,22 +97,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         message: 'No email address included in request',
       })
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(EmailAddressType.Email, email),
-      { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(EmailAccountType.Email, email.toLowerCase()),
+      { node_type: NodeType.Email, addr_type: EmailAccountType.Email },
       { alias: email, hidden: 'true' }
     )
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
+    const coreClient = getCoreClient({ context, accountURN })
+    const successfulVerification =
+      await coreClient.account.verifyEmailOTP.mutate({
+        code: formData.get('code') as string,
+        state: formData.get('state') as string,
+      })
 
-    const successfulVerification = await addressClient.verifyEmailOTP.mutate({
-      code: formData.get('code') as string,
-      state: formData.get('state') as string,
-    })
-
-    return json({ addressURN, successfulVerification })
+    return json({ accountURN, successfulVerification })
   }
 )

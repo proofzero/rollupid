@@ -19,7 +19,8 @@ function pickIcon(
     height: number
   },
   minWidth?: number,
-  minHeight?: number
+  minHeight?: number,
+  variant: string = 'public'
 ) {
   return (e: any) =>
     new Promise<any>(async (ok) => {
@@ -86,12 +87,12 @@ function pickIcon(
             body: formData,
           }).then((res) => res.json())
 
-          const publicVariantUrls = cfUploadRes.result.variants.filter((v) =>
-            v.endsWith('public')
+          const variantUrls = cfUploadRes.result.variants.filter((v) =>
+            v.endsWith(variant)
           )
 
-          if (publicVariantUrls.length) {
-            setIconUrl(publicVariantUrls[0])
+          if (variantUrls.length) {
+            setIconUrl(variantUrls[0])
           }
         }
 
@@ -128,6 +129,7 @@ type IconPickerProps = {
   setIsFormChanged: (val: boolean) => void
   setIsImgUploading: (val: boolean) => void
   imageUploadCallback?: (url: string) => void
+  variant?: string
 }
 
 export default function IconPicker({
@@ -143,6 +145,7 @@ export default function IconPicker({
   setIsFormChanged,
   setIsImgUploading,
   imageUploadCallback = () => {},
+  variant,
 }: IconPickerProps) {
   const [icon, setIcon] = useState<string>('')
   const [iconUrl, setIconUrl] = useState<string>('')
@@ -204,13 +207,6 @@ export default function IconPicker({
     e.stopPropagation()
   }
 
-  const appIcon =
-    icon !== '' ? (
-      <img className="rounded" src={icon} alt="Application icon" />
-    ) : (
-      <CameraIcon className="h-6 w-6 text-gray-300" aria-hidden="true" />
-    )
-
   const calculateDimensions = (
     aspectRatioWidth: number,
     aspectRatioHeight: number,
@@ -247,13 +243,23 @@ export default function IconPicker({
             style={{
               width: `${width}px`,
               height: `${height}px`,
+              backgroundImage:
+                iconUrl && iconUrl !== '' ? `url(${iconUrl})` : '',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
             }}
             onDrop={(e) => handleDrop(e)}
             onDragOver={(e) => handleDragOver(e)}
             onDragEnter={(e) => handleDragEnter(e)}
             onDragLeave={(e) => handleDragLeave(e)}
           >
-            {appIcon}
+            {(!iconUrl || iconUrl === '') && (
+              <CameraIcon
+                className="h-6 w-6 text-gray-300"
+                aria-hidden="true"
+              />
+            )}
           </div>
 
           <div className="grid place-items-center">
@@ -283,7 +289,8 @@ export default function IconPicker({
                     maxSize,
                     aspectRatio,
                     minWidth,
-                    minHeight
+                    minHeight,
+                    variant
                   )(event)
                   if (Object.keys(errors).length) {
                     setInvalidState(true)
