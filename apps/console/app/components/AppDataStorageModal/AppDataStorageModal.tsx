@@ -6,12 +6,15 @@ import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 import { useEffect, useState } from 'react'
 import { HiOutlineX } from 'react-icons/hi'
+import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
+import { FaCheck, FaTimes } from 'react-icons/fa'
 
 type AppDataStorageModalProps = {
   isOpen: boolean
   onClose: () => void
   subscriptionFetcher: FetcherWithComponents<any>
   currentPackage?: ExternalAppDataPackageType
+  topUp?: boolean
   clientID: string
 }
 
@@ -20,12 +23,15 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
   onClose,
   subscriptionFetcher,
   currentPackage,
+  topUp = false,
   clientID,
 }) => {
   const [selectedPackage, setSelectedPackage] =
     useState<ExternalAppDataPackageType>(
       currentPackage ?? ExternalAppDataPackageType.STARTER
     )
+  const [autoTopUp, setAutoTopUp] = useState(topUp)
+
   useEffect(() => {
     if (currentPackage) {
       setSelectedPackage(currentPackage)
@@ -114,6 +120,51 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
                 </Text>
                 <Text size="sm" weight="medium" className="text-gray-500">
                   {ExternalAppDataPackages[selectedPackage].writes}
+                </Text>
+              </div>
+            </div>
+          </section>
+
+          <section className="flex flex-col">
+            <Text size="xs" className="text-gray-500 uppercase text-left">
+              Auto Top-Up
+            </Text>
+
+            <div className="flex flex-row items-start gap-2 border rounded px-4 py-2">
+              <Text
+                className="flex-1 text-gray-500 max-w-[638px] text-left"
+                size="sm"
+              >
+                When enabled it allows for automatic package purchasing to
+                prevent stopping services from running if you ever ran out of
+                units. The unused value of the top-up carries over to the next
+                billing cycle.
+              </Text>
+
+              <InputToggle
+                id="top-up"
+                checked={autoTopUp}
+                onToggle={(val) => setAutoTopUp(val)}
+              />
+            </div>
+          </section>
+
+          <section className="flex flex-row border rounded px-4 py-2 justify-between items-center">
+            <Text size="sm" className="text-gray-800">
+              Changes to your subscription
+            </Text>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row justify-between items-center">
+                <span>
+                  {autoTopUp ? (
+                    <FaCheck className="text-green-500" />
+                  ) : (
+                    <FaTimes className="text-red-500" />
+                  )}
+                </span>
+                <Text type="span" size="sm" className="text-gray-800">
+                  Auto top-up
                 </Text>
               </div>
             </div>

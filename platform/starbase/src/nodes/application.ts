@@ -343,7 +343,8 @@ export default class StarbaseApplication extends DOProxy {
 
   async setExternalAppDataPackage(
     clientId: string,
-    packageType: ExternalAppDataPackageType | undefined
+    packageType: ExternalAppDataPackageType | undefined,
+    autoTopUp: boolean = false
   ): Promise<NodeMethodReturnValue<boolean, RollupError>> {
     const externalStorageUsageWriteKey = generateUsageKey(
       clientId,
@@ -409,6 +410,7 @@ export default class StarbaseApplication extends DOProxy {
         {
           packageDetails,
           status: ExternalAppDataPackageStatus.Enabled,
+          autoTopUp,
         }
       )
     } else {
@@ -428,6 +430,7 @@ export default class StarbaseApplication extends DOProxy {
         {
           packageDetails: currentPackageDefinition.packageDetails,
           status: ExternalAppDataPackageStatus.Deleting,
+          autoTopUp: false,
         }
       )
     }

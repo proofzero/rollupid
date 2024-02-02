@@ -19,6 +19,7 @@ import { CoreQueueMessageType } from '@proofzero/platform.core/src/types'
 export const SetExternalAppDataPackageInputSchema =
   AppClientIdParamSchema.extend({
     packageType: z.nativeEnum(ExternalAppDataPackageType).optional(),
+    autoTopUp: z.boolean().optional(),
   })
 type SetExternalAppDataPackageInput = z.infer<
   typeof SetExternalAppDataPackageInputSchema
@@ -31,7 +32,7 @@ export const setExternalAppDataPackage = async ({
   input: SetExternalAppDataPackageInput
   ctx: Context
 }): Promise<void> => {
-  const { packageType, clientId } = input
+  const { packageType, clientId, autoTopUp } = input
 
   const appURN = ApplicationURNSpace.componentizedUrn(clientId)
   if (!ctx.allAppURNs || !ctx.allAppURNs.includes(appURN))
@@ -74,7 +75,8 @@ export const setExternalAppDataPackage = async ({
 
   const { error } = await appDO.class.setExternalAppDataPackage(
     clientId,
-    packageType
+    packageType,
+    autoTopUp
   )
   if (error) throw getErrorCause(error)
 

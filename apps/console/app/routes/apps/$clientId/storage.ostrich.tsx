@@ -52,9 +52,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (fd.get('op')) {
       case 'enable':
         const packageType = fd.get('package') as ExternalAppDataPackageType
+        const autoTopUp = fd.get('top-up') !== '0'
         await coreClient.starbase.setExternalAppDataPackage.mutate({
           clientId,
           packageType,
+          autoTopUp,
         })
         break
       case 'disable':
@@ -172,7 +174,6 @@ export default () => {
 
   const fetcher = useFetcher()
   useEffect(() => {
-    console.log(fetcher)
     if (fetcher.state === 'idle' && fetcher.type === 'done') {
       setIsSubscriptionModalOpen(false)
     }
@@ -196,6 +197,7 @@ export default () => {
             appDetails.externalAppDataPackageDefinition?.packageDetails
               .packageType
           }
+          topUp={appDetails.externalAppDataPackageDefinition?.autoTopUp}
         />
       )}
 
