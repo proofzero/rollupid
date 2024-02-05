@@ -81,4 +81,7 @@ export interface Environment {
 
   POSTHOG_API_KEY: string
   SECRET_ZERODEV_PROJECTID: string
+
+  SECRET_STRIPE_API_KEY: string
+  SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID: string
 }
