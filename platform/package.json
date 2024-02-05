@@ -1,7 +1,9 @@
 {
   "name": "@proofzero/platform",
   "version": "0.1.0",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "private": true,
+  "license": "UNLICENSED",
   "useWorkspaces": true,
   "workspaces": [
     "*"

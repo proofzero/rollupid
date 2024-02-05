@@ -2,10 +2,10 @@
   "name": "@proofzero/types",
   "private": true,
   "version": "0.1.0",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "description": "RollupId platform types",
   "keywords": [],
-  "license": "ISC",
-  "author": "Kubelt, Inc.",
+  "license": "UNLICENSED",
   "main": "index.ts",
   "scripts": {
     "check": "run-s format:check lint:check types:check",

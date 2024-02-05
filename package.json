@@ -1,6 +1,7 @@
 {
   "name": "@proofzero/rollupid",
   "version": "0.1.0",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "private": true,
   "useWorkspaces": true,
   "workspaces": [
@@ -24,6 +25,7 @@
     "npm-run-all": "4.1.5"
   },
   "packageManager": "yarn@3.2.4",
+  "license": "UNLICENSED",
   "dependencies": {
     "@dnd-kit/core": "6.0.6",
     "@dnd-kit/sortable": "7.0.1"

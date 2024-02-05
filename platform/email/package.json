@@ -1,6 +1,9 @@
 {
   "name": "@proofzero/services.email",
   "version": "0.0.0",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
+  "private": true,
+  "license": "UNLICENSED",
   "devDependencies": {
     "@cloudflare/workers-types": "4.20231121.0",
     "@types/node": "18.15.3",
@@ -8,7 +11,6 @@
     "typescript": "5.0.4",
     "wrangler": "3.18"
   },
-  "private": true,
   "scripts": {
     "build": "wrangler publish --dry-run --outdir=dist",
     "test": "echo \"Error: no test specified\" && exit 0",

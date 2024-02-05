@@ -1,6 +1,8 @@
 {
   "name": "@proofzero/alchemy-client",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "version": "0.1.0",
+  "license": "UNLICENSED",
   "description": "A client for Alchemy calls.",
   "main": "index.ts",
   "scripts": {
@@ -13,7 +15,6 @@
     "lint:check:src": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
-  "license": "UNLICENSED",
   "devDependencies": {
     "eslint": "8.28.0",
     "eslint-plugin-tsdoc": "0.2.17",

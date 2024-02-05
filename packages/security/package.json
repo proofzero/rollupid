@@ -1,9 +1,10 @@
 {
   "name": "@proofzero/security",
   "version": "0.1.0",
-  "author": "Proof Zero Inc.",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "description": "Platform security definitions and utilities",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "build:dev": "tsc",
     "docs": "run-s 'build:*' 'docs:*'",
@@ -30,6 +31,5 @@
     "cross-env": "7.0.3",
     "psl": "1.9.0"
   },
-  "packageManager": "yarn@3.2.4",
-  "license": "UNLICENSED"
+  "packageManager": "yarn@3.2.4"
 }

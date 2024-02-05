@@ -1,9 +1,10 @@
 {
   "name": "@proofzero/platform.edges",
   "version": "0.1.0",
-  "author": "Proof Zero Inc.",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "description": "Graph edge storage and retrieval",
   "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "db:generate": "drizzle-kit generate:sqlite --schema=src/db/schema.ts",
@@ -53,6 +54,5 @@
     "urns": "0.6.0",
     "zod": "3.22.4"
   },
-  "packageManager": "yarn@3.2.4",
-  "license": "UNLICENSED"
+  "packageManager": "yarn@3.2.4"
 }
