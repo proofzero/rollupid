@@ -44,7 +44,8 @@ jobs:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: platform/emailinbounder
-          command: publish
+          command: publish --config wrangler.dev.toml --env dev
+          environment: 'dev'
           secrets: |
             SECRET_EMAIL_DISTRIBUTION_MAP
             INTERNAL_EMAIL_DISTRIBUTION_KEY
