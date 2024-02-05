@@ -33,6 +33,13 @@ export type App = {
   title: Scalars['String'];
 };
 
+export type AuthorizationIdentity = {
+  __typename?: 'AuthorizationIdentity';
+  identityURN?: Maybe<Scalars['String']>;
+  imageURL?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+};
+
 export type ConnectedAccountPropertiesUpdateInput = {
   accountURN: Scalars['String'];
   public?: InputMaybe<Scalars['Boolean']>;
@@ -107,6 +114,11 @@ export type PfpInput = {
   isToken?: InputMaybe<Scalars['Boolean']>;
 };
 
+export type Pagination = {
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
+};
+
 export type Profile = {
   __typename?: 'Profile';
   displayName?: Maybe<Scalars['String']>;
@@ -124,6 +136,7 @@ export type Query = {
   accountProfiles: Array<AccountProfile>;
   authorizedApps?: Maybe<Array<Maybe<App>>>;
   connectedAccounts?: Maybe<Array<Node>>;
+  getAuthorizedIdentities?: Maybe<Array<Maybe<AuthorizationIdentity>>>;
   getExternalAppData?: Maybe<Scalars['JSON']>;
   identityFromAlias: Scalars['String'];
   profile?: Maybe<Profile>;
@@ -142,6 +155,11 @@ export type QueryAccountProfilesArgs = {
 
 export type QueryConnectedAccountsArgs = {
   targetIdentityURN?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryGetAuthorizedIdentitiesArgs = {
+  opts: Pagination;
 };
 
 
