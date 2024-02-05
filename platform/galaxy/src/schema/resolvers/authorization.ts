@@ -19,6 +19,7 @@ import {
   ApplicationURNSpace,
 } from '@proofzero/urns/application'
 import * as jose from 'jose'
+import { BadRequestError } from '@proofzero/errors'
 
 const authorizationResolvers: Resolvers = {
   Query: {
@@ -56,9 +57,10 @@ const authorizationResolvers: Resolvers = {
         limit > 50 ||
         limit < 1
       )
-        throw new GraphQLError(
-          'Limit and offset numbers need to be provided, with the limit beging between 1 and 50'
-        )
+        throw new BadRequestError({
+          message:
+            'Limit and offset numbers need to be provided, with the limit beging between 1 and 50',
+        })
 
       let clientIdFromApiKey
       try {
@@ -68,7 +70,9 @@ const authorizationResolvers: Resolvers = {
           ApplicationURNSpace.nss(apiKeyApplicationURN).split('/')[1]
       } catch (e) {
         console.error('Error parsing clientId', e)
-        throw new GraphQLError('Could not retrieve clientId from API key.')
+        throw new BadRequestError({
+          message: 'Could not retrieve clientId from API key.',
+        })
       }
 
       const edgeResults =
