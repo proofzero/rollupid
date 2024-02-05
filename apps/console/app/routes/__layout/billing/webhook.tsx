@@ -6,7 +6,6 @@ import Stripe from 'stripe'
 import createCoreClient from '@proofzero/platform-clients/core'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { reconcileSubscriptions } from '~/services/billing/stripe'
 import { InternalServerError } from '@proofzero/errors'
 import { type AccountURN } from '@proofzero/urns/account'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
@@ -16,6 +15,7 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
+import { reconcileSubscriptions } from '@proofzero/utils/billing/stripe'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -66,7 +66,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             billingURL: `${context.env.CONSOLE_URL}/billing`,
             settingsURL: `${context.env.CONSOLE_URL}`,
           },
-          context.env
+          context.env.SECRET_STRIPE_API_KEY,
+          context.env.SECRET_STRIPE_PRO_PLAN_ID,
+          context.env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID
         )
 
         break

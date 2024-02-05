@@ -51,7 +51,6 @@ import {
   process3DSecureCard,
 } from '~/utils/billing'
 import Stripe from 'stripe'
-import plans from '~/utils/plans'
 import {
   getEmailDropdownItems,
   getEmailIcon,
@@ -63,6 +62,7 @@ import {
 import { redirectToPassport } from '~/utils'
 import { HiOutlineMail } from 'react-icons/hi'
 import { AccountURN } from '@proofzero/urns/account'
+import plans from '@proofzero/utils/billing/plans'
 
 type GroupAppTransferLoaderData = {
   connectedEmails: DropdownSelectListItem[]

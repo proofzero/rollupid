@@ -1,5 +1,4 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import plans, { type PlanDetails } from '~/utils/plans'
 import { Button } from '@proofzero/design-system'
 import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
 import {
@@ -53,6 +52,7 @@ import { PlanFeatures } from '~/components/Billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
+import plans, { PlanDetails } from '@proofzero/utils/billing/plans'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {

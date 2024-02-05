@@ -50,7 +50,6 @@ import {
   process3DSecureCard,
 } from '~/utils/billing'
 import Stripe from 'stripe'
-import plans from '~/utils/plans'
 import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import {
   Dropdown,
@@ -63,6 +62,7 @@ import { appDetailsProps } from '~/types'
 import { GroupAppTransferInfo } from '~/routes/api/group-app-transfer-info'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import dangerVector from '~/images/danger.svg'
+import plans from '@proofzero/utils/billing/plans'
 
 type GroupModel = {
   name: string

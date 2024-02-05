@@ -45,9 +45,12 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { IdentityURN } from '@proofzero/urns/identity'
-import { cancelSubscription, changePriceID } from '~/services/billing/stripe'
 import Stripe from 'stripe'
 import { packageTypeToPriceID } from '~/utils/external-app-data'
+import {
+  cancelSubscription,
+  changePriceID,
+} from '@proofzero/utils/billing/stripe'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {

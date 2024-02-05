@@ -6,8 +6,8 @@ import {
   requireJWT,
 } from '~/utilities/session.server'
 
-import { voidInvoice } from '~/services/billing/stripe'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
+import { voidInvoice } from '@proofzero/utils/billing/stripe'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {

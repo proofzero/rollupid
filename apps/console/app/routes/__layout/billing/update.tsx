@@ -11,7 +11,6 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { reconcileSubscriptions } from '~/services/billing/stripe'
 import { type IdentityURN } from '@proofzero/urns/identity'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { ServicePlanType } from '@proofzero/types/billing'
@@ -21,6 +20,7 @@ import {
   IdentityGroupURN,
 } from '@proofzero/urns/identity-group'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
+import { reconcileSubscriptions } from '@proofzero/utils/billing/stripe'
 
 /**
  * WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user
@@ -82,7 +82,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           billingURL: `${context.env.CONSOLE_URL}/billing`,
           settingsURL: `${context.env.CONSOLE_URL}`,
         },
-        context.env
+        context.env.SECRET_STRIPE_API_KEY,
+        context.env.SECRET_STRIPE_PRO_PLAN_ID,
+        context.env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID
       )
 
       // Then based on reconciled result we update the plan

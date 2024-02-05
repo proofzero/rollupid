@@ -1,9 +1,3 @@
-import {
-  createSubscription,
-  getInvoices,
-  getUpcomingInvoices,
-  updateSubscription,
-} from '~/services/billing/stripe'
 import type { StripePaymentData } from '@proofzero/platform/billing/src/types'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { type PaymentIntent, loadStripe } from '@stripe/stripe-js'
@@ -14,6 +8,12 @@ import { type Env } from 'bindings'
 import Stripe from 'stripe'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
+import {
+  createSubscription,
+  getInvoices,
+  getUpcomingInvoices,
+  updateSubscription,
+} from '@proofzero/utils/billing/stripe'
 
 export type StripeInvoice = {
   id: string

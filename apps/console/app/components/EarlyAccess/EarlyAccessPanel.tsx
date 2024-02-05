@@ -5,11 +5,11 @@ import type { IdentityURN } from '@proofzero/urns/identity'
 import ContactUs from '../ContactUs'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { isPlanGuarded } from '~/utils/planGate'
-import plans from '~/utils/plans'
 import _ from 'lodash'
 import { TbLock } from 'react-icons/tb'
 import { Button } from '@proofzero/design-system'
 import { NavLink } from '@remix-run/react'
+import plans from '@proofzero/utils/billing/plans'
 
 type EarlyAccessPanelProps = {
   clientID: string

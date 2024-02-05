@@ -7,7 +7,6 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { accessCustomerPortal } from '~/services/billing/stripe'
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 import {
   IdentityGroupURNSpace,
@@ -15,6 +14,7 @@ import {
 } from '@proofzero/urns/identity-group'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
+import { accessCustomerPortal } from '@proofzero/utils/billing/stripe'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -64,7 +64,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         customerID,
         returnURL,
       },
-      context.env
+      context.env.SECRET_STRIPE_API_KEY
     )
   }
 )

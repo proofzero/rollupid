@@ -9,9 +9,8 @@ import {
 } from '@proofzero/urns/identity-group'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { redirect } from '@remix-run/cloudflare'
-import { type Env } from 'bindings'
 import Stripe from 'stripe'
-import plans from '~/utils/plans'
+import plans from './plans'
 
 type CreateCustomerParams = {
   email: string
@@ -56,9 +55,9 @@ type GetInvoicesParams = {
 
 export const createCustomer = async (
   { email, name, URN }: CreateCustomerParams,
-  env: Env
+  SECRET_STRIPE_API_KEY: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -75,9 +74,9 @@ export const createCustomer = async (
 
 export const updateCustomer = async (
   { customerID, email, name }: UpdateCustomerParams,
-  env: Env
+  SECRET_STRIPE_API_KEY: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -91,9 +90,9 @@ export const updateCustomer = async (
 
 export const accessCustomerPortal = async (
   { customerID, returnURL }: CustomerPortalParams,
-  env: Env
+  SECRET_STRIPE_API_KEY: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -107,9 +106,9 @@ export const accessCustomerPortal = async (
 
 export const updatePaymentMethod = async (
   { customerID, returnURL }: CustomerPortalParams,
-  env: Env
+  SECRET_STRIPE_API_KEY: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -243,9 +242,9 @@ export const updateSubscriptionMetadata = async (
     id: string
     metadata: SubscriptionMetadata
   },
-  env: Env
+  SECRET_STRIPE_API_KEY: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -312,35 +311,6 @@ export const voidInvoice = async (
   await stripeClient.invoices.voidInvoice(invoiceId)
 }
 
-export const createInvoice = async (
-  stripeClient: Stripe,
-  customerID: string,
-  subscriptionID: string,
-  priceID: string,
-  autopay: boolean = false,
-  metadata?: Stripe.MetadataParam
-) => {
-  let invoice = await stripeClient.invoices.create({
-    customer: customerID,
-    subscription: subscriptionID,
-    metadata,
-  })
-
-  await stripeClient.invoiceItems.create({
-    customer: customerID,
-    price: priceID,
-    invoice: invoice.id,
-  })
-
-  if (autopay) {
-    await stripeClient.invoices.pay(invoice.id)
-  }
-
-  invoice = await stripeClient.invoices.retrieve(invoice.id)
-
-  return invoice
-}
-
 export const reconcileSubscriptions = async (
   {
     subscriptionID,
@@ -355,9 +325,11 @@ export const reconcileSubscriptions = async (
     billingURL: string
     settingsURL: string
   },
-  env: Env
+  SECRET_STRIPE_API_KEY: string,
+  SECRET_STRIPE_PRO_PLAN_ID: string,
+  SECRET_STRIPE_GROUP_SEAT_PLAN_ID: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -379,7 +351,7 @@ export const reconcileSubscriptions = async (
 
   if (activeSub && paidInvoice) {
     const priceIdToPlanTypeDict = {
-      [env.SECRET_STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
+      [SECRET_STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
     }
 
     const { email: billingEmail } =
@@ -445,7 +417,7 @@ export const reconcileSubscriptions = async (
   if (activeSub) {
     if (IdentityGroupURNSpace.is(URN)) {
       const seatQuantities = mappedSubItems.find(
-        (msu) => msu.priceID === env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID
+        (msu) => msu.priceID === SECRET_STRIPE_GROUP_SEAT_PLAN_ID
       )
 
       if (seatQuantities) {

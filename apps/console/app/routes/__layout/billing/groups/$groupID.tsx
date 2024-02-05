@@ -26,7 +26,6 @@ import _ from 'lodash'
 import { process3DSecureCard } from '~/utils/billing'
 import { IoWarningOutline } from 'react-icons/io5'
 import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
-import plans from '../../../../utils/plans'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { PlanCard } from '~/components/Billing'
 import {
@@ -40,6 +39,7 @@ import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonr
 import { AppLoaderData } from '~/root'
 import { GroupSeatingCard } from '~/components/Billing/seating'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
+import plans from '@proofzero/utils/billing/plans'
 
 export const loader = billingLoader
 export const action = billingAction
