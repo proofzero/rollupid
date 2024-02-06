@@ -45,10 +45,7 @@ import { KeyPairSerialized } from '@proofzero/packages/types/application'
 import { generateUsageKey, UsageCategory } from '@proofzero/utils/usage'
 import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
 import { NodeMethodReturnValue } from '@proofzero/types/node'
-import {
-  ExternalStorageAlreadyDisabledError,
-  ExternalStorageAlreadyEnabledError,
-} from '../errors'
+import { ExternalStorageAlreadyDisabledError } from '../errors'
 import { ExternalAppDataPackageStatus } from '../jsonrpc/validators/externalAppDataPackageDefinition'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
