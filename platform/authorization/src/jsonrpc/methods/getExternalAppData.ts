@@ -59,11 +59,21 @@ export const getExternalAppDataMethod = async ({
   const { numValue: externalStorageReadNumVal, metadata } =
     await getStoredUsageWithMetadata(ctx.env.UsageKV, externalStorageReadKey)
 
-  if (externalStorageReadNumVal >= metadata.limit) {
-    throw new BadRequestError({
-      message: 'external storage read limit reached',
+  const appDO = await getApplicationNodeByClientId(
+    clientId,
+    ctx.env.StarbaseApp
+  )
+  const { externalAppDataPackageDefinition } = await appDO.class.getDetails()
+  if (!externalAppDataPackageDefinition) {
+    throw new InternalServerError({
+      message: 'external app data package not found',
     })
-  } else if (externalStorageReadNumVal >= 0.8 * metadata.limit) {
+  }
+
+  if (
+    externalStorageReadNumVal >= 0.8 * metadata.limit &&
+    externalAppDataPackageDefinition.autoTopUp
+  ) {
     let ownerNode
     if (IdentityURNSpace.is(identityURN)) {
       ownerNode = initIdentityNodeByName(identityURN, ctx.env.Identity)
@@ -86,38 +96,34 @@ export const getExternalAppDataMethod = async ({
       })
     }
 
-    const appDO = await getApplicationNodeByClientId(
-      clientId,
-      ctx.env.StarbaseApp
-    )
-    const { externalAppDataPackageDefinition } = await appDO.class.getDetails()
-    if (!externalAppDataPackageDefinition) {
-      throw new InternalServerError({
-        message: 'external app data package not found',
-      })
-    }
-
-    if (externalAppDataPackageDefinition.autoTopUp) {
-      await createInvoice(
-        ctx.env.SECRET_STRIPE_API_KEY,
-        customerID,
-        externalAppDataPackageDefinition.packageDetails.subscriptionID,
-        ctx.env.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID,
-        true
-      )
-    }
-  }
-
-  const [externalAppData] = await Promise.all([
-    node.storage.get('externalAppData'),
-    ctx.env.UsageKV.put(
+    await ctx.env.UsageKV.put(
       externalStorageReadKey,
       `${externalStorageReadNumVal + 1}`,
       {
         metadata,
       }
-    ),
-  ])
+    )
 
-  return externalAppData
+    await createInvoice(
+      ctx.env.SECRET_STRIPE_API_KEY,
+      customerID,
+      externalAppDataPackageDefinition.packageDetails.subscriptionID,
+      ctx.env.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID,
+      true
+    )
+  } else if (externalStorageReadNumVal >= metadata.limit) {
+    throw new BadRequestError({
+      message: 'external storage read limit reached',
+    })
+  } else {
+    await ctx.env.UsageKV.put(
+      externalStorageReadKey,
+      `${externalStorageReadNumVal + 1}`,
+      {
+        metadata,
+      }
+    )
+  }
+
+  return node.storage.get('externalAppData')
 }
