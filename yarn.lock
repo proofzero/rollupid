@@ -6596,6 +6596,7 @@ __metadata:
     autoprefixer: latest
     chromatic: 6.11.4
     classnames: 2.3.2
+    connectkit: 1.5.3
     cra-template-typescript: 1.2.0
     cross-env: 7.0.3
     css-loader: 6.7.1
@@ -6628,6 +6629,8 @@ __metadata:
     style-loader: 3.3.1
     styled-components: 5.3.6
     tailwindcss: 3.3.3
+    viem: 1.0.0
+    wagmi: 1.4.12
     webpack: 5.75.0
   languageName: unknown
   linkType: soft
