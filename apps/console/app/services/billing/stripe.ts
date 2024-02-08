@@ -209,7 +209,6 @@ export const changePriceID = async ({
       },
     ],
     payment_behavior: 'pending_if_incomplete',
-    expand: ['latest_invoice.payment_intent'],
   })
 
   return subscription
