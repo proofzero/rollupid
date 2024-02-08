@@ -43,7 +43,6 @@ import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constan
 export enum TxProduct {
   Entitlements = 'entitlements',
   Seats = 'seats',
-  ExternalAppStorage = 'external_app_storage',
 }
 
 export type LoaderData = {
@@ -149,9 +148,7 @@ export const loader = getRollupReqFunctionErrorWrapper(
     const connectedAccounts = await coreClient.identity.getAccounts.query({
       URN: targetURN,
     })
-    const connectedEmails = getEmailDropdownItems(
-      connectedAccounts || undefined
-    )
+    const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
     const spd = await coreClient.billing.getStripePaymentData.query({
       URN: targetURN,
