@@ -43,6 +43,12 @@ export const patchProfileFieldsMethod = async ({
     })
   }
 
+  if (!IdentityURNSpace.is(identityGraphNode.baseUrn)) {
+    throw new InternalServerError({
+      message: 'Identity graph node URN is invalid',
+    })
+  }
+
   if (!profile.primaryAccountURN) {
     throw new InternalServerError({
       message: 'Primary account URN not found',
@@ -51,6 +57,11 @@ export const patchProfileFieldsMethod = async ({
   if (!identityGraphNode.qc.primaryAccountURN) {
     throw new InternalServerError({
       message: 'Identity graph node primary account URN not found',
+    })
+  }
+  if (!AccountURNSpace.is(identityGraphNode.qc.primaryAccountURN)) {
+    throw new InternalServerError({
+      message: 'Identity graph node primary account URN is invalid',
     })
   }
 

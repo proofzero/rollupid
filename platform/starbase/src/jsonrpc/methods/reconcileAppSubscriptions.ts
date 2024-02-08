@@ -49,6 +49,7 @@ export const reconcileAppSubscriptions = async ({
   const reconciledApps = []
   const apps = []
   for (const edge of edges) {
+    if (!ApplicationURNSpace.is(edge.dst.baseUrn)) continue
     const clientID = ApplicationURNSpace.decode(edge.dst.baseUrn)
     const appDO = await getApplicationNodeByClientId(
       clientID,

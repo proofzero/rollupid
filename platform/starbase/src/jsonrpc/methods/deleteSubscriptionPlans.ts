@@ -2,7 +2,10 @@ import { z } from 'zod'
 import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { ApplicationURNSpace } from '@proofzero/urns/application'
+import {
+  type ApplicationURN,
+  ApplicationURNSpace,
+} from '@proofzero/urns/application'
 import { EDGE_PAYS_APP } from '@proofzero/types/graph'
 import { IdentityRefURNValidator } from '@proofzero/platform-middleware/inputValidators'
 
@@ -32,7 +35,10 @@ export const deleteSubscriptionPlans = async ({
   })
 
   const appURNs = edges.map((edge) => edge.dst.baseUrn)
-  const clientIds = appURNs.map((appURN) => ApplicationURNSpace.decode(appURN))
+
+  const clientIds = appURNs.map((appURN) =>
+    ApplicationURNSpace.decode(appURN as ApplicationURN)
+  )
 
   if (appURNs.length !== 0) {
     await Promise.all([

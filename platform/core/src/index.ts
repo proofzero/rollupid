@@ -17,7 +17,7 @@ import { initAuthorizationNodeByName } from '@proofzero/platform.authorization/s
 import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/nodes/application'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 import { EDGE_AUTHORIZES } from '@proofzero/platform.authorization/src/constants'
-import { IdentityURNSpace } from '@proofzero/urns/identity'
+import { IdentityURNSpace, type IdentityURN } from '@proofzero/urns/identity'
 
 export { Account } from '@proofzero/platform.account'
 export { Identity, IdentityGroup } from '@proofzero/platform.identity'
@@ -111,7 +111,9 @@ export default {
                 type: CoreQueueMessageType.ExternalAppDataDelReq,
                 data: {
                   appID: clientID,
-                  athID: IdentityURNSpace.decode(edge.src.baseUrn),
+                  athID: IdentityURNSpace.decode(
+                    edge.src.baseUrn as IdentityURN
+                  ),
                 },
               },
             }))
