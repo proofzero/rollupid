@@ -67,11 +67,15 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
 
           <section className="flex flex-col gap-4">
             <div>
-              <Text size="xs" className="text-gray-500 uppercase text-left">
+              <Text
+                size="xs"
+                className="text-gray-500 uppercase text-left mb-2"
+              >
                 Choose Package
               </Text>
               <div className="text-left flex flex-row items-center gap-1.5">
                 <Button
+                  disabled={subscriptionFetcher.state !== 'idle'}
                   btnType={
                     selectedPackage === ExternalAppDataPackageType.STARTER
                       ? 'secondary'
@@ -87,6 +91,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
                   }
                 </Button>
                 <Button
+                  disabled={subscriptionFetcher.state !== 'idle'}
                   btnType={
                     selectedPackage === ExternalAppDataPackageType.SCALE
                       ? 'secondary'
@@ -126,7 +131,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
           </section>
 
           <section className="flex flex-col">
-            <Text size="xs" className="text-gray-500 uppercase text-left">
+            <Text size="xs" className="text-gray-500 uppercase text-left mb-2">
               Auto Top-Up
             </Text>
 
@@ -145,6 +150,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
                 id="top-up"
                 checked={autoTopUp}
                 onToggle={(val) => setAutoTopUp(val)}
+                disabled={subscriptionFetcher.state !== 'idle'}
               />
             </div>
           </section>
@@ -174,7 +180,11 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
             <Button btnType="secondary-alt" onClick={() => onClose()}>
               Close
             </Button>
-            <Button btnType="primary-alt" type="submit">
+            <Button
+              btnType="primary-alt"
+              type="submit"
+              disabled={subscriptionFetcher.state !== 'idle'}
+            >
               Change Subscription
             </Button>
           </footer>
