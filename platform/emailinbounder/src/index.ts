@@ -70,8 +70,13 @@ const relay = async (message: string, env: Environment) => {
     if (!sourceEmail) continue
 
     const from: MailChannelAddress = {
-      name: email.from.name,
+      name: `Rollup Hidden email from ${email.from.name}`,
       email: recipient.address,
+    }
+
+    const replyTo: MailChannelAddress = {
+      name: email.from.name,
+      email: email.from.address,
     }
 
     const to: MailChannelAddress[] = [
@@ -80,7 +85,7 @@ const relay = async (message: string, env: Environment) => {
         email: sourceEmail,
       },
     ]
-    await send(email, from, to, dkim)
+    await send(email, from, to, replyTo, dkim)
   }
 }
 
@@ -88,6 +93,7 @@ const send = async (
   email: Email,
   from: MailChannelAddress,
   to: MailChannelAddress[],
+  replyTo: MailChannelAddress,
   dkim: DKIM
 ) => {
   const { subject } = email
@@ -121,6 +127,7 @@ const send = async (
         subject,
         content,
         personalizations,
+        reply_to: replyTo,
       },
       null,
       2
