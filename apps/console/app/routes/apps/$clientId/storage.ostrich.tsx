@@ -31,6 +31,7 @@ import dangerVector from '~/images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import AppDataStorageModal from '~/components/AppDataStorageModal/AppDataStorageModal'
 import { Menu, Transition } from '@headlessui/react'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -181,6 +182,7 @@ export default () => {
 
   return (
     <>
+      {fetcher.state !== 'idle' && <Loader />}
       {isCancelModalOpen && (
         <ConfirmCancelModal
           isOpen={isCancelModalOpen}
