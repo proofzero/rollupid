@@ -43,12 +43,9 @@ import {
 } from '@proofzero/types/billing'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
 import { generateUsageKey, UsageCategory } from '@proofzero/utils/usage'
-import ExternalAppDataPackages from '../utils/externalAppDataPackages'
+import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
 import { NodeMethodReturnValue } from '@proofzero/types/node'
-import {
-  ExternalStorageAlreadyDisabledError,
-  ExternalStorageAlreadyEnabledError,
-} from '../errors'
+import { ExternalStorageAlreadyDisabledError } from '../errors'
 import { ExternalAppDataPackageStatus } from '../jsonrpc/validators/externalAppDataPackageDefinition'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
@@ -343,7 +340,8 @@ export default class StarbaseApplication extends DOProxy {
 
   async setExternalAppDataPackage(
     clientId: string,
-    packageType: ExternalAppDataPackageType | undefined
+    packageType: ExternalAppDataPackageType | undefined,
+    autoTopUp = false
   ): Promise<NodeMethodReturnValue<boolean, RollupError>> {
     const externalStorageUsageWriteKey = generateUsageKey(
       clientId,
@@ -370,9 +368,7 @@ export default class StarbaseApplication extends DOProxy {
         : undefined
 
     if (packageDetails) {
-      if (externalStorageWrites && externalStorageReads) {
-        return { error: ExternalStorageAlreadyEnabledError }
-      } else if (!externalStorageWrites || !externalStorageReads) {
+      if (!externalStorageWrites || !externalStorageReads) {
         console.warn(
           `external storage reads or writes for ${clientId} in a bad state; ${externalStorageWrites} writes and ${externalStorageReads} reads.`
         )
@@ -411,6 +407,7 @@ export default class StarbaseApplication extends DOProxy {
         {
           packageDetails,
           status: ExternalAppDataPackageStatus.Enabled,
+          autoTopUp,
         }
       )
     } else {
@@ -430,6 +427,7 @@ export default class StarbaseApplication extends DOProxy {
         {
           packageDetails: currentPackageDefinition.packageDetails,
           status: ExternalAppDataPackageStatus.Deleting,
+          autoTopUp: false,
         }
       )
     }

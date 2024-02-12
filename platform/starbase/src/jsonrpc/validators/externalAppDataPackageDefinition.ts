@@ -16,4 +16,5 @@ export const ExternalAppDataPackageDetailsSchema = z.object({
 export const ExternalAppDataPackageDefinitionSchema = z.object({
   packageDetails: ExternalAppDataPackageDetailsSchema,
   status: z.nativeEnum(ExternalAppDataPackageStatus),
+  autoTopUp: z.boolean(),
 })

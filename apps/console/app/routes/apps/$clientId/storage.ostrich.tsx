@@ -1,4 +1,9 @@
-import { Form, useOutletContext, useTransition } from '@remix-run/react'
+import {
+  Form,
+  useFetcher,
+  useOutletContext,
+  useTransition,
+} from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -12,16 +17,21 @@ import classNames from 'classnames'
 import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 import {
+  HiDotsVertical,
+  HiOutlinePencilAlt,
   HiOutlineShoppingCart,
   HiOutlineTrash,
   HiOutlineX,
 } from 'react-icons/hi'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
-import { useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import dangerVector from '~/images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import AppDataStorageModal from '~/components/AppDataStorageModal/AppDataStorageModal'
+import { Menu, Transition } from '@headlessui/react'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -42,9 +52,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const fd = await request.formData()
     switch (fd.get('op')) {
       case 'enable':
+        const packageType = fd.get('package') as ExternalAppDataPackageType
+        const autoTopUp = fd.get('top-up') !== '0'
         await coreClient.starbase.setExternalAppDataPackage.mutate({
           clientId,
-          packageType: ExternalAppDataPackageType.STARTER,
+          packageType,
+          autoTopUp,
         })
         break
       case 'disable':
@@ -157,13 +170,39 @@ export default () => {
     appDetails: appDetailsProps
   }>()
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
+
+  const fetcher = useFetcher()
+  useEffect(() => {
+    if (fetcher.state === 'idle' && fetcher.type === 'done') {
+      setIsSubscriptionModalOpen(false)
+    }
+  }, [fetcher])
 
   return (
     <>
-      {isModalOpen && (
-        <ConfirmCancelModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+      {fetcher.state !== 'idle' && <Loader />}
+      {isCancelModalOpen && (
+        <ConfirmCancelModal
+          isOpen={isCancelModalOpen}
+          setIsOpen={setIsCancelModalOpen}
+        />
       )}
+      {isSubscriptionModalOpen && (
+        <AppDataStorageModal
+          isOpen={isSubscriptionModalOpen}
+          onClose={() => setIsSubscriptionModalOpen(false)}
+          subscriptionFetcher={fetcher}
+          clientID={appDetails.clientId!}
+          currentPackage={
+            appDetails.externalAppDataPackageDefinition?.packageDetails
+              .packageType
+          }
+          topUp={appDetails.externalAppDataPackageDefinition?.autoTopUp}
+        />
+      )}
+
       <section className="flex flex-col space-y-5">
         <div className="flex flex-row items-center space-x-3">
           <Text size="2xl" weight="semibold" className="text-gray-900">
@@ -213,30 +252,90 @@ export default () => {
               ExternalAppDataPackageStatus.Deleting && (
               <>
                 {!Boolean(appDetails.externalAppDataPackageDefinition) && (
-                  <Form method="post">
-                    <input type="hidden" name="op" value="enable" />
-                    <Button
-                      btnType="primary-alt"
-                      className="flex flex-row items-center gap-3"
-                      type="submit"
-                    >
-                      <HiOutlineShoppingCart className="w-3.5 h-3.5" />
-                      <Text>Purchase Package</Text>
-                    </Button>
-                  </Form>
-                )}
-                {Boolean(appDetails.externalAppDataPackageDefinition) && (
                   <Button
-                    btnType="dangerous-alt"
+                    btnType="primary-alt"
                     className="flex flex-row items-center gap-3"
                     type="submit"
                     onClick={() => {
-                      setIsModalOpen(true)
+                      setIsSubscriptionModalOpen(true)
                     }}
                   >
-                    <HiOutlineTrash className="w-3.5 h-3.5" />
-                    <Text>Cancel Service</Text>
+                    <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                    <Text>Purchase Package</Text>
                   </Button>
+                )}
+                {Boolean(appDetails.externalAppDataPackageDefinition) && (
+                  <Menu>
+                    <Menu.Button>
+                      <div
+                        className="w-8 h-8 flex justify-center items-center cursor-pointer
+          hover:bg-gray-100 hover:rounded-[6px]"
+                      >
+                        <HiDotsVertical className="text-lg text-gray-400" />
+                      </div>
+                    </Menu.Button>
+
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items
+                        className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100
+          rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y
+           divide-gray-100"
+                      >
+                        <div className="p-1 ">
+                          <div
+                            onClick={() => {
+                              setIsSubscriptionModalOpen(true)
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <Menu.Item
+                              as="div"
+                              className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                  hover:rounded-[6px] hover:bg-gray-100"
+                            >
+                              <HiOutlinePencilAlt className="text-xl font-normal text-gray-400" />
+                              <Text
+                                size="sm"
+                                weight="normal"
+                                className="text-gray-700"
+                              >
+                                Edit Package
+                              </Text>
+                            </Menu.Item>
+                          </div>
+                        </div>
+
+                        <div className="p-1">
+                          <Menu.Item
+                            as="div"
+                            className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                hover:rounded-[6px] hover:bg-gray-100 "
+                            onClick={() => {
+                              setIsCancelModalOpen(true)
+                            }}
+                          >
+                            <HiOutlineTrash className="text-xl font-normal text-red-500" />
+
+                            <Text
+                              size="sm"
+                              weight="normal"
+                              className="text-red-500"
+                            >
+                              Cancel Service
+                            </Text>
+                          </Menu.Item>
+                        </div>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
                 )}
               </>
             )}
