@@ -15,3 +15,4 @@ services = [{ binding = "Core", service = "core-next" }]
 [env.next.vars]
 INTERNAL_RELAY_DKIM_DOMAIN = "rollup.email"
 INTERNAL_RELAY_DKIM_SELECTOR = "mailchannels"
+INTERNAL_EMAIL_DISTRIBUTION_KEY = "next"

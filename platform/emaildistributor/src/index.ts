@@ -1,5 +1,6 @@
 import type { Environment } from './types'
 import type { CloudflareEmailMessage } from '@proofzero/packages/types/email'
+import { RelayRecipientHeader } from '@proofzero/types/headers'
 
 export default {
   async email(message: CloudflareEmailMessage, env: Environment) {
@@ -31,7 +32,9 @@ export default {
       console.info(
         `Forwarding to env suffix ${addressEnvSuffix} for ${message.to}`
       )
-      await message.forward(targetEnvEmail)
+      const newHeaders = new Headers(message.headers)
+      newHeaders.append(RelayRecipientHeader, message.to)
+      await message.forward(targetEnvEmail, newHeaders)
     }
   },
 }
