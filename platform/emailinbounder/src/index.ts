@@ -1,6 +1,7 @@
 import { CloudflareEmailMessage } from '@proofzero/packages/types/email'
 import type { Environment } from './types'
 import createCoreClient from '@proofzero/platform-clients/core'
+import { RelayRecipientHeader } from '@proofzero/types/headers'
 
 import {
   generateTraceContextHeaders,
@@ -20,7 +21,15 @@ export default {
       ;({ done, value } = await reader.read())
     }
 
-    return relay(content, env)
+    const recipient = message.headers.get(RelayRecipientHeader)
+    if (!recipient) console.error('Received email without the expected headers')
+    else if (
+      !recipient.endsWith(
+        `.${env.INTERNAL_EMAIL_DISTRIBUTION_KEY}@${env.INTERNAL_RELAY_DKIM_DOMAIN}`
+      )
+    )
+      console.warn('Received email for wrong environment')
+    else return relay(recipient, content, env)
   },
 }
 
@@ -42,7 +51,7 @@ interface DKIM {
   dkim_private_key: string
 }
 
-const relay = async (message: string, env: Environment) => {
+const relay = async (recipient: string, message: string, env: Environment) => {
   const postalMime = new PostalMime()
   const email = await postalMime.parse(message)
 
@@ -52,41 +61,30 @@ const relay = async (message: string, env: Environment) => {
     dkim_private_key: env.SECRET_RELAY_DKIM_PRIVATE_KEY,
   }
 
-  const recipients = new Array<Address>()
-    .concat(email.to || [])
-    .concat(email.cc || [])
-    .filter((recipient) =>
-      recipient.address.endsWith(
-        `.${env.INTERNAL_EMAIL_DISTRIBUTION_KEY}@${env.INTERNAL_RELAY_DKIM_DOMAIN}`
-      )
-    )
+  const coreClient = getCoreClient(env)
+  const { sourceEmail, nickname } =
+    await coreClient.account.getSourceFromMaskedAddress.query({
+      maskedEmail: recipient,
+    })
+  if (!sourceEmail) return
 
-  for (const recipient of recipients) {
-    const coreClient = getCoreClient(env)
-    const { sourceEmail, nickname } =
-      await coreClient.account.getSourceFromMaskedAddress.query({
-        maskedEmail: recipient.address,
-      })
-    if (!sourceEmail) continue
-
-    const from: MailChannelAddress = {
-      name: `Rollup Hidden email from ${email.from.name}`,
-      email: recipient.address,
-    }
-
-    const replyTo: MailChannelAddress = {
-      name: email.from.name,
-      email: email.from.address,
-    }
-
-    const to: MailChannelAddress[] = [
-      {
-        name: nickname,
-        email: sourceEmail,
-      },
-    ]
-    await send(email, from, to, replyTo, dkim)
+  const from: MailChannelAddress = {
+    name: `Rollup Hidden email from ${email.from.name}`,
+    email: recipient,
   }
+
+  const replyTo: MailChannelAddress = {
+    name: email.from.name,
+    email: email.from.address,
+  }
+
+  const to: MailChannelAddress[] = [
+    {
+      name: nickname,
+      email: sourceEmail,
+    },
+  ]
+  await send(email, from, to, replyTo, dkim)
 }
 
 const send = async (
