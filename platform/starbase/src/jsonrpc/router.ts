@@ -158,6 +158,11 @@ import {
   ExternalAppDataUsageResetInputSchema,
   externalAppDataUsageResetMethod,
 } from './methods/externalAppDataUsageReset'
+import {
+  getAppExternalDataUsage,
+  GetAppExternalDataUsageInputSchema,
+  GetAppExternalDataUsageOutputSchema,
+} from './methods/getAppExternalDataUsage'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -447,6 +452,15 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(ExternalAppDataUsageResetInputSchema)
     .mutation(externalAppDataUsageResetMethod),
+  getAppExternalDataUsage: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(GetAppExternalDataUsageInputSchema)
+    .output(GetAppExternalDataUsageOutputSchema)
+    .query(getAppExternalDataUsage),
 })
 
 export type StarbaseRouter = typeof appRouter
