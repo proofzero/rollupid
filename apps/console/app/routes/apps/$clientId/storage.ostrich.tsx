@@ -1,13 +1,14 @@
 import {
   Form,
   useFetcher,
+  useLoaderData,
   useOutletContext,
   useTransition,
 } from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction } from '@remix-run/cloudflare'
+import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import {
@@ -51,6 +52,28 @@ import {
   cancelSubscription,
   changePriceID,
 } from '@proofzero/utils/billing/stripe'
+import { GetAppExternalDataUsageOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppExternalDataUsage'
+
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const jwt = await requireJWT(request, context.env)
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const coreClient = createCoreClient(context.env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const appExternalStorageUsage =
+      await coreClient.starbase.getAppExternalDataUsage.query({
+        clientId: params.clientId as string,
+      })
+
+    return json({
+      appExternalStorageUsage,
+    })
+  }
+)
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -262,6 +285,10 @@ export default () => {
     appDetails: appDetailsProps
   }>()
 
+  const { appExternalStorageUsage } = useLoaderData<{
+    appExternalStorageUsage: GetAppExternalDataUsageOutput
+  }>()
+
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
 
@@ -295,6 +322,8 @@ export default () => {
           currentPrice={
             appDetails.externalAppDataPackageDefinition?.packageDetails.price
           }
+          reads={appExternalStorageUsage?.readUsage}
+          writes={appExternalStorageUsage?.writeUsage}
         />
       )}
 

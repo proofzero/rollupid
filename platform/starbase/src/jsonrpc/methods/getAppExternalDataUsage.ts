@@ -23,7 +23,7 @@ export const GetAppExternalDataUsageOutputSchema = z
 type GetAppExternalDataUsageInput = z.infer<
   typeof GetAppExternalDataUsageInputSchema
 >
-type GetAppExternalDataUsageOutput = z.infer<
+export type GetAppExternalDataUsageOutput = z.infer<
   typeof GetAppExternalDataUsageOutputSchema
 >
 
