@@ -15,7 +15,7 @@ type AppDataStorageModalProps = {
   subscriptionFetcher: FetcherWithComponents<any>
   currentPackage?: ExternalAppDataPackageType
   topUp?: boolean
-  currentCost?: number
+  currentPrice?: number
   clientID: string
 }
 
@@ -25,7 +25,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
   subscriptionFetcher,
   currentPackage,
   topUp = false,
-  currentCost = 0,
+  currentPrice = 0,
   clientID,
 }) => {
   const [selectedPackage, setSelectedPackage] =
@@ -171,17 +171,17 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
                     weight="semibold"
                     className="text-gray-900"
                   >
-                    {currentCost
+                    {currentPrice
                       ? ExternalAppDataPackages[selectedPackage].price -
-                          currentCost >=
+                          currentPrice >=
                         0
                         ? `+$${
                             ExternalAppDataPackages[selectedPackage].price -
-                            currentCost
+                            currentPrice
                           }`
                         : `-$${Math.abs(
                             ExternalAppDataPackages[selectedPackage].price -
-                              currentCost
+                              currentPrice
                           )}`
                       : `+$${ExternalAppDataPackages[selectedPackage].price}`}
                   </Text>{' '}
