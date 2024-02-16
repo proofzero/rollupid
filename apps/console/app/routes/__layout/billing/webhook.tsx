@@ -264,14 +264,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           URN = metaDel.URN as IdentityRefURN
 
           const delSub = event.data.object as Stripe.Subscription
-          delSub.items.data.forEach(async (item) => {
-            if (notificationEnabledPriceIDSet.has(item.price.id)) {
-              await coreClient.account.sendBillingNotification.mutate({
-                email,
-                name: name || 'Client',
-              })
-            }
-          })
+          await Promise.all(
+            delSub.items.data.map(async (item) => {
+              if (notificationEnabledPriceIDSet.has(item.price.id)) {
+                await coreClient.account.sendBillingNotification.mutate({
+                  email,
+                  name: name || 'Client',
+                })
+              }
+            })
+          )
 
           await Promise.all([
             coreClient.billing.cancelServicePlans.mutate({
