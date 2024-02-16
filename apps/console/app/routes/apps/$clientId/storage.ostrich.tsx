@@ -286,7 +286,7 @@ export default () => {
               .packageType
           }
           topUp={appDetails.externalAppDataPackageDefinition?.autoTopUp}
-          currentCost={
+          currentPrice={
             appDetails.externalAppDataPackageDefinition?.packageDetails.price
           }
         />
