@@ -50,9 +50,13 @@ import Stripe from 'stripe'
 import {
   cancelSubscription,
   changePriceID,
+  createInvoice,
 } from '@proofzero/utils/billing/stripe'
 import { GetAppExternalDataUsageOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppExternalDataUsage'
-import { packageTypeToPriceID } from '@proofzero/utils/external-app-data'
+import {
+  packageTypeToPriceID,
+  packageTypeToTopUpPriceID,
+} from '@proofzero/utils/external-app-data'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -128,6 +132,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       case 'enable':
         const newPackageType = fd.get('package') as ExternalAppDataPackageType
         const autoTopUp = fd.get('top-up') !== '0'
+        const forceTopUp = fd.get('force-top-up') != undefined
 
         let sub
         if (appDetails.externalAppDataPackageDefinition?.packageDetails) {
@@ -161,6 +166,20 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           },
           autoTopUp,
         })
+        if (appDetails.externalAppDataPackageDefinition && forceTopUp) {
+          await createInvoice(
+            env.SECRET_STRIPE_API_KEY,
+            spd.customerID,
+            sub.id,
+            packageTypeToTopUpPriceID(
+              env,
+              appDetails.externalAppDataPackageDefinition.packageDetails
+                .packageType
+            ),
+            true
+          )
+        }
+
         break
       case 'disable':
         if (!appDetails.externalAppDataPackageDefinition?.packageDetails) {

@@ -121,19 +121,22 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
               ExternalAppDataPackages[selectedPackage].reads < reads) ||
             (writes &&
               ExternalAppDataPackages[selectedPackage].writes < writes) ? (
-              <div className="flex flex-row rounded p-4 gap-2 max-w-[724px] bg-orange-50">
-                <HiExclamationTriangle className="h-5 w-5 text-orange-400" />
+              <>
+                <input type="hidden" name="force-top-up" value="1" />
+                <div className="flex flex-row rounded p-4 gap-2 max-w-[724px] bg-orange-50">
+                  <HiExclamationTriangle className="h-5 w-5 text-orange-400" />
 
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="text-left text-orange-600"
-                >
-                  You are already past usage limits of selected package. You
-                  will be charged a one time top-up fee to enable continued
-                  access to the service within the current billing cycle.
-                </Text>
-              </div>
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-left text-orange-600"
+                  >
+                    You are already past usage limits of selected package. You
+                    will be charged a one time top-up fee to enable continued
+                    access to the service within the current billing cycle.
+                  </Text>
+                </div>
+              </>
             ) : null}
 
             <div className="flex flex-col border rounded">
