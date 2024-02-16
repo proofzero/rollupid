@@ -47,12 +47,12 @@ import {
 } from '@proofzero/urns/identity-group'
 import { IdentityURN } from '@proofzero/urns/identity'
 import Stripe from 'stripe'
-import { packageTypeToPriceID } from '~/utils/external-app-data'
 import {
   cancelSubscription,
   changePriceID,
 } from '@proofzero/utils/billing/stripe'
 import { GetAppExternalDataUsageOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppExternalDataUsage'
+import { packageTypeToPriceID } from '@proofzero/utils/external-app-data'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {

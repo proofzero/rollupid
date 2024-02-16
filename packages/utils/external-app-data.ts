@@ -5,9 +5,11 @@ interface IAppDataStoragePricingEnv {
   SECRET_STRIPE_APP_DATA_STORAGE_PRICE_IDS: string
 }
 
-type AppDataStoragePricingEnvObj = {
+export type AppDataStoragePricingEnvObj = {
   SECRET_STRIPE_APP_DATA_STORAGE_STARTER_PRICE_ID: string
   SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID: string
+  SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID: string
+  SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID: string
 }
 
 export const packageTypeToPriceID = (
@@ -23,6 +25,26 @@ export const packageTypeToPriceID = (
       return storagePrices.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_PRICE_ID
     case ExternalAppDataPackageType.SCALE:
       return storagePrices.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID
+    default:
+      throw new InternalServerError({
+        message: 'Invalid package type',
+      })
+  }
+}
+
+export const packageTypeToTopUpPriceID = (
+  env: IAppDataStoragePricingEnv,
+  packageType: ExternalAppDataPackageType
+) => {
+  const storagePrices = JSON.parse(
+    env.SECRET_STRIPE_APP_DATA_STORAGE_PRICE_IDS
+  ) as AppDataStoragePricingEnvObj
+
+  switch (packageType) {
+    case ExternalAppDataPackageType.STARTER:
+      return storagePrices.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID
+    case ExternalAppDataPackageType.SCALE:
+      return storagePrices.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID
     default:
       throw new InternalServerError({
         message: 'Invalid package type',

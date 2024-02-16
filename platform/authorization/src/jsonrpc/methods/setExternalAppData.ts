@@ -20,6 +20,7 @@ import {
 import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/nodes/application'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { createInvoice } from '@proofzero/utils/billing/stripe'
+import { packageTypeToTopUpPriceID } from '@proofzero/utils/external-app-data'
 
 export const SetExternalAppDataInputSchema = AppClientIdParamSchema.extend({
   payload: z.any(),
@@ -107,7 +108,10 @@ export const setExternalAppDataMethod = async ({
       ctx.env.SECRET_STRIPE_API_KEY,
       customerID,
       externalAppDataPackageDefinition.packageDetails.subscriptionID,
-      ctx.env.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID,
+      packageTypeToTopUpPriceID(
+        ctx.env,
+        externalAppDataPackageDefinition.packageDetails.packageType
+      ),
       true
     )
   } else if (externalStorageWriteNumVal >= metadata.limit) {

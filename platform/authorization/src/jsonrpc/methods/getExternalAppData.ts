@@ -20,6 +20,7 @@ import {
 } from '@proofzero/platform.identity/src/nodes'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/nodes/application'
+import { packageTypeToTopUpPriceID } from '@proofzero/utils/external-app-data'
 
 export const GetExternalAppDataInputSchema = AppClientIdParamSchema
 type GetExternalAppDataInput = z.infer<typeof GetExternalAppDataInputSchema>
@@ -108,7 +109,10 @@ export const getExternalAppDataMethod = async ({
       ctx.env.SECRET_STRIPE_API_KEY,
       customerID,
       externalAppDataPackageDefinition.packageDetails.subscriptionID,
-      ctx.env.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID,
+      packageTypeToTopUpPriceID(
+        ctx.env,
+        externalAppDataPackageDefinition.packageDetails.packageType
+      ),
       true
     )
   } else if (externalStorageReadNumVal >= metadata.limit) {

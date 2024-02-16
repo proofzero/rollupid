@@ -16,6 +16,7 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { reconcileSubscriptions } from '@proofzero/utils/billing/stripe'
+import { AppDataStoragePricingEnvObj } from '@proofzero/utils/external-app-data'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -229,14 +230,20 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           .map((ili) => ili.price!.id)
           .filter((val, ind, arr) => arr.indexOf(val) === ind)
 
+        const {
+          SECRET_STRIPE_APP_DATA_STORAGE_STARTER_PRICE_ID,
+          SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID,
+          SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID,
+          SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID,
+        } = JSON.parse(
+          context.env.SECRET_STRIPE_APP_DATA_STORAGE_PRICE_IDS
+        ) as AppDataStoragePricingEnvObj
+
         if (
           finalizedPriceIDList.some(
             (pi) =>
-              pi ===
-                context.env
-                  .SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID ||
-              pi ===
-                context.env.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID
+              pi === SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID ||
+              pi === SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID
           )
         ) {
           const subscription = await stripeClient.subscriptions.retrieve(
@@ -265,6 +272,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             })
           }
 
+          // Need to refactor this to take into account the top up package paid...
           await coreClient.starbase.externalAppDataLimitIncrement.mutate({
             clientId: clientID,
             reads: externalAppDataPackage.reads,
@@ -275,9 +283,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         if (
           finalizedPriceIDList.some(
             (pi) =>
-              pi ===
-                context.env.SECRET_STRIPE_APP_DATA_STORAGE_STARTER_PRICE_ID ||
-              pi === context.env.SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID
+              pi === SECRET_STRIPE_APP_DATA_STORAGE_STARTER_PRICE_ID ||
+              pi === SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID
           )
         ) {
           const subscription = await stripeClient.subscriptions.retrieve(
