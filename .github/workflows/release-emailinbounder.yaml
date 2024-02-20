@@ -47,8 +47,6 @@ jobs:
           environment: 'current'
           secrets: |
             SECRET_EMAIL_DISTRIBUTION_MAP
-            INTERNAL_EMAIL_DISTRIBUTION_KEY
 
         env:
           SECRET_EMAIL_DISTRIBUTION_MAP: ${{ secrets.SECRET_EMAIL_DISTRIBUTION_MAP }}
-          INTERNAL_EMAIL_DISTRIBUTION_KEY: ${{secrets.INTERNAL_EMAIL_DISTRIBUTION_KEY_PROD }}
