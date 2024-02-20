@@ -8,6 +8,7 @@ import {
   generateUsageKey,
   getStoredUsageWithMetadata,
 } from '@proofzero/utils/usage'
+import { ExternalAppDataPackageStatus } from '../validators/externalAppDataPackageDefinition'
 
 export const GetAppExternalDataUsageInputSchema = AppClientIdParamSchema
 export const GetAppExternalDataUsageOutputSchema = z
@@ -41,8 +42,12 @@ export const getAppExternalDataUsage = async ({
     ctx.env.StarbaseApp
   )
   const { externalAppDataPackageDefinition } = await appDO.class.getDetails()
-  if (!externalAppDataPackageDefinition) {
-    return externalAppDataPackageDefinition
+  if (
+    !externalAppDataPackageDefinition ||
+    externalAppDataPackageDefinition.status !==
+      ExternalAppDataPackageStatus.Enabled
+  ) {
+    return undefined
   }
 
   const { packageDetails } = externalAppDataPackageDefinition
