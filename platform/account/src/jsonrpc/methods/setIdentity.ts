@@ -40,11 +40,21 @@ export const setIdentityMethod = async ({
     throw new Error('Invalid identity URN')
   }
 
+  const stored = await nodeClient.class.getIdentity()
+
   // Store the owning identity for the account node in the node
   // itself.
   await nodeClient.class.setIdentity(identity)
 
   const caller = router.createCaller(ctx)
+
+  if (stored)
+    await caller.edges.removeEdge({
+      src: stored,
+      dst: account,
+      tag: EDGE_ACCOUNT,
+    })
+
   const linkResult = await caller.edges.makeEdge({
     src: identity,
     dst: account,
