@@ -7,7 +7,7 @@ import createCoreClient from '@proofzero/platform-clients/core'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { reconcileSubscriptions } from '~/services/billing/stripe'
-import { InternalServerError, RollupError } from '@proofzero/errors'
+import { InternalServerError } from '@proofzero/errors'
 import { type AccountURN } from '@proofzero/urns/account'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { ServicePlanType } from '@proofzero/types/billing'
@@ -17,23 +17,12 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 
-type StripeInvoicePayload = {
-  id: string
-  subscription: string
-  customer: string
-  payment_intent: string
-  lines: {
-    data: Array<{
-      price: { product: string }
-      amount: number
-      quantity: number
-    }>
-  }
-  metadata: any
-}
-
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
+    const notificationEnabledPriceIDSet = new Set([
+      context.env.SECRET_STRIPE_PRO_PLAN_ID,
+    ])
+
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
     const coreClient = createCoreClient(context.env.Core, {
@@ -136,32 +125,36 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'invoice.payment_succeeded':
-        const {
-          customer: customerSuccess,
-          lines: linesSuccess,
-          metadata: metaSuccess,
-        } = event.data.object as StripeInvoicePayload
+        const { customer: customerSuccess, lines: linesSuccess } = event.data
+          .object as Stripe.Invoice
         const customerDataSuccess = await stripeClient.customers.retrieve(
-          customerSuccess
+          customerSuccess as string
         )
 
         const updatedItems = {} as {
-          [key: string]: { amount: number; quantity: number }
+          [key: string]: { amount: number; quantity: number; productID: string }
         }
 
         linesSuccess.data.forEach((line) => {
-          if (updatedItems[line.price.product]) {
-            updatedItems[line.price.product] = {
-              amount: updatedItems[line.price.product].amount + line.amount,
-              quantity:
-                updatedItems[line.price.product].quantity + line.quantity,
-            }
-          } else {
-            updatedItems[line.price.product] = {
-              // this amount is negative when we cancel or update subsription,
-              // but this event is being fired anyway
-              amount: line.amount,
-              quantity: line.amount > 0 ? line.quantity : -line.quantity,
+          if (line.price) {
+            const priceID = line.price.id
+            const productID = line.price.product as string
+
+            if (updatedItems[priceID]) {
+              updatedItems[priceID] = {
+                amount: updatedItems[priceID].amount + line.amount,
+                quantity: updatedItems[priceID].quantity + (line.quantity ?? 0),
+                productID,
+              }
+            } else {
+              updatedItems[priceID] = {
+                // this amount is negative when we cancel or update subsription,
+                // but this event is being fired anyway
+                amount: line.amount,
+                quantity:
+                  line.amount > 0 ? line.quantity ?? 0 : -(line.quantity ?? 0),
+                productID,
+              }
             }
           }
         })
@@ -173,9 +166,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           })
           .map((key) => {
             return {
-              productID: key,
+              priceID: key,
               amount: updatedItems[key].amount,
               quantity: updatedItems[key].quantity,
+              productID: updatedItems[key].productID,
             }
           })
         if (
@@ -190,42 +184,49 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             })
           )
 
-          await createAnalyticsEvent({
-            eventName: 'identity_purchased_entitlement',
-            apiKey: context.env.POSTHOG_API_KEY,
-            distinctId: customerDataSuccess.metadata.URN,
-            properties: {
-              plans: purchasedItems.map((item) => ({
+          const proEntitlements = purchasedItems.filter(
+            (item) => item.priceID === context.env.SECRET_STRIPE_PRO_PLAN_ID
+          )
+
+          if (proEntitlements.length > 0) {
+            await createAnalyticsEvent({
+              eventName: 'identity_purchased_entitlement',
+              apiKey: context.env.POSTHOG_API_KEY,
+              distinctId: customerDataSuccess.metadata.URN,
+              properties: {
+                plans: proEntitlements.map((item) => ({
+                  quantity: item.quantity,
+                  name: products.find(
+                    (product) => product?.id === item?.productID
+                  )!.name,
+                  type: ServicePlanType.PRO,
+                })),
+              },
+            })
+
+            await coreClient.account.sendSuccessfulPaymentNotification.mutate({
+              email,
+              name: name || 'Client',
+              plans: proEntitlements.map((item) => ({
                 quantity: item.quantity,
                 name: products.find(
                   (product) => product?.id === item?.productID
                 )!.name,
-                type: ServicePlanType.PRO,
               })),
-            },
-          })
-
-          await coreClient.account.sendSuccessfulPaymentNotification.mutate({
-            email,
-            name: name || 'Client',
-            plans: purchasedItems.map((item) => ({
-              quantity: item.quantity,
-              name: products.find((product) => product?.id === item?.productID)!
-                .name,
-            })),
-          })
+            })
+          }
         }
 
         break
 
       case 'invoice.payment_failed':
         const { customer: customerFail, payment_intent: paymentIntentFail } =
-          event.data.object as StripeInvoicePayload
+          event.data.object as Stripe.Invoice
         const customerDataFail = await stripeClient.customers.retrieve(
-          customerFail
+          customerFail as string
         )
         const paymentIntentInfo = await stripeClient.paymentIntents.retrieve(
-          paymentIntentFail
+          paymentIntentFail as string
         )
 
         if (
@@ -262,14 +263,21 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
           URN = metaDel.URN as IdentityRefURN
 
+          const delSub = event.data.object as Stripe.Subscription
+          await Promise.all(
+            delSub.items.data.map(async (item) => {
+              if (notificationEnabledPriceIDSet.has(item.price.id)) {
+                await coreClient.account.sendBillingNotification.mutate({
+                  email,
+                  name: name || 'Client',
+                })
+              }
+            })
+          )
+
           await Promise.all([
-            coreClient.account.sendBillingNotification.mutate({
-              email,
-              name: name || 'Client',
-            }),
             coreClient.billing.cancelServicePlans.mutate({
               URN,
-              subscriptionID: subIdDel,
               deletePaymentData: event.type === 'customer.deleted',
             }),
             coreClient.starbase.deleteSubscriptionPlans.mutate({

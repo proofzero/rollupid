@@ -3,12 +3,14 @@ import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 export default {
   [ExternalAppDataPackageType.STARTER]: {
     title: 'Starter',
-    reads: 1000,
-    writes: 1000,
+    reads: 5,
+    writes: 5,
+    price: 5,
   },
   [ExternalAppDataPackageType.SCALE]: {
     title: 'Scale',
-    reads: 2000,
-    writes: 2000,
+    reads: 10,
+    writes: 10,
+    price: 10,
   },
 }

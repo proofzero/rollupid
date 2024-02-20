@@ -340,7 +340,12 @@ export default class StarbaseApplication extends DOProxy {
 
   async setExternalAppDataPackage(
     clientId: string,
-    packageType: ExternalAppDataPackageType | undefined,
+    externalAppDataPackage:
+      | {
+          packageType: ExternalAppDataPackageType
+          subscriptionID: string
+        }
+      | undefined,
     autoTopUp = false
   ): Promise<NodeMethodReturnValue<boolean, RollupError>> {
     const externalStorageUsageWriteKey = generateUsageKey(
@@ -360,10 +365,10 @@ export default class StarbaseApplication extends DOProxy {
     )
 
     const packageDetails: ExternalAppDataPackageDetails | undefined =
-      packageType
+      externalAppDataPackage
         ? {
-            packageType,
-            ...ExternalAppDataPackages[packageType],
+            ...externalAppDataPackage,
+            ...ExternalAppDataPackages[externalAppDataPackage.packageType],
           }
         : undefined
 

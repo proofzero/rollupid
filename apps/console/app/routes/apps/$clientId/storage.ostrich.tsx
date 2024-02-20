@@ -10,9 +10,16 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ActionFunction } from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
 import { requireJWT } from '~/utilities/session.server'
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import {
+  BadRequestError,
+  InternalServerError,
+  UnauthorizedError,
+} from '@proofzero/errors'
 import classNames from 'classnames'
 import { appDetailsProps } from '~/types'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
@@ -32,12 +39,26 @@ import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import AppDataStorageModal from '~/components/AppDataStorageModal/AppDataStorageModal'
 import { Menu, Transition } from '@headlessui/react'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
+import { createOrUpdateSubscription } from '~/utils/billing'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { IdentityURN } from '@proofzero/urns/identity'
+import { cancelSubscription, changePriceID } from '~/services/billing/stripe'
+import Stripe from 'stripe'
+import { packageTypeToPriceID } from '~/utils/external-app-data'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
+    const { env } = context
+
+    const jwt = await requireJWT(request, env)
+    const parsedJwt = parseJwt(jwt!)
+    const identityURN = parsedJwt.sub as IdentityURN
+
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const jwt = await requireJWT(request, context.env)
-    const coreClient = createCoreClient(context.env.Core, {
+    const coreClient = createCoreClient(env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
@@ -49,20 +70,85 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
+    const appDetails = await coreClient.starbase.getAppDetails.query({
+      clientId: clientId as string,
+    })
+
+    if (IdentityGroupURNSpace.is(appDetails.ownerURN)) {
+      const { write } =
+        await coreClient.identity.hasIdentityGroupPermissions.query({
+          identityURN,
+          identityGroupURN: appDetails.ownerURN as IdentityGroupURN,
+        })
+
+      if (!write) {
+        throw new UnauthorizedError({
+          message:
+            'You are not authorized to update an app belonging to this identity group.',
+        })
+      }
+    }
+
+    const spd = await coreClient.billing.getStripePaymentData.query({
+      URN: appDetails.ownerURN,
+    })
+
+    const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+      apiVersion: '2022-11-15',
+    })
+
     const fd = await request.formData()
     switch (fd.get('op')) {
       case 'enable':
-        const packageType = fd.get('package') as ExternalAppDataPackageType
+        const newPackageType = fd.get('package') as ExternalAppDataPackageType
         const autoTopUp = fd.get('top-up') !== '0'
+
+        let sub
+        if (appDetails.externalAppDataPackageDefinition?.packageDetails) {
+          const { subscriptionID, packageType: oldPackageType } =
+            appDetails.externalAppDataPackageDefinition.packageDetails
+
+          sub = await changePriceID({
+            subscriptionID,
+            stripeClient,
+            oldPriceID: packageTypeToPriceID(env, oldPackageType),
+            newPriceID: packageTypeToPriceID(env, newPackageType),
+          })
+        } else {
+          sub = await createOrUpdateSubscription({
+            customerID: spd.customerID,
+            URN: appDetails.ownerURN,
+            planID: packageTypeToPriceID(env, newPackageType),
+            SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
+            quantity: 1,
+          })
+        }
+
         await coreClient.starbase.setExternalAppDataPackage.mutate({
           clientId,
-          packageType,
+          externalAppDataPackage: {
+            packageType: newPackageType,
+            subscriptionID: sub.id,
+          },
           autoTopUp,
         })
         break
       case 'disable':
+        if (!appDetails.externalAppDataPackageDefinition?.packageDetails) {
+          throw new BadRequestError({
+            message: 'No package found',
+          })
+        }
+
         await coreClient.starbase.setExternalAppDataPackage.mutate({
           clientId,
+        })
+
+        const { subscriptionID } =
+          appDetails.externalAppDataPackageDefinition.packageDetails
+        await cancelSubscription({
+          subscriptionID,
+          stripeClient,
         })
         break
       default:
@@ -200,6 +286,9 @@ export default () => {
               .packageType
           }
           topUp={appDetails.externalAppDataPackageDefinition?.autoTopUp}
+          currentPrice={
+            appDetails.externalAppDataPackageDefinition?.packageDetails.price
+          }
         />
       )}
 

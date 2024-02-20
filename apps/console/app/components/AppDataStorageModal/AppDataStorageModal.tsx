@@ -15,6 +15,7 @@ type AppDataStorageModalProps = {
   subscriptionFetcher: FetcherWithComponents<any>
   currentPackage?: ExternalAppDataPackageType
   topUp?: boolean
+  currentPrice?: number
   clientID: string
 }
 
@@ -24,6 +25,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
   subscriptionFetcher,
   currentPackage,
   topUp = false,
+  currentPrice = 0,
   clientID,
 }) => {
   const [selectedPackage, setSelectedPackage] =
@@ -161,6 +163,32 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
             </Text>
 
             <div className="flex flex-col gap-2">
+              <div>
+                <Text size="sm" weight="medium" className="text-gray-500">
+                  <Text
+                    type="span"
+                    size="lg"
+                    weight="semibold"
+                    className="text-gray-900"
+                  >
+                    {currentPrice
+                      ? ExternalAppDataPackages[selectedPackage].price -
+                          currentPrice >=
+                        0
+                        ? `+$${
+                            ExternalAppDataPackages[selectedPackage].price -
+                            currentPrice
+                          }`
+                        : `-$${Math.abs(
+                            ExternalAppDataPackages[selectedPackage].price -
+                              currentPrice
+                          )}`
+                      : `+$${ExternalAppDataPackages[selectedPackage].price}`}
+                  </Text>{' '}
+                  per month
+                </Text>
+              </div>
+
               <div className="flex flex-row justify-between items-center">
                 <span>
                   {autoTopUp ? (

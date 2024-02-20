@@ -11,7 +11,6 @@ import { IdentityRefURNValidator } from '@proofzero/platform-middleware/inputVal
 
 export const CancelServicePlansInput = z.object({
   URN: IdentityRefURNValidator,
-  subscriptionID: z.string(),
   deletePaymentData: z.boolean().optional(),
 })
 
