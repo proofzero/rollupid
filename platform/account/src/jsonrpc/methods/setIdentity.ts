@@ -31,6 +31,7 @@ export const setIdentityMethod = async ({
   ctx: Context
 }): Promise<SetIdentityResult> => {
   const nodeClient = ctx.account
+  if (!nodeClient) throw new Error('missing node')
 
   const account = ctx.accountURN as AccountURN
 
@@ -41,7 +42,7 @@ export const setIdentityMethod = async ({
 
   // Store the owning identity for the account node in the node
   // itself.
-  await nodeClient?.class.setIdentity(identity)
+  await nodeClient.class.setIdentity(identity)
 
   const caller = router.createCaller(ctx)
   const linkResult = await caller.edges.makeEdge({
