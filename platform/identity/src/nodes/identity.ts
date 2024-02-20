@@ -6,6 +6,7 @@ import {
   ServicePlans,
 } from '@proofzero/types/billing'
 import { RollupError } from '@proofzero/errors'
+import { IdentityURN } from '@proofzero/urns/identity'
 
 export default class Identity extends DOProxy {
   declare state: DurableObjectState
@@ -84,5 +85,16 @@ export default class Identity extends DOProxy {
     }
 
     await this.state.storage.put('stripePaymentData', paymentData)
+  }
+
+  async getForwardIdentityURN(): Promise<IdentityURN | undefined> {
+    return this.state.storage.get<IdentityURN>('forwardIdentityURN')
+  }
+
+  async setForwardIdentityURN(forwardIdentityURN: IdentityURN): Promise<void> {
+    return this.state.storage.put<IdentityURN>(
+      'forwardIdentityURN',
+      forwardIdentityURN
+    )
   }
 }

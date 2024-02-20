@@ -102,6 +102,7 @@ import {
   patchProfileFieldsMethod,
 } from './methods/patchProfileFields'
 import { resetProfileFieldsMethod } from './methods/resetProfileFields'
+import { mergeMethod, MergeInput, MergeOutput } from './methods/merge'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -306,4 +307,14 @@ export const appRouter = t.router({
     .use(RequireIdentity)
     .use(injectIdentityNode)
     .mutation(resetProfileFieldsMethod),
+  merge: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireIdentity)
+    .use(injectIdentityNode)
+    .input(MergeInput)
+    .output(MergeOutput)
+    .mutation(mergeMethod),
 })
