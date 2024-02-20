@@ -20,6 +20,8 @@ type AppDataStorageModalProps = {
   clientID: string
   reads?: number
   writes?: number
+  readTopUp?: number
+  writeTopUp?: number
 }
 
 const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
@@ -32,6 +34,8 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
   clientID,
   reads,
   writes,
+  readTopUp = 0,
+  writeTopUp = 0,
 }) => {
   const [selectedPackage, setSelectedPackage] =
     useState<ExternalAppDataPackageType>(
@@ -118,9 +122,11 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
             </div>
 
             {(reads &&
-              ExternalAppDataPackages[selectedPackage].reads < reads) ||
+              ExternalAppDataPackages[selectedPackage].reads <
+                reads - readTopUp) ||
             (writes &&
-              ExternalAppDataPackages[selectedPackage].writes < writes) ? (
+              ExternalAppDataPackages[selectedPackage].writes <
+                writes - writeTopUp) ? (
               <>
                 <input type="hidden" name="force-top-up" value="1" />
                 <div className="flex flex-row rounded p-4 gap-2 max-w-[724px] bg-orange-50">

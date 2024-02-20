@@ -343,6 +343,8 @@ export default () => {
           }
           reads={appExternalStorageUsage?.readUsage}
           writes={appExternalStorageUsage?.writeUsage}
+          readTopUp={appExternalStorageUsage?.readTopUp}
+          writeTopUp={appExternalStorageUsage?.writeTopUp}
         />
       )}
 

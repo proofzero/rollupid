@@ -13,10 +13,12 @@ export const GetAppExternalDataUsageInputSchema = AppClientIdParamSchema
 export const GetAppExternalDataUsageOutputSchema = z
   .object({
     packageType: z.nativeEnum(ExternalAppDataPackageType),
-    reads: z.number(),
-    writes: z.number(),
+    readAvailable: z.number(),
     readUsage: z.number(),
+    readTopUp: z.number(),
+    writeAvailable: z.number(),
     writeUsage: z.number(),
+    writeTopUp: z.number(),
   })
   .optional()
 
@@ -63,9 +65,13 @@ export const getAppExternalDataUsage = async ({
 
   return {
     packageType: packageDetails.packageType,
-    reads: readMeta.limit,
+    readAvailable: readMeta.limit,
     readUsage: readNumVal,
-    writes: writeMeta.limit,
+    readTopUp:
+      readMeta.limit - externalAppDataPackageDefinition.packageDetails.reads,
+    writeAvailable: writeMeta.limit,
     writeUsage: writeNumVal,
+    writeTopUp:
+      writeMeta.limit - externalAppDataPackageDefinition.packageDetails.writes,
   }
 }
