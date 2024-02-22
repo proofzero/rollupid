@@ -3,6 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema } from '../validators/app'
 import { ExternalAppDataPackageType } from '@proofzero/types/billing'
+import { ExternalAppDataPackageStatus } from '../validators/externalAppDataPackageDefinition'
 
 export const GetAppExternalDataPackageInputSchema = AppClientIdParamSchema
 export const GetAppExternalDataPackageOutputSchema = z
@@ -10,6 +11,7 @@ export const GetAppExternalDataPackageOutputSchema = z
     packageType: z.nativeEnum(ExternalAppDataPackageType),
     reads: z.number(),
     writes: z.number(),
+    status: z.nativeEnum(ExternalAppDataPackageStatus),
   })
   .optional()
 
@@ -42,5 +44,6 @@ export const getAppExternalDataPackage = async ({
     packageType: packageDetails.packageType,
     reads: packageDetails.reads,
     writes: packageDetails.writes,
+    status: externalAppDataPackageDefinition.status,
   }
 }

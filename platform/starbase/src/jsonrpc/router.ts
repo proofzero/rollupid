@@ -163,6 +163,10 @@ import {
   GetAppExternalDataUsageInputSchema,
   GetAppExternalDataUsageOutputSchema,
 } from './methods/getAppExternalDataUsage'
+import {
+  setExternalAppDataPackageStatus,
+  SetExternalAppDataPackageStatusInputSchema,
+} from './methods/setExternalAppDataPackageStatus'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -436,6 +440,11 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(SetExternalAppDataPackageInputSchema)
     .mutation(setExternalAppDataPackage),
+  setExternalAppDataPackageStatus: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SetExternalAppDataPackageStatusInputSchema)
+    .mutation(setExternalAppDataPackageStatus),
   getAppExternalDataPackage: t.procedure
     .use(LogUsage)
     .use(Analytics)

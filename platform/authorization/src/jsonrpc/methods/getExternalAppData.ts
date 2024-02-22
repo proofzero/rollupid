@@ -21,6 +21,7 @@ import {
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/nodes/application'
 import { packageTypeToTopUpPriceID } from '@proofzero/utils/external-app-data'
+import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 
 export const GetExternalAppDataInputSchema = AppClientIdParamSchema
 type GetExternalAppDataInput = z.infer<typeof GetExternalAppDataInputSchema>
@@ -73,7 +74,9 @@ export const getExternalAppDataMethod = async ({
 
   if (
     externalStorageReadNumVal >= 0.8 * metadata.limit &&
-    externalAppDataPackageDefinition.autoTopUp
+    externalAppDataPackageDefinition.autoTopUp &&
+    externalAppDataPackageDefinition.status ===
+      ExternalAppDataPackageStatus.Enabled
   ) {
     let ownerNode
     if (IdentityURNSpace.is(identityURN)) {
@@ -105,6 +108,9 @@ export const getExternalAppDataMethod = async ({
       }
     )
 
+    await appDO.class.setExternalAppDataPackageStatus(
+      ExternalAppDataPackageStatus.ToppingUp
+    )
     await createInvoice(
       ctx.env.SECRET_STRIPE_API_KEY,
       customerID,

@@ -17,6 +17,7 @@ import {
 } from '@proofzero/urns/identity-group'
 import { reconcileSubscriptions } from '@proofzero/utils/billing/stripe'
 import { AppDataStoragePricingEnvObj } from '@proofzero/utils/external-app-data'
+import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -272,12 +273,21 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             })
           }
 
-          // Need to refactor this to take into account the top up package paid...
           await coreClient.starbase.externalAppDataLimitIncrement.mutate({
             clientId: clientID,
             reads: externalAppDataPackage.reads,
             writes: externalAppDataPackage.writes,
           })
+
+          if (
+            externalAppDataPackage.status ===
+            ExternalAppDataPackageStatus.ToppingUp
+          ) {
+            await coreClient.starbase.setExternalAppDataPackageStatus.mutate({
+              clientId: clientID,
+              status: ExternalAppDataPackageStatus.Enabled,
+            })
+          }
         }
 
         if (

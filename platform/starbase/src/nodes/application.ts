@@ -504,6 +504,37 @@ export default class StarbaseApplication extends DOProxy {
     return { value: true }
   }
 
+  async setExternalAppDataPackageStatus(
+    status: ExternalAppDataPackageStatus
+  ): Promise<void> {
+    const currentPackageDefinition =
+      await this.state.storage.get<ExternalAppDataPackageDefinition>(
+        'externalAppDataPackageDefinition'
+      )
+    if (!currentPackageDefinition) {
+      throw new InternalServerError({
+        message: 'No existing package definition found when setting status',
+      })
+    }
+
+    if (
+      currentPackageDefinition.status === ExternalAppDataPackageStatus.Deleting
+    ) {
+      throw new InternalServerError({
+        message: 'Cannot set status when package is in deleting state',
+      })
+    }
+
+    await this.state.storage.put<ExternalAppDataPackageDefinition>(
+      'externalAppDataPackageDefinition',
+      {
+        packageDetails: currentPackageDefinition.packageDetails,
+        status,
+        autoTopUp: currentPackageDefinition.autoTopUp,
+      }
+    )
+  }
+
   async setQueueLimitAndOffset(
     input:
       | {

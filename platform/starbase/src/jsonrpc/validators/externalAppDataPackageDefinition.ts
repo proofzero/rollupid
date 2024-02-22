@@ -4,6 +4,7 @@ import { z } from 'zod'
 export enum ExternalAppDataPackageStatus {
   Enabled = 'enabled',
   Deleting = 'deleting',
+  ToppingUp = 'topping-up',
 }
 
 export const ExternalAppDataPackageDetailsSchema = z.object({
