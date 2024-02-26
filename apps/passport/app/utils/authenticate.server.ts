@@ -1,6 +1,5 @@
-import { AccountURNSpace } from '@proofzero/urns/account'
-import type { AccountURN } from '@proofzero/urns/account'
-import type { IdentityURN } from '@proofzero/urns/identity'
+import { type AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+import { type IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
 
 import { GrantType, ResponseType } from '@proofzero/types/authorization'
 
@@ -19,6 +18,8 @@ import {
   AUTHN_PARAMS_SESSION_KEY,
   createAuthenticatorSessionStorage,
 } from '~/auth.server'
+
+import { createIdentityMergeState } from '~/session.server'
 
 export const authenticateAccount = async (
   account: AccountURN,
@@ -42,6 +43,7 @@ export const authenticateAccount = async (
     (['connect', 'reconnect'].includes(appData?.rollup_action) ||
       appData?.rollup_action.startsWith('groupconnect'))
   ) {
+    const headers = new Headers()
     let result = undefined
 
     if (
@@ -49,17 +51,20 @@ export const authenticateAccount = async (
       (appData.rollup_action === 'connect' ||
         appData.rollup_action.startsWith('groupconnect'))
     ) {
-      const loggedInIdentity = parseJwt(jwt).sub
-      if (identity !== loggedInIdentity) {
-        result = 'ACCOUNT_CONNECT_ERROR'
-      } else {
-        result = 'ALREADY_CONNECTED_ERROR'
+      const source = identity
+      const target = parseJwt(jwt).sub
+      if (!target) result = 'ACCOUNT_CONNECT_ERROR'
+      else if (source === target) result = 'ALREADY_CONNECTED_ERROR'
+      else if (IdentityURNSpace.is(target) && source !== target) {
+        result = 'ACCOUNT_LINKED_ERROR'
+        headers.append(
+          'Set-Cookie',
+          await createIdentityMergeState(request, env, account, source, target)
+        )
       }
     }
 
-    const redirectURL = getAuthzRedirectURL(appData, result)
-
-    return redirect(redirectURL)
+    return redirect(getAuthzRedirectURL(appData, result), { headers })
   }
 
   const context = { env: { Core: env.Core }, traceSpan }
