@@ -19,6 +19,7 @@ import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import {
   useActionData,
+  useFetcher,
   useLoaderData,
   useOutletContext,
   useSubmit,
@@ -31,6 +32,7 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { useEffect, useMemo, useState } from 'react'
 import { HiArrowUp, HiOutlineShoppingCart, HiOutlineX } from 'react-icons/hi'
+import { TbDatabaseImport } from 'react-icons/tb'
 import {
   ToastType,
   Toaster,
@@ -53,6 +55,8 @@ import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import plans, { PlanDetails } from '@proofzero/utils/billing/plans'
+import { GetAppExternalDataUsageOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppExternalDataUsage'
+import AppDataStorageModal from '~/components/AppDataStorageModal/AppDataStorageModal'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -68,7 +72,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId: params.clientId as string,
     })
 
-    const appServiceBasedFoo =
+    const appExternalStorageUsage =
       await coreClient.starbase.getAppExternalDataUsage.query({
         clientId: params.clientId as string,
       })
@@ -99,7 +103,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         toastNotification,
         STRIPE_PUBLISHABLE_KEY: context.env.STRIPE_PUBLISHABLE_KEY,
         groupID,
-        appServiceBasedFoo,
+        appExternalStorageUsage,
       },
       {
         headers: {
@@ -779,14 +783,14 @@ export default () => {
     toastNotification,
     STRIPE_PUBLISHABLE_KEY,
     groupID,
-    appServiceBasedFoo,
+    appExternalStorageUsage,
   } = useLoaderData<{
     STRIPE_PUBLISHABLE_KEY: string
     entitlements: GetEntitlementsOutput
     paymentData: PaymentData
     toastNotification?: ToastNotification
     groupID?: string
-    appServiceBasedFoo: any
+    appExternalStorageUsage: GetAppExternalDataUsageOutput
   }>()
 
   const actionData = useActionData()
@@ -825,12 +829,164 @@ export default () => {
     }
   }, [toastNotification])
 
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
+
+  const fetcher = useFetcher()
+  useEffect(() => {
+    if (fetcher.state === 'idle' && fetcher.type === 'done') {
+      setIsSubscriptionModalOpen(false)
+    }
+  }, [fetcher])
+
   return (
     <>
+      {isSubscriptionModalOpen && (
+        <AppDataStorageModal
+          isOpen={isSubscriptionModalOpen}
+          onClose={() => setIsSubscriptionModalOpen(false)}
+          subscriptionFetcher={fetcher}
+          clientID={appDetails.clientId!}
+          currentPackage={
+            appDetails.externalAppDataPackageDefinition?.packageDetails
+              .packageType
+          }
+          topUp={appDetails.externalAppDataPackageDefinition?.autoTopUp}
+          currentPrice={
+            appDetails.externalAppDataPackageDefinition?.packageDetails.price
+          }
+          reads={appExternalStorageUsage?.readUsage}
+          writes={appExternalStorageUsage?.writeUsage}
+          readTopUp={appExternalStorageUsage?.readTopUp}
+          writeTopUp={appExternalStorageUsage?.writeTopUp}
+        />
+      )}
+
       <Toaster position="top-right" reverseOrder={false} />
 
+      <section className="mb-4 flex flex-col gap-4">
+        <Text size="lg" weight="semibold">
+          Usage based Services
+        </Text>
+        <table className="min-w-full table-auto border">
+          <thead className="bg-gray-50">
+            <tr className="rounded-tl-lg">
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Applies to service
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Unit package
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Service status
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Usage
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Auto top-up
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-right">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Action
+                </Text>
+              </th>
+            </tr>
+          </thead>
+
+          {!appExternalStorageUsage && (
+            <tbody className="bg-white">
+              <tr>
+                <td className="px-6 py-3">
+                  <div className=" flex items-center gap-2">
+                    <div className="bg-gray-100 rounded-full p-2">
+                      <TbDatabaseImport className="w-4 h-4 text-gray-600" />
+                    </div>
+
+                    <Text size="sm" className="text-gray-500">
+                      App data storage
+                    </Text>
+                  </div>
+                </td>
+                <td className="px-6 py-3">
+                  <Text size="sm" className="text-gray-500">
+                    -
+                  </Text>
+                </td>
+                <td className="px-6 py-3">
+                  <Text size="sm" className="text-gray-500">
+                    Inactive
+                  </Text>
+                </td>
+                <td className="px-6 py-3">
+                  <Text size="sm" className="text-gray-500">
+                    -
+                  </Text>
+                </td>
+                <td className="px-6 py-3">
+                  <Text size="sm" className="text-gray-500">
+                    -
+                  </Text>
+                </td>
+                <td className="px-6 py-3">
+                  <div className="flex justify-end">
+                    <Button
+                      btnType="secondary-alt"
+                      btnSize="xs"
+                      className="flex flex-row items-center gap-3"
+                      type="submit"
+                      onClick={() => {
+                        setIsSubscriptionModalOpen(true)
+                      }}
+                    >
+                      <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                      <Text size="sm">Purchase Package</Text>
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          )}
+        </table>
+      </section>
+
       <section className="flex flex-col gap-4">
-        <pre>{JSON.stringify(appServiceBasedFoo, null, 2)}</pre>
+        <Text size="lg" weight="semibold">
+          Plan based Services
+        </Text>
         <PlanCard
           hasUnpaidInvoices={hasUnpaidInvoices}
           currentPlan={appDetails.appPlan}
