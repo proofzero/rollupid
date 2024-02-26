@@ -389,9 +389,9 @@ export default () => {
           !appDetails.externalAppDataPackageDefinition.autoTopUp &&
           appExternalStorageUsage &&
           (appExternalStorageUsage.readUsage >=
-            0.9 * appExternalStorageUsage.readAvailable ||
+            Math.floor(0.9 * appExternalStorageUsage.readAvailable) ||
             appExternalStorageUsage.writeUsage >=
-              0.9 * appExternalStorageUsage.writeAvailable) && (
+              Math.floor(0.9 * appExternalStorageUsage.writeAvailable)) && (
             <div className="flex flex-row rounded p-4 gap-2 bg-orange-50 items-center">
               <HiExclamationTriangle className="h-5 w-5 text-orange-400" />
 
