@@ -1,4 +1,4 @@
-import { keccak256, recoverAddress } from 'viem'
+import { keccak256, recoverAddress, type Hex } from 'viem'
 
 import {
   CryptoAccountType,
@@ -87,7 +87,7 @@ export const isValidAccountType = (type: string) => {
 
 export const recoverEthereumAddress = (
   message: string,
-  signature: '0x${string}'
+  signature: Hex
 ): Promise<string> => {
   const prefix = `\u0019Ethereum Signed Message:\n${message.length}`
   const encoder = new TextEncoder()

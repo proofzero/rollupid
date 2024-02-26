@@ -24,8 +24,12 @@ export default /* GraphQL */ `
       accountURNList: [ConnectedAccountPropertiesUpdateInput!]!
     ): Boolean
     registerSessionKey(
-      sessionPublicKey: String!
+      sessionKeyAddress: String!
       smartContractWalletAddress: String!
     ): String!
+    revokeSessionKey(
+      sessionKeyAddress: String!
+      smartContractWalletAddress: String!
+    ): Boolean
   }
 `

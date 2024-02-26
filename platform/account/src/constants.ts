@@ -27,3 +27,5 @@ export const NO_OP_ACCOUNT_PLACEHOLDER = AccountURNSpace.componentizedUrn(
   { addr_type: EmailAccountType.Email, node_type: NodeType.Email },
   { alias: 'no-op-account-placeholder' }
 )
+
+export const ZERODEV_SESSION_KEY_TTL = 90 * 24 * 60 * 60 * 10000 // 90 days

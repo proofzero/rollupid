@@ -36,6 +36,6 @@
     "ts-set-utils": "0.2.0",
     "typed-json-rpc": "1.1.0",
     "urns": "0.6.0",
-    "viem": "1.20.0"
+    "viem": "2.7.1"
   }
 }

@@ -1,14 +1,17 @@
 import { z } from 'zod'
-import { Wallet } from '@ethersproject/wallet'
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { polygonMumbai as chain } from 'viem/chains'
+import { createEcdsaKernelAccountClient } from '@zerodev/presets/zerodev'
 
 import { router } from '@proofzero/platform.core'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 
+import { Hex } from '../validators/wallet'
 import { Context } from '../../context'
 import { CryptoAccountType, NodeType } from '@proofzero/types/account'
 import { initAccountNodeByName } from '../../nodes'
+
 import createImageClient from '@proofzero/platform-clients/image'
-import { getZeroDevSigner } from '@zerodevapp/sdk'
 import { EDGE_ACCOUNT } from '@proofzero/platform.account/src/constants'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -22,7 +25,7 @@ type InitSmartContractWalletInput = z.infer<typeof InitSmartContractWalletInput>
 
 export const InitSmartContractWalletOutput = z.object({
   accountURN: AccountURNInput,
-  walletAccount: z.string(),
+  walletAccount: Hex,
 })
 
 type InitSmartContractWalletResult = z.infer<
@@ -37,21 +40,24 @@ export const initSmartContractWalletMethod = async ({
   ctx: Context
 }): Promise<InitSmartContractWalletResult> => {
   const nodeClient = ctx.account
-  const identity = await nodeClient?.class.getIdentity()
 
+  const identity = await nodeClient?.class.getIdentity()
   if (!identity) {
     throw new Error('missing identity')
   }
 
-  const owner = Wallet.createRandom()
+  const projectId = ctx.env.SECRET_ZERODEV_PROJECTID
 
-  const smartContractWallet = await getZeroDevSigner({
-    skipFetchSetup: true,
-    projectId: ctx.env.SECRET_ZERODEV_PROJECTID,
-    owner,
+  const privateKey = generatePrivateKey()
+  const signer = privateKeyToAccount(privateKey)
+
+  const kernelClient = await createEcdsaKernelAccountClient({
+    chain,
+    projectId,
+    signer,
   })
 
-  const smartContractWalletAddress = await smartContractWallet.getAddress()
+  const smartContractWalletAddress = kernelClient.account.address
 
   const { accountURN, baseAccountURN } = generateSmartWalletAccountUrn(
     smartContractWalletAddress,
@@ -70,7 +76,7 @@ export const initSmartContractWalletMethod = async ({
     gradientSeed: smartContractWalletAddress,
   })
   await Promise.all([
-    smartContractWalletNode.storage.put('privateKey', owner.privateKey),
+    smartContractWalletNode.storage.put('privateKey', privateKey),
     smartContractWalletNode.class.setAddress(smartContractWalletAddress),
     smartContractWalletNode.class.setNickname(input.nickname),
     smartContractWalletNode.class.setNodeType(NodeType.Crypto),

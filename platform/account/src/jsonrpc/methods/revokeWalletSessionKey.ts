@@ -1,18 +1,29 @@
 import { z } from 'zod'
-import { toBytes } from 'viem'
+import { createPublicClient, http } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import { polygonMumbai as chain } from 'viem/chains'
+import { signerToEcdsaValidator } from '@zerodev/ecdsa-validator'
+import {
+  createKernelAccount,
+  createKernelAccountClient,
+  createZeroDevPaymasterClient,
+} from '@zerodev/sdk'
+import { revokeSessionKey } from '@zerodev/session-key'
 
 import { BadRequestError } from '@proofzero/errors'
 
-import { AccountURNSpace, type AccountURN } from '@proofzero/urns/account'
-import { Wallet } from '@ethersproject/wallet'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 
+import { Hex } from '../validators/wallet'
 import type { Context } from '../../context'
-import { initAccountNodeByName } from '../../nodes'
+import { type AccountNode, initAccountNodeByName } from '../../nodes'
+import { generateSmartWalletAccountUrn } from '../../utils'
 
 export const RevokeWalletSessionKeyInput = z.object({
-  publicSessionKey: z.string(),
   projectId: z.string(),
+  sessionKeyAddress: Hex,
+  smartContractWalletAddress: Hex,
 })
 
 export const RevokeWalletSessionKeyBatchInput = z.object({
@@ -20,7 +31,7 @@ export const RevokeWalletSessionKeyBatchInput = z.object({
   smartWalletSessionKeys: z.array(
     z.object({
       urn: AccountURNInput,
-      publicSessionKey: z.string(),
+      sessionKeyAddress: Hex,
     })
   ),
 })
@@ -30,13 +41,6 @@ type RevokeWalletSessionKeyBatchParams = z.infer<
   typeof RevokeWalletSessionKeyBatchInput
 >
 
-const requestInit = {
-  method: 'post',
-  headers: {
-    'content-type': 'application/json;charset=UTF-8',
-  },
-}
-
 export const revokeWalletSessionKeyMethod = async ({
   input,
   ctx,
@@ -44,15 +48,20 @@ export const revokeWalletSessionKeyMethod = async ({
   input: RevokeWalletSessionKeyParams
   ctx: Context
 }): Promise<void> => {
+  const { baseAccountURN } = generateSmartWalletAccountUrn(
+    input.smartContractWalletAddress,
+    ''
+  )
+
   const smartContractWalletNode = initAccountNodeByName(
-    ctx.accountURN as AccountURN,
+    baseAccountURN,
     ctx.env.Account
   )
 
   await revokeWalletSessionKey({
-    smartContractWalletNode,
     projectId: input.projectId,
-    publicSessionKey: input.publicSessionKey,
+    sessionKeyAddress: input.sessionKeyAddress,
+    smartContractWalletNode,
   })
 }
 
@@ -74,7 +83,7 @@ export const revokeWalletSessionKeyBatchMethod = async ({
       revokeWalletSessionKey({
         smartContractWalletNode,
         projectId: input.projectId,
-        publicSessionKey: smartWalletSessionKey.publicSessionKey,
+        sessionKeyAddress: smartWalletSessionKey.sessionKeyAddress,
       })
     )
   }
@@ -82,49 +91,49 @@ export const revokeWalletSessionKeyBatchMethod = async ({
 }
 
 const revokeWalletSessionKey = async ({
-  smartContractWalletNode,
   projectId,
-  publicSessionKey,
+  sessionKeyAddress,
+  smartContractWalletNode,
 }: {
-  smartContractWalletNode: any
+  smartContractWalletNode: AccountNode
   projectId: string
-  publicSessionKey: string
+  sessionKeyAddress: Hex
 }) => {
-  const owner = (await smartContractWalletNode.storage.get(
+  const privateKey = await smartContractWalletNode.storage.get<Hex>(
     'privateKey'
-  )) as '0x${string}'
+  )
 
-  if (!owner) {
+  if (!privateKey) {
     throw new BadRequestError({ message: 'missing private key for the user' })
   }
 
-  const signer = new Wallet(owner)
+  const publicClient = createPublicClient({ chain, transport: http() })
 
-  const createRevokeSessionKeyUserOpResponse = await fetch(
-    'https://zerodev-api.zobeir.workers.dev/create-revoke-session-key-user-op',
-    {
-      ...requestInit,
-      body: JSON.stringify({
-        address: await signer.getAddress(),
-        projectId,
-        publicSessionKey,
+  const account = await createKernelAccount(publicClient, {
+    plugins: {
+      validator: await signerToEcdsaValidator(publicClient, {
+        signer: privateKeyToAccount(privateKey),
       }),
-    }
-  )
-
-  const { userOp, userOpHash } =
-    (await createRevokeSessionKeyUserOpResponse.json()) as {
-      userOp: any
-      userOpHash: string
-    }
-
-  const signedMessage = await signer.signMessage(toBytes(userOpHash))
-
-  await fetch('https://zerodev-api.zobeir.workers.dev/send-userop', {
-    ...requestInit,
-    body: JSON.stringify({
-      userOp: { ...userOp, signature: signedMessage },
-      projectId,
-    }),
+    },
   })
+
+  const kernelClient = createKernelAccountClient({
+    account,
+    chain,
+    transport: http(`https://rpc.zerodev.app/api/v2/bundler/${projectId}`),
+    sponsorUserOperation: async ({ userOperation }) => {
+      const zerodevPaymaster = createZeroDevPaymasterClient({
+        chain: chain,
+        transport: http(
+          `https://rpc.zerodev.app/api/v2/paymaster/${projectId}`
+        ),
+      })
+      return zerodevPaymaster.sponsorUserOperation({
+        userOperation,
+      })
+    },
+  })
+
+  const hash = await revokeSessionKey(kernelClient, sessionKeyAddress)
+  await publicClient.waitForTransactionReceipt({ hash })
 }

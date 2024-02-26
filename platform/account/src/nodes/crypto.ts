@@ -1,4 +1,4 @@
-import { toHex } from 'viem'
+import { toHex, type Hex } from 'viem'
 
 import type { Scope } from '@proofzero/types/authorization'
 import { CryptoAccountType } from '@proofzero/types/account'
@@ -50,10 +50,7 @@ export default class CryptoAccount {
     return nonce
   }
 
-  async verifyNonce(
-    nonce: string,
-    signature: '0x${string}'
-  ): Promise<Challenge> {
+  async verifyNonce(nonce: string, signature: Hex): Promise<Challenge> {
     const challenges: Record<string, Challenge> =
       (await this.node.storage.get<Record<string, Challenge>>('challenges')) ||
       {}
