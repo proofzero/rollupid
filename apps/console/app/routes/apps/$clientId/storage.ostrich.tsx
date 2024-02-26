@@ -8,7 +8,12 @@ import {
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  LoaderFunction,
+  json,
+  redirect,
+} from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import {
@@ -219,6 +224,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         })
     }
 
+    if (fd.get('redirect_url')) {
+      return redirect(fd.get('redirect_url') as string)
+    }
+
     return null
   }
 )
@@ -226,9 +235,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 export const ConfirmCancelModal = ({
   isOpen,
   setIsOpen,
+  clientID,
+  redirectURL,
 }: {
   isOpen: boolean
   setIsOpen: (val: boolean) => void
+  clientID: string
+  redirectURL?: string
 }) => {
   const [confirmationText, setConfirmationText] = useState('')
   const transition = useTransition()
@@ -258,6 +271,7 @@ export const ConfirmCancelModal = ({
           </div>
 
           <Form
+            action={`/apps/${clientID}/storage/ostrich`}
             method="post"
             onSubmit={() => {
               setConfirmationText('')
@@ -265,6 +279,10 @@ export const ConfirmCancelModal = ({
             }}
           >
             <input type="hidden" name="op" value="disable" />
+            {redirectURL && (
+              <input type="hidden" name="redirect_url" value={redirectURL} />
+            )}
+
             <section className="mb-4">
               <Text size="sm" weight="normal" className="text-gray-500 my-3">
                 Are you sure you want to stop{' '}
@@ -339,6 +357,7 @@ export default () => {
         <ConfirmCancelModal
           isOpen={isCancelModalOpen}
           setIsOpen={setIsCancelModalOpen}
+          clientID={appDetails.clientId!}
         />
       )}
       {isSubscriptionModalOpen && (
