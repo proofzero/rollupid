@@ -4,6 +4,7 @@ export enum ERROR_CODES {
   UNAUTHORIZED = 'UNAUTHORIZED',
   FORBIDDEN = 'FORBIDDEN',
   NOT_FOUND = 'NOT_FOUND',
+  CONFLICT = 'CONFLICT',
 }
 
 export const HTTP_STATUS_CODES = {
@@ -12,6 +13,7 @@ export const HTTP_STATUS_CODES = {
   [ERROR_CODES.UNAUTHORIZED]: 401,
   [ERROR_CODES.FORBIDDEN]: 403,
   [ERROR_CODES.NOT_FOUND]: 404,
+  [ERROR_CODES.CONFLICT]: 409,
 }
 
 export const ERROR_MESSAGES = {
@@ -20,6 +22,7 @@ export const ERROR_MESSAGES = {
   [ERROR_CODES.UNAUTHORIZED]: 'not authorized',
   [ERROR_CODES.FORBIDDEN]: 'forbidden',
   [ERROR_CODES.NOT_FOUND]: 'not found',
+  [ERROR_CODES.CONFLICT]: 'conflict',
 }
 
 export type RollupErrorOptions = {
@@ -83,6 +86,15 @@ export class NotFoundError extends RollupError {
     if (!options) options = {}
     options.code = options.code ?? ERROR_CODES.NOT_FOUND
     options.message = options.message ?? ERROR_MESSAGES.NOT_FOUND
+    super(options)
+  }
+}
+
+export class ConflictError extends RollupError {
+  constructor(options?: RollupErrorOptions) {
+    if (!options) options = {}
+    options.code = options.code ?? ERROR_CODES.CONFLICT
+    options.message = options.message ?? ERROR_MESSAGES.CONFLICT
     super(options)
   }
 }
