@@ -103,6 +103,11 @@ import {
 } from './methods/patchProfileFields'
 import { resetProfileFieldsMethod } from './methods/resetProfileFields'
 import { mergeMethod, MergeInput, MergeOutput } from './methods/merge'
+import {
+  mergePreviewMethod,
+  MergePreviewInput,
+  MergePreviewOutput,
+} from './methods/merge-preview'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -317,4 +322,14 @@ export const appRouter = t.router({
     .input(MergeInput)
     .output(MergeOutput)
     .mutation(mergeMethod),
+  mergePreview: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireIdentity)
+    .use(injectIdentityNode)
+    .input(MergePreviewInput)
+    .output(MergePreviewOutput)
+    .query(mergePreviewMethod),
 })
