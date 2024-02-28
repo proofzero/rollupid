@@ -16,7 +16,7 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { reconcileSubscriptions } from '@proofzero/utils/billing/stripe'
-import { AppDataStoragePricingEnvObj } from '@proofzero/utils/external-app-data'
+import { getAppDataStoragePricingEnv } from '@proofzero/utils/external-app-data'
 import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -236,9 +236,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID,
           SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID,
           SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID,
-        } = JSON.parse(
-          context.env.SECRET_STRIPE_APP_DATA_STORAGE_PRICE_IDS
-        ) as AppDataStoragePricingEnvObj
+        } = getAppDataStoragePricingEnv(context.env)
 
         if (
           finalizedPriceIDList.some(
