@@ -140,7 +140,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         const newPackageType = fd.get('package') as ExternalAppDataPackageType
         const autoTopUp = fd.get('top-up') !== '0'
 
-        const { readUsage, writeUsage, readTopUp, writeTopUp } =
+        const externalDataUsage =
           await coreClient.starbase.getAppExternalDataUsage.query({
             clientId: params.clientId as string,
           })
@@ -178,25 +178,29 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           autoTopUp,
         })
 
-        const forceTopUp =
-          (readUsage &&
-            readUsage >
-              ExternalAppDataPackages[newPackageType].reads + readTopUp) ||
-          (writeUsage &&
-            writeUsage >
-              ExternalAppDataPackages[newPackageType].writes + writeTopUp)
-        if (appDetails.externalAppDataPackageDefinition && forceTopUp) {
-          await createInvoice(
-            env.SECRET_STRIPE_API_KEY,
-            spd.customerID,
-            sub.id,
-            packageTypeToTopUpPriceID(
-              env,
-              appDetails.externalAppDataPackageDefinition.packageDetails
-                .packageType
-            ),
-            true
-          )
+        if (externalDataUsage) {
+          const { readUsage, writeUsage, readTopUp, writeTopUp } =
+            externalDataUsage
+          const forceTopUp =
+            (readUsage &&
+              readUsage >
+                ExternalAppDataPackages[newPackageType].reads + readTopUp) ||
+            (writeUsage &&
+              writeUsage >
+                ExternalAppDataPackages[newPackageType].writes + writeTopUp)
+          if (appDetails.externalAppDataPackageDefinition && forceTopUp) {
+            await createInvoice(
+              env.SECRET_STRIPE_API_KEY,
+              spd.customerID,
+              sub.id,
+              packageTypeToTopUpPriceID(
+                env,
+                appDetails.externalAppDataPackageDefinition.packageDetails
+                  .packageType
+              ),
+              true
+            )
+          }
         }
 
         break
