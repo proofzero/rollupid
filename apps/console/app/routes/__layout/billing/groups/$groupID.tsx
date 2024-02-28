@@ -40,6 +40,7 @@ import { AppLoaderData } from '~/root'
 import { GroupSeatingCard } from '~/components/Billing/seating'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 import plans from '@proofzero/utils/billing/plans'
+import AppDataStorageUsageTable from '~/components/AppDataStorageUsageTable/AppDataStorageUsageTable'
 
 export const loader = billingLoader
 export const action = billingAction
@@ -388,6 +389,20 @@ export default () => {
             }}
           />
         )}
+      </section>
+
+      <section className="mt-10">
+        <header className="flex flex-col lg:flex-row justify-between lg:items-center relative mb-6">
+          <Text size="lg" weight="semibold" className="text-gray-900">
+            Usage based Services
+          </Text>
+        </header>
+
+        <AppDataStorageUsageTable
+          apps={apps.filter(
+            (a) => Boolean(a.groupID) && Boolean(a.externalAppDataPackage)
+          )}
+        />
       </section>
 
       <section className="mt-10">
