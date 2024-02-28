@@ -4,6 +4,8 @@ import {
   HiOutlineCreditCard,
   HiOutlineMail,
   HiInformationCircle,
+  HiDotsVertical,
+  HiOutlinePencilAlt,
 } from 'react-icons/hi'
 import {
   Link,
@@ -14,8 +16,8 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import type { LoaderData as OutletContextData } from '~/root'
-import { useEffect, useState } from 'react'
+import type { AppLoaderData, LoaderData as OutletContextData } from '~/root'
+import { Fragment, useEffect, useState } from 'react'
 import { Toaster, toast } from '@proofzero/design-system/src/atoms/toast'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -40,6 +42,10 @@ import {
   action as billingAction,
 } from './ops'
 import plans from '@proofzero/utils/billing/plans'
+import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
+import { FaCheck, FaTimes } from 'react-icons/fa'
+import { Menu, Transition } from '@headlessui/react'
+import AppDataStorageModal from '~/components/AppDataStorageModal/AppDataStorageModal'
 
 export const loader = billingLoader
 export const action = billingAction
@@ -130,10 +136,41 @@ export default () => {
 
   const hydrated = useHydrated()
 
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
+  const [selectedApp, setSelectedApp] = useState<AppLoaderData | undefined>()
+  const externalAppDataFetcher = useFetcher()
+  useEffect(() => {
+    if (
+      externalAppDataFetcher.state === 'idle' &&
+      externalAppDataFetcher.type === 'done'
+    ) {
+      setIsSubscriptionModalOpen(false)
+    }
+  }, [externalAppDataFetcher])
+
   return (
     <>
+      {selectedApp && isSubscriptionModalOpen && (
+        <AppDataStorageModal
+          isOpen={isSubscriptionModalOpen}
+          onClose={() => setIsSubscriptionModalOpen(false)}
+          subscriptionFetcher={externalAppDataFetcher}
+          clientID={selectedApp.clientId!}
+          currentPackage={
+            selectedApp.externalAppDataPackage?.definition.packageDetails
+              .packageType
+          }
+          topUp={selectedApp.externalAppDataPackage?.definition.autoTopUp}
+          currentPrice={
+            selectedApp.externalAppDataPackage?.definition.packageDetails.price
+          }
+          reads={selectedApp.externalAppDataPackage?.usage?.readUsage}
+          writes={selectedApp.externalAppDataPackage?.usage?.writeUsage}
+          readTopUp={selectedApp.externalAppDataPackage?.usage?.readTopUp}
+          writeTopUp={selectedApp.externalAppDataPackage?.usage?.writeTopUp}
+        />
+      )}
       <Toaster position="top-right" reverseOrder={false} />
-
       <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
         <div className="flex flex-row items-center space-x-3">
           <Text
@@ -145,7 +182,6 @@ export default () => {
           </Text>
         </div>
       </section>
-
       <section>
         {paymentData && !paymentData.paymentMethodID ? (
           <article className="mb-3.5">
@@ -174,7 +210,6 @@ export default () => {
           </article>
         ) : null}
       </section>
-
       <section className="flex flex-col gap-4">
         <article className="bg-white rounded-lg border">
           <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
@@ -314,6 +349,182 @@ export default () => {
           fetcher={fetcher}
           hasUnpaidInvoices={hasUnpaidInvoices}
         />
+      </section>
+      <section className="mt-10">
+        <header className="flex flex-col lg:flex-row justify-between lg:items-center relative mb-6">
+          <Text size="lg" weight="semibold" className="text-gray-900">
+            Usage based Services
+          </Text>
+        </header>
+
+        <table className="min-w-full table-auto border">
+          <thead className="bg-gray-50">
+            <tr className="rounded-tl-lg">
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Application
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Service
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Active packages
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-left">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Auto top-up
+                </Text>
+              </th>
+              <th className="px-6 py-3 text-right">
+                <Text
+                  size="xs"
+                  weight="medium"
+                  className="uppercase text-gray-500"
+                >
+                  Action
+                </Text>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white">
+            {apps
+              .filter(
+                (a) => !Boolean(a.groupID) && Boolean(a.externalAppDataPackage)
+              )
+              .map((app) => (
+                <tr>
+                  <td className="px-6 py-3">
+                    <div className=" flex items-center gap-2">
+                      <Text size="sm" className="text-gray-500">
+                        {app.name}
+                      </Text>
+                    </div>
+                  </td>
+                  <td className="px-6 py-3">
+                    <Text size="sm" className="text-gray-500">
+                      App Data Storage
+                    </Text>
+                  </td>
+                  <td className="px-6 py-3">
+                    <Text size="sm" className="text-gray-500">
+                      {`${
+                        ExternalAppDataPackages[
+                          app.externalAppDataPackage!.definition.packageDetails
+                            .packageType
+                        ].title
+                      } Package`}
+                    </Text>
+                  </td>
+                  <td className="px-6 py-3">
+                    <Text size="sm" className="text-gray-500">
+                      {app.externalAppDataPackage!.definition.autoTopUp ? (
+                        <FaCheck className="text-green-500" />
+                      ) : (
+                        <FaTimes className="text-red-500" />
+                      )}
+                    </Text>
+                  </td>
+                  <td className="px-6 py-3">
+                    <div className="flex justify-end">
+                      <Menu>
+                        <Menu.Button>
+                          <div
+                            className="w-8 h-8 flex justify-center items-center cursor-pointer
+          hover:bg-gray-100 hover:rounded-[6px]"
+                          >
+                            <HiDotsVertical className="text-lg text-gray-400" />
+                          </div>
+                        </Menu.Button>
+
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95"
+                        >
+                          <Menu.Items
+                            className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100
+          rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y
+           divide-gray-100"
+                          >
+                            <div className="p-1 ">
+                              <div
+                                onClick={() => {
+                                  setSelectedApp(app)
+                                  setIsSubscriptionModalOpen(true)
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <Menu.Item
+                                  as="div"
+                                  className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                  hover:rounded-[6px] hover:bg-gray-100"
+                                >
+                                  <HiOutlinePencilAlt className="text-xl font-normal text-gray-400" />
+                                  <Text
+                                    size="sm"
+                                    weight="normal"
+                                    className="text-gray-700"
+                                  >
+                                    Edit Package
+                                  </Text>
+                                </Menu.Item>
+                              </div>
+                            </div>
+
+                            <div className="p-1">
+                              <Menu.Item
+                                as="div"
+                                className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                hover:rounded-[6px] hover:bg-gray-100 "
+                                onClick={() => {
+                                  // setIsCancelModalOpen(true)
+                                }}
+                              >
+                                {/* <HiOutlineTrash className="text-xl font-normal text-red-500" /> */}
+
+                                <Text
+                                  size="sm"
+                                  weight="normal"
+                                  className="text-red-500"
+                                >
+                                  Go to Application
+                                </Text>
+                              </Menu.Item>
+                            </div>
+                          </Menu.Items>
+                        </Transition>
+                      </Menu>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </section>
 
       <section className="mt-10">

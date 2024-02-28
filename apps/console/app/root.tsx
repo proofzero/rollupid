@@ -56,6 +56,8 @@ import { useHydrated } from 'remix-utils'
 import { getCurrentAndUpcomingInvoices } from './utils/billing'
 import type { ServicePlanType } from '@proofzero/types/billing'
 import { registerFeatureFlag } from '@proofzero/design-system/src/hooks/feature-flags'
+import { ExternalAppDataPackageDefinition } from '@proofzero/platform.starbase/src/types'
+import { GetAppExternalDataUsageOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppExternalDataUsage'
 
 export const links: LinksFunction = () => {
   return [
@@ -78,6 +80,10 @@ export type AppLoaderData = {
   hasCustomDomain: boolean
   groupID?: string
   groupName?: string
+  externalAppDataPackage?: {
+    definition: ExternalAppDataPackageDefinition
+    usage: GetAppExternalDataUsageOutput
+  }
 }
 
 export type LoaderData = {
@@ -126,6 +132,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         coreClient.starbase.listGroupApps.query(),
       ])
 
+      const allClientIdentifiers = [
+        ...apps.map((a) => a.clientId),
+        ...groupApps.map((a) => a.clientId),
+      ]
+      const appsExternalAppDataUsage =
+        await coreClient.starbase.getAppExternalDataUsageBatch.query(
+          allClientIdentifiers
+        )
+
       const reshapedApps = [
         ...apps.map((a) => {
           return {
@@ -136,6 +151,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             createdTimestamp: a.createdTimestamp,
             appPlan: a.appPlan,
             hasCustomDomain: Boolean(a.customDomain),
+            externalAppDataPackage: a.externalAppDataPackageDefinition
+              ? {
+                  definition: a.externalAppDataPackageDefinition,
+                  usage: appsExternalAppDataUsage.find(
+                    (u) => u?.clientID === a.clientId
+                  ),
+                }
+              : undefined,
           }
         }),
         ...groupApps.map((a) => ({
@@ -148,6 +171,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           hasCustomDomain: Boolean(a.customDomain),
           groupName: a.groupName,
           groupID: a.groupURN.split('/')[1],
+          externalAppDataPackage: a.externalAppDataPackageDefinition
+            ? {
+                definition: a.externalAppDataPackageDefinition,
+                usage: appsExternalAppDataUsage.find(
+                  (u) => u?.clientID === a.clientId
+                ),
+              }
+            : undefined,
         })),
       ].sort(
         (a, b) =>
@@ -296,6 +327,7 @@ export default function App() {
   registerFeatureFlag()
 
   const paymentFailedIdentityGroupsFetcher = useFetcher()
+
   useEffect(() => {
     paymentFailedIdentityGroupsFetcher.load(
       '/api/payment-failed-identity-groups'

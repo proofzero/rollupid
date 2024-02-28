@@ -20,8 +20,14 @@ export const GetAppExternalDataUsageOutputSchema = z
     writeAvailable: z.number(),
     writeUsage: z.number(),
     writeTopUp: z.number(),
+    clientID: z.string(),
   })
   .optional()
+
+export const GetAppExternalDataUsageBatchInputSchema = z.array(z.string())
+export const GetAppExternalDataUsageBatchOutputSchema = z.array(
+  GetAppExternalDataUsageOutputSchema
+)
 
 type GetAppExternalDataUsageInput = z.infer<
   typeof GetAppExternalDataUsageInputSchema
@@ -30,15 +36,33 @@ export type GetAppExternalDataUsageOutput = z.infer<
   typeof GetAppExternalDataUsageOutputSchema
 >
 
+type GetAppExternalDataUsageBatchInput = z.infer<
+  typeof GetAppExternalDataUsageBatchInputSchema
+>
+export type GetAppExternalDataUsageBatchOutput = z.infer<
+  typeof GetAppExternalDataUsageBatchOutputSchema
+>
+
 export const getAppExternalDataUsage = async ({
   input,
   ctx,
 }: {
   input: GetAppExternalDataUsageInput
   ctx: Context
-}): Promise<GetAppExternalDataUsageOutput> => {
+}): Promise<GetAppExternalDataUsageOutput> => getUsage(ctx, input.clientId)
+
+export const getAppExternalDataUsageBatch = async ({
+  input,
+  ctx,
+}: {
+  input: GetAppExternalDataUsageBatchInput
+  ctx: Context
+}): Promise<GetAppExternalDataUsageBatchOutput> =>
+  Promise.all(input.map((clientId) => getUsage(ctx, clientId)))
+
+const getUsage = async (ctx: Context, clientID: string) => {
   const appDO = await getApplicationNodeByClientId(
-    input.clientId,
+    clientID,
     ctx.env.StarbaseApp
   )
   const { externalAppDataPackageDefinition } = await appDO.class.getDetails()
@@ -53,12 +77,12 @@ export const getAppExternalDataUsage = async ({
   const { packageDetails } = externalAppDataPackageDefinition
 
   const externalStorageReadKey = generateUsageKey(
-    input.clientId,
+    clientID,
     UsageCategory.ExternalAppDataRead
   )
 
   const externalStorageWriteKey = generateUsageKey(
-    input.clientId,
+    clientID,
     UsageCategory.ExternalAppDataWrite
   )
 
@@ -78,5 +102,6 @@ export const getAppExternalDataUsage = async ({
     writeUsage: writeNumVal,
     writeTopUp:
       writeMeta.limit - externalAppDataPackageDefinition.packageDetails.writes,
+    clientID,
   }
 }
