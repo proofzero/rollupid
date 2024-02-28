@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 
@@ -8,7 +8,93 @@ import { Context } from '../../context'
 import { initAuthorizationNodeByName } from '../../nodes'
 import type { IdentityURN } from '@proofzero/urns/identity'
 import { AppClientIdParamSchema } from '@proofzero/platform.starbase/src/jsonrpc/validators/app'
-import { UsageCategory, generateUsageKey } from '@proofzero/utils/usage'
+import {
+  UsageCategory,
+  generateUsageKey,
+  getStoredUsageWithMetadata,
+} from '@proofzero/utils/usage'
+import {
+  initIdentityNodeByName,
+  initIdentityGroupNodeByName,
+} from '@proofzero/platform.identity/src/nodes'
+import { getApplicationNodeByClientId } from '@proofzero/platform.starbase/src/nodes/application'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
+import { createInvoice } from '@proofzero/utils/billing/stripe'
+import { packageTypeToTopUpPriceID } from '@proofzero/utils/external-app-data'
+import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
+
+export const usageGate = async (
+  ctx: Context,
+  identityURN: IdentityURN,
+  clientID: string,
+  storageKey: string
+) => {
+  const { numValue: externalStorageNumVal, metadata } =
+    await getStoredUsageWithMetadata(ctx.env.UsageKV, storageKey)
+
+  const appDO = await getApplicationNodeByClientId(
+    clientID,
+    ctx.env.StarbaseApp
+  )
+  const { externalAppDataPackageDefinition } = await appDO.class.getDetails()
+  if (!externalAppDataPackageDefinition) {
+    throw new InternalServerError({
+      message: 'external app data package not found',
+    })
+  }
+
+  if (
+    externalStorageNumVal >= 0.8 * metadata.limit &&
+    externalAppDataPackageDefinition.autoTopUp &&
+    externalAppDataPackageDefinition.status ===
+      ExternalAppDataPackageStatus.Enabled
+  ) {
+    let ownerNode
+    if (IdentityURNSpace.is(identityURN)) {
+      ownerNode = initIdentityNodeByName(identityURN, ctx.env.Identity)
+    } else if (IdentityGroupURNSpace.is(identityURN)) {
+      ownerNode = initIdentityGroupNodeByName(
+        identityURN,
+        ctx.env.IdentityGroup
+      )
+    } else {
+      throw new BadRequestError({
+        message: `URN type not supported`,
+      })
+    }
+
+    const stripePaymentData = await ownerNode.class.getStripePaymentData()
+    const customerID = stripePaymentData?.customerID
+    if (!customerID) {
+      throw new InternalServerError({
+        message: 'stripe customer id not found',
+      })
+    }
+
+    await ctx.env.UsageKV.put(storageKey, `${externalStorageNumVal + 1}`, {
+      metadata,
+    })
+
+    await createInvoice(
+      ctx.env.SECRET_STRIPE_API_KEY,
+      customerID,
+      externalAppDataPackageDefinition.packageDetails.subscriptionID,
+      packageTypeToTopUpPriceID(
+        ctx.env,
+        externalAppDataPackageDefinition.packageDetails.packageType
+      ),
+      true
+    )
+  } else if (externalStorageNumVal >= metadata.limit) {
+    throw new BadRequestError({
+      message: 'external storage write limit reached',
+    })
+  } else {
+    await ctx.env.UsageKV.put(storageKey, `${externalStorageNumVal + 1}`, {
+      metadata,
+    })
+  }
+}
 
 export const SetExternalAppDataInputSchema = AppClientIdParamSchema.extend({
   payload: z.any(),
@@ -44,42 +130,7 @@ export const setExternalAppDataMethod = async ({
     UsageCategory.ExternalAppDataWrite
   )
 
-  const { value: externalStorageWriteStr, metadata } =
-    await ctx.env.UsageKV.getWithMetadata<{
-      limit?: number
-    }>(externalStorageWriteKey)
-  if (!externalStorageWriteStr) {
-    throw new BadRequestError({
-      message: 'external storage not enabled',
-    })
-  }
-  if (!metadata || !metadata.limit) {
-    throw new BadRequestError({
-      message: 'missing metadata',
-    })
-  }
+  await usageGate(ctx, identityURN, clientId, externalStorageWriteKey)
 
-  const externalStorageWritesNum = Number(externalStorageWriteStr)
-  if (isNaN(externalStorageWritesNum)) {
-    throw new BadRequestError({
-      message: 'invalid external storage write count',
-    })
-  }
-
-  if (externalStorageWritesNum >= metadata.limit) {
-    throw new BadRequestError({
-      message: 'external storage write limit reached',
-    })
-  }
-
-  await Promise.all([
-    node.storage.put('externalAppData', payload),
-    ctx.env.UsageKV.put(
-      externalStorageWriteKey,
-      `${externalStorageWritesNum + 1}`,
-      {
-        metadata,
-      }
-    ),
-  ])
+  return node.storage.put('externalAppData', payload)
 }

@@ -9,7 +9,6 @@ import createCoreClient, {
   CoreClientType,
 } from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { reconcileSubscriptions } from '~/services/billing/stripe'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
@@ -39,6 +38,7 @@ import {
   getCurrentAndUpcomingInvoices,
 } from '~/utils/billing'
 import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
+import { reconcileSubscriptions } from '@proofzero/utils/billing/stripe'
 
 export enum TxProduct {
   Entitlements = 'entitlements',
@@ -346,7 +346,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           billingURL: `${context.env.CONSOLE_URL}/billing`,
           settingsURL: `${context.env.CONSOLE_URL}`,
         },
-        context.env
+        context.env.SECRET_STRIPE_API_KEY,
+        context.env.SECRET_STRIPE_PRO_PLAN_ID,
+        context.env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID
       )
     }
 

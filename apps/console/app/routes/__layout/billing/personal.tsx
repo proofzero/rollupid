@@ -17,7 +17,6 @@ import {
 import type { LoaderData as OutletContextData } from '~/root'
 import { useEffect, useState } from 'react'
 import { Toaster, toast } from '@proofzero/design-system/src/atoms/toast'
-import plans from '../../../utils/plans'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
@@ -40,6 +39,7 @@ import {
   loader as billingLoader,
   action as billingAction,
 } from './ops'
+import plans from '@proofzero/utils/billing/plans'
 
 export const loader = billingLoader
 export const action = billingAction

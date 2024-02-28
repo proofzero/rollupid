@@ -6,7 +6,6 @@ import Stripe from 'stripe'
 import createCoreClient from '@proofzero/platform-clients/core'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { reconcileSubscriptions } from '~/services/billing/stripe'
 import { InternalServerError } from '@proofzero/errors'
 import { type AccountURN } from '@proofzero/urns/account'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
@@ -16,6 +15,9 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
+import { reconcileSubscriptions } from '@proofzero/utils/billing/stripe'
+import { getAppDataStoragePricingEnv } from '@proofzero/utils/external-app-data'
+import { ExternalAppDataPackageStatus } from '@proofzero/platform.starbase/src/jsonrpc/validators/externalAppDataPackageDefinition'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -66,7 +68,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             billingURL: `${context.env.CONSOLE_URL}/billing`,
             settingsURL: `${context.env.CONSOLE_URL}`,
           },
-          context.env
+          context.env.SECRET_STRIPE_API_KEY,
+          context.env.SECRET_STRIPE_PRO_PLAN_ID,
+          context.env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID
         )
 
         break
@@ -218,7 +222,109 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         break
+      case 'invoice.finalized':
+        const { lines, subscription: invoiceSubscription } = event.data
+          .object as Stripe.Invoice
 
+        const finalizedPriceIDList = lines.data
+          .filter((ili) => Boolean(ili.price))
+          .map((ili) => ili.price!.id)
+          .filter((val, ind, arr) => arr.indexOf(val) === ind)
+
+        const {
+          SECRET_STRIPE_APP_DATA_STORAGE_STARTER_PRICE_ID,
+          SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID,
+          SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID,
+          SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID,
+        } = getAppDataStoragePricingEnv(context.env)
+
+        if (
+          finalizedPriceIDList.some(
+            (pi) =>
+              pi === SECRET_STRIPE_APP_DATA_STORAGE_STARTER_TOP_UP_PRICE_ID ||
+              pi === SECRET_STRIPE_APP_DATA_STORAGE_SCALE_TOP_UP_PRICE_ID
+          )
+        ) {
+          const subscription = await stripeClient.subscriptions.retrieve(
+            invoiceSubscription as string
+          )
+          if (!subscription) {
+            throw new InternalServerError({
+              message: `Could not find subscription. Expected external app data package to be associated to a subscription.`,
+            })
+          }
+
+          const clientID = subscription.metadata?.clientID
+          if (!clientID) {
+            throw new InternalServerError({
+              message: `Could not find clientID in metadata.`,
+            })
+          }
+
+          const externalAppDataPackage =
+            await coreClient.starbase.getAppExternalDataPackage.query({
+              clientId: clientID,
+            })
+          if (!externalAppDataPackage) {
+            throw new InternalServerError({
+              message: `Could not find externalAppDataPackage.`,
+            })
+          }
+
+          await coreClient.starbase.externalAppDataLimitIncrement.mutate({
+            clientId: clientID,
+            reads: externalAppDataPackage.reads,
+            writes: externalAppDataPackage.writes,
+          })
+
+          if (
+            externalAppDataPackage.status ===
+            ExternalAppDataPackageStatus.ToppingUp
+          ) {
+            await coreClient.starbase.setExternalAppDataPackageStatus.mutate({
+              clientId: clientID,
+              status: ExternalAppDataPackageStatus.Enabled,
+            })
+          }
+        }
+
+        if (
+          finalizedPriceIDList.some(
+            (pi) =>
+              pi === SECRET_STRIPE_APP_DATA_STORAGE_STARTER_PRICE_ID ||
+              pi === SECRET_STRIPE_APP_DATA_STORAGE_SCALE_PRICE_ID
+          )
+        ) {
+          const subscription = await stripeClient.subscriptions.retrieve(
+            invoiceSubscription as string
+          )
+          if (!subscription) {
+            throw new InternalServerError({
+              message: `Could not find subscription. Expected external app data package to be associated to a subscription.`,
+            })
+          }
+
+          const clientID = subscription.metadata?.clientID
+          if (!clientID) {
+            throw new InternalServerError({
+              message: `Could not find clientID in metadata`,
+            })
+          }
+
+          if (subscription.metadata.noReset === 'true') {
+            await stripeClient.subscriptions.update(subscription.id, {
+              metadata: {
+                noReset: null,
+              },
+            })
+          } else {
+            await coreClient.starbase.externalAppDataUsageReset.mutate({
+              clientId: clientID,
+            })
+          }
+        }
+
+        break
       case 'invoice.payment_failed':
         const { customer: customerFail, payment_intent: paymentIntentFail } =
           event.data.object as Stripe.Invoice

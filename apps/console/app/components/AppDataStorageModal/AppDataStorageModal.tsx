@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { HiOutlineX } from 'react-icons/hi'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import { FaCheck, FaTimes } from 'react-icons/fa'
+import { HiExclamationTriangle } from 'react-icons/hi2'
 
 type AppDataStorageModalProps = {
   isOpen: boolean
@@ -17,6 +18,10 @@ type AppDataStorageModalProps = {
   topUp?: boolean
   currentPrice?: number
   clientID: string
+  reads?: number
+  writes?: number
+  readTopUp?: number
+  writeTopUp?: number
 }
 
 const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
@@ -27,6 +32,10 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
   topUp = false,
   currentPrice = 0,
   clientID,
+  reads,
+  writes,
+  readTopUp = 0,
+  writeTopUp = 0,
 }) => {
   const [selectedPackage, setSelectedPackage] =
     useState<ExternalAppDataPackageType>(
@@ -57,7 +66,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
               weight="semibold"
               className="text-left text-gray-800"
             >
-              Purchase Entitlement(s)
+              App Data Storage
             </Text>
             <button
               className="bg-white p-2 rounded-lg text-xl cursor-pointer hover:bg-[#F3F4F6]"
@@ -75,6 +84,7 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
               >
                 Choose Package
               </Text>
+
               <div className="text-left flex flex-row items-center gap-1.5">
                 <Button
                   disabled={subscriptionFetcher.state !== 'idle'}
@@ -110,6 +120,30 @@ const AppDataStorageModal: React.FC<AppDataStorageModalProps> = ({
                 </Button>
               </div>
             </div>
+
+            {(reads &&
+              reads >
+                ExternalAppDataPackages[selectedPackage].reads + readTopUp) ||
+            (writes &&
+              writes >
+                ExternalAppDataPackages[selectedPackage].writes +
+                  writeTopUp) ? (
+              <>
+                <div className="flex flex-row rounded p-4 gap-2 max-w-[724px] bg-orange-50">
+                  <HiExclamationTriangle className="h-5 w-5 text-orange-400" />
+
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-left text-orange-600"
+                  >
+                    You are already past usage limits of selected package. You
+                    will be charged a one time top-up fee to enable continued
+                    access to the service within the current billing cycle.
+                  </Text>
+                </div>
+              </>
+            ) : null}
 
             <div className="flex flex-col border rounded">
               <div className="flex flex-row items-center justify-between px-4 py-2">

@@ -1,9 +1,3 @@
-import {
-  createSubscription,
-  getInvoices,
-  getUpcomingInvoices,
-  updateSubscription,
-} from '~/services/billing/stripe'
 import type { StripePaymentData } from '@proofzero/platform/billing/src/types'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { type PaymentIntent, loadStripe } from '@stripe/stripe-js'
@@ -14,6 +8,12 @@ import { type Env } from 'bindings'
 import Stripe from 'stripe'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
+import {
+  createSubscription,
+  getInvoices,
+  getUpcomingInvoices,
+  updateSubscription,
+} from '@proofzero/utils/billing/stripe'
 
 export type StripeInvoice = {
   id: string
@@ -94,6 +94,7 @@ export const createOrUpdateSubscription = async ({
   quantity,
   URN,
   customerID,
+  metadata,
 }: {
   subscriptionID?: string | null
   planID: string
@@ -101,6 +102,7 @@ export const createOrUpdateSubscription = async ({
   quantity: number
   URN: IdentityRefURN
   customerID: string
+  metadata?: Stripe.MetadataParam
 }) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
@@ -115,6 +117,7 @@ export const createOrUpdateSubscription = async ({
         quantity,
         URN,
         handled: true,
+        metadata,
       },
       stripeClient
     )

@@ -1,13 +1,14 @@
 import {
   Form,
   useFetcher,
+  useLoaderData,
   useOutletContext,
   useTransition,
 } from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction } from '@remix-run/cloudflare'
+import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import {
@@ -45,9 +46,39 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { IdentityURN } from '@proofzero/urns/identity'
-import { cancelSubscription, changePriceID } from '~/services/billing/stripe'
 import Stripe from 'stripe'
-import { packageTypeToPriceID } from '~/utils/external-app-data'
+import {
+  cancelSubscription,
+  changePriceID,
+  createInvoice,
+} from '@proofzero/utils/billing/stripe'
+import { GetAppExternalDataUsageOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppExternalDataUsage'
+import {
+  packageTypeToPriceID,
+  packageTypeToTopUpPriceID,
+} from '@proofzero/utils/external-app-data'
+import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
+
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const jwt = await requireJWT(request, context.env)
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const coreClient = createCoreClient(context.env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const appExternalStorageUsage =
+      await coreClient.starbase.getAppExternalDataUsage.query({
+        clientId: params.clientId as string,
+      })
+
+    return json({
+      appExternalStorageUsage,
+    })
+  }
+)
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -103,6 +134,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         const newPackageType = fd.get('package') as ExternalAppDataPackageType
         const autoTopUp = fd.get('top-up') !== '0'
 
+        const { readUsage, writeUsage, readTopUp, writeTopUp } =
+          await coreClient.starbase.getAppExternalDataUsage.query({
+            clientId: params.clientId as string,
+          })
+
         let sub
         if (appDetails.externalAppDataPackageDefinition?.packageDetails) {
           const { subscriptionID, packageType: oldPackageType } =
@@ -121,6 +157,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             planID: packageTypeToPriceID(env, newPackageType),
             SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
             quantity: 1,
+            metadata: {
+              clientID: clientId,
+            },
           })
         }
 
@@ -132,6 +171,28 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           },
           autoTopUp,
         })
+
+        const forceTopUp =
+          (readUsage &&
+            readUsage >
+              ExternalAppDataPackages[newPackageType].reads + readTopUp) ||
+          (writeUsage &&
+            writeUsage >
+              ExternalAppDataPackages[newPackageType].writes + writeTopUp)
+        if (appDetails.externalAppDataPackageDefinition && forceTopUp) {
+          await createInvoice(
+            env.SECRET_STRIPE_API_KEY,
+            spd.customerID,
+            sub.id,
+            packageTypeToTopUpPriceID(
+              env,
+              appDetails.externalAppDataPackageDefinition.packageDetails
+                .packageType
+            ),
+            true
+          )
+        }
+
         break
       case 'disable':
         if (!appDetails.externalAppDataPackageDefinition?.packageDetails) {
@@ -256,6 +317,10 @@ export default () => {
     appDetails: appDetailsProps
   }>()
 
+  const { appExternalStorageUsage } = useLoaderData<{
+    appExternalStorageUsage: GetAppExternalDataUsageOutput
+  }>()
+
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
 
@@ -289,6 +354,10 @@ export default () => {
           currentPrice={
             appDetails.externalAppDataPackageDefinition?.packageDetails.price
           }
+          reads={appExternalStorageUsage?.readUsage}
+          writes={appExternalStorageUsage?.writeUsage}
+          readTopUp={appExternalStorageUsage?.readTopUp}
+          writeTopUp={appExternalStorageUsage?.writeTopUp}
         />
       )}
 

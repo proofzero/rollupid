@@ -27,9 +27,9 @@ import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWit
 import { HiArrowNarrowRight } from 'react-icons/hi'
 import _ from 'lodash'
 import iSvg from '@proofzero/design-system/src/atoms/info/i.svg'
-import plans, { PlanDetails } from '~/utils/plans'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
 import { Spinner } from '@proofzero/packages/design-system/src/atoms/spinner/Spinner'
+import plans, { PlanDetails } from '@proofzero/utils/billing/plans'
 
 export const PlanFeatures = ({
   plan,

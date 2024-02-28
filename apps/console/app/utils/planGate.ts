@@ -1,9 +1,9 @@
 import { ServicePlanType } from '@proofzero/types/billing'
 import { appendToastToFlashSession } from './toast.server'
-import plans from '~/utils/plans'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { commitFlashSession } from '~/utilities/session.server'
 import { Env } from 'bindings'
+import plans from '@proofzero/utils/billing/plans'
 
 export const isPlanGuarded = (
   appPlan: ServicePlanType,

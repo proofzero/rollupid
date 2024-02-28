@@ -145,6 +145,28 @@ import {
   setExternalAppDataPackage,
   SetExternalAppDataPackageInputSchema,
 } from './methods/setExternalAppDataPackage'
+import {
+  getAppExternalDataPackage,
+  GetAppExternalDataPackageInputSchema,
+  GetAppExternalDataPackageOutputSchema,
+} from './methods/getAppExternalDataPackage'
+import {
+  ExternalAppDataLimitIncrementInputSchema,
+  externalAppDataLimitIncrementMethod,
+} from './methods/externalAppDataLimitIncrement'
+import {
+  ExternalAppDataUsageResetInputSchema,
+  externalAppDataUsageResetMethod,
+} from './methods/externalAppDataUsageReset'
+import {
+  getAppExternalDataUsage,
+  GetAppExternalDataUsageInputSchema,
+  GetAppExternalDataUsageOutputSchema,
+} from './methods/getAppExternalDataUsage'
+import {
+  setExternalAppDataPackageStatus,
+  SetExternalAppDataPackageStatusInputSchema,
+} from './methods/setExternalAppDataPackageStatus'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -418,6 +440,36 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(SetExternalAppDataPackageInputSchema)
     .mutation(setExternalAppDataPackage),
+  setExternalAppDataPackageStatus: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SetExternalAppDataPackageStatusInputSchema)
+    .mutation(setExternalAppDataPackageStatus),
+  getAppExternalDataPackage: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppExternalDataPackageInputSchema)
+    .output(GetAppExternalDataPackageOutputSchema)
+    .query(getAppExternalDataPackage),
+  externalAppDataLimitIncrement: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(ExternalAppDataLimitIncrementInputSchema)
+    .mutation(externalAppDataLimitIncrementMethod),
+  externalAppDataUsageReset: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(ExternalAppDataUsageResetInputSchema)
+    .mutation(externalAppDataUsageResetMethod),
+  getAppExternalDataUsage: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(GetAppExternalDataUsageInputSchema)
+    .output(GetAppExternalDataUsageOutputSchema)
+    .query(getAppExternalDataUsage),
 })
 
 export type StarbaseRouter = typeof appRouter

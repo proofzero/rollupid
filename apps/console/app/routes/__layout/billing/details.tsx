@@ -11,7 +11,6 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { createCustomer, updateCustomer } from '~/services/billing/stripe'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { AccountURN } from '@proofzero/urns/account'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
@@ -21,6 +20,7 @@ import {
 } from '@proofzero/urns/identity-group'
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
+import { createCustomer, updateCustomer } from '@proofzero/utils/billing/stripe'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -82,7 +82,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           name,
           URN: targetURN,
         },
-        context.env
+        context.env.SECRET_STRIPE_API_KEY
       )
 
       paymentData = {
@@ -105,7 +105,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           email,
           name,
         },
-        context.env
+        context.env.SECRET_STRIPE_API_KEY
       )
     }
 

@@ -169,7 +169,7 @@ export default {
         try {
           const { appID, athID } = msg.body.data
 
-          const nss = `${appID}@${athID}`
+          const nss = `${athID}@${appID}`
           const urn = AuthorizationURNSpace.componentizedUrn(nss)
 
           const node = initAuthorizationNodeByName(urn, env.Authorization)
