@@ -131,5 +131,5 @@ export const setExternalAppDataMethod = async ({
     )
   }
 
-  return node.storage.get('externalAppData')
+  return node.storage.put('externalAppData', payload)
 }
