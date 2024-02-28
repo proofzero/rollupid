@@ -57,6 +57,7 @@ import {
   packageTypeToPriceID,
   packageTypeToTopUpPriceID,
 } from '@proofzero/utils/external-app-data'
+import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -132,7 +133,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       case 'enable':
         const newPackageType = fd.get('package') as ExternalAppDataPackageType
         const autoTopUp = fd.get('top-up') !== '0'
-        const forceTopUp = fd.get('force-top-up') != undefined
+
+        const { readUsage, writeUsage, readTopUp, writeTopUp } =
+          await coreClient.starbase.getAppExternalDataUsage.query({
+            clientId: params.clientId as string,
+          })
 
         let sub
         if (appDetails.externalAppDataPackageDefinition?.packageDetails) {
@@ -166,6 +171,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           },
           autoTopUp,
         })
+
+        const forceTopUp =
+          (readUsage &&
+            readUsage >
+              ExternalAppDataPackages[newPackageType].reads + readTopUp) ||
+          (writeUsage &&
+            writeUsage >
+              ExternalAppDataPackages[newPackageType].writes + writeTopUp)
         if (appDetails.externalAppDataPackageDefinition && forceTopUp) {
           await createInvoice(
             env.SECRET_STRIPE_API_KEY,
