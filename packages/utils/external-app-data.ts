@@ -13,7 +13,7 @@ export type AppDataStoragePricingEnvObj = {
 }
 
 export const getAppDataStoragePricingEnv = (env: IAppDataStoragePricingEnv) => {
-  let storagePriceEnvVars = env.SECRET_STRIPE_APP_DATA_STORAGE_PRICE_IDS
+  const storagePriceEnvVars = env.SECRET_STRIPE_APP_DATA_STORAGE_PRICE_IDS
   if (!storagePriceEnvVars || storagePriceEnvVars === '') {
     throw new InternalServerError({
       message: `Could not find storage price env vars.`,
