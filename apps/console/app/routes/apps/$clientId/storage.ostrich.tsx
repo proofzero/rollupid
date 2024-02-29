@@ -228,8 +228,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         })
     }
 
-    if (fd.get('redirect_url')) {
-      return redirect(fd.get('redirect_url') as string)
+    if (fd.get('redirect_to_app_billing')) {
+      return redirect(`/apps/${clientId}/billing`)
     }
 
     return null
@@ -240,12 +240,12 @@ export const ConfirmCancelModal = ({
   isOpen,
   setIsOpen,
   clientID,
-  redirectURL,
+  redirectToAppBilling = false,
 }: {
   isOpen: boolean
   setIsOpen: (val: boolean) => void
   clientID: string
-  redirectURL?: string
+  redirectToAppBilling?: boolean
 }) => {
   const [confirmationText, setConfirmationText] = useState('')
   const transition = useTransition()
@@ -283,8 +283,12 @@ export const ConfirmCancelModal = ({
             }}
           >
             <input type="hidden" name="op" value="disable" />
-            {redirectURL && (
-              <input type="hidden" name="redirect_url" value={redirectURL} />
+            {redirectToAppBilling && (
+              <input
+                type="hidden"
+                name="redirect_to_app_billing"
+                value="true"
+              />
             )}
 
             <section className="mb-4">

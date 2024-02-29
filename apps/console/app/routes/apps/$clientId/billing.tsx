@@ -858,7 +858,7 @@ export default () => {
           isOpen={isCancelModalOpen}
           setIsOpen={setIsCancelModalOpen}
           clientID={appDetails.clientId!}
-          redirectURL={`/apps/${appDetails.clientId}/billing`}
+          redirectToAppBilling={true}
         />
       )}
       {isSubscriptionModalOpen && (
