@@ -6,6 +6,8 @@ import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { AuthorizationJWTPayload } from '@proofzero/types/authorization'
 
+import { initIdentityNodeByName } from '@proofzero/platform.identity/src/nodes'
+
 import { Context } from '../../context'
 import { getJWKS } from '../../jwk'
 import { initAuthorizationNodeByName } from '../../nodes'
@@ -34,7 +36,6 @@ export const getUserInfoMethod = async ({
 }): Promise<z.infer<typeof GetUserInfoOutput>> => {
   const token = input.access_token
   const jwt = decodeJwt(token) as AuthorizationJWTPayload
-  const identityURN = jwt.sub
   const [clientId] = jwt.aud
   const scope = jwt.scope.split(' ')
 
@@ -43,10 +44,15 @@ export const getUserInfoMethod = async ({
       message: 'missing client id in the aud claim',
     })
 
-  if (!IdentityURNSpace.is(identityURN))
+  if (!IdentityURNSpace.is(jwt.sub))
     throw new BadRequestError({
       message: 'missing identity in the sub claim',
     })
+
+  const tokenIdentityNode = initIdentityNodeByName(jwt.sub, ctx.env.Identity)
+  const forwardIdentityURN =
+    await tokenIdentityNode.class.getForwardIdentityURN()
+  const identityURN = forwardIdentityURN || jwt.sub
 
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)

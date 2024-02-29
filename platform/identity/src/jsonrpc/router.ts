@@ -117,7 +117,10 @@ export const injectIdentityNode = t.middleware(async ({ ctx, next }) => {
   if (!identityURN)
     throw new UnauthorizedError({ message: 'No identityURN in context' })
 
-  const identityNode = initIdentityNodeByName(identityURN, ctx.env.Identity)
+  let identityNode = initIdentityNodeByName(identityURN, ctx.env.Identity)
+  const forwardIdentityURN = await identityNode.class.getForwardIdentityURN()
+  if (forwardIdentityURN)
+    identityNode = initIdentityNodeByName(forwardIdentityURN, ctx.env.Identity)
 
   return next({
     ctx: {

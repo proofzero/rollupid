@@ -52,6 +52,9 @@ export const usageGate = async (
     let ownerNode
     if (IdentityURNSpace.is(identityURN)) {
       ownerNode = initIdentityNodeByName(identityURN, ctx.env.Identity)
+      const forwardIdentityURN = await ownerNode.class.getForwardIdentityURN()
+      if (forwardIdentityURN)
+        ownerNode = initIdentityNodeByName(forwardIdentityURN, ctx.env.Identity)
     } else if (IdentityGroupURNSpace.is(identityURN)) {
       ownerNode = initIdentityGroupNodeByName(
         identityURN,
