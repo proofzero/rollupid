@@ -4,6 +4,8 @@ import { BadRequestError } from '@proofzero/errors'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 
+import { initIdentityNodeByName } from '@proofzero/platform.identity/src/nodes'
+
 import { Context } from '../../context'
 import { initAuthorizationNodeByName } from '../../nodes'
 import { PersonaData } from '@proofzero/types/application'
@@ -22,17 +24,24 @@ export const getPersonaDataMethod = async ({
   input: z.infer<typeof GetPersonaDataInput>
   ctx: Context
 }): Promise<z.infer<typeof GetPersonaDataOutput>> => {
-  const { identityURN, clientId } = input
+  const { clientId } = input
 
   if (!clientId)
     throw new BadRequestError({
       message: 'missing client id',
     })
 
-  if (!IdentityURNSpace.is(identityURN))
+  if (!IdentityURNSpace.is(input.identityURN))
     throw new BadRequestError({
       message: 'missing identity',
     })
+
+  const identityNode = initIdentityNodeByName(
+    input.identityURN,
+    ctx.env.Identity
+  )
+  const forwardIdentityURN = await identityNode.class.getForwardIdentityURN()
+  const identityURN = forwardIdentityURN || input.identityURN
 
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)

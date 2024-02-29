@@ -238,7 +238,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       const responseType = ResponseType.Code
       const preauthorizeRes =
         await coreClient.authorization.preauthorize.mutate({
-          identity: identityURN,
+          identityURN,
           responseType,
           clientId,
           redirectUri,

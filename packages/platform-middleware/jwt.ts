@@ -3,6 +3,9 @@ import { IdentityURNSpace, type IdentityURN } from '@proofzero/urns/identity'
 import { getAuthzTokenFromReq } from '@proofzero/utils'
 import { checkToken } from '@proofzero/utils/token'
 
+import { type Environment } from '@proofzero/platform.core/src/types'
+import { initIdentityNodeByName } from '@proofzero/platform.identity/src/nodes'
+
 import { BaseMiddlewareFunction } from './types'
 
 export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
@@ -20,15 +23,21 @@ export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
 }
 
 export const ValidateJWT: BaseMiddlewareFunction<{
+  env: Environment
   token?: string
-}> = ({ ctx, next }) => {
+}> = async ({ ctx, next }) => {
   if (ctx.token) {
     const { sub: subject } = checkToken(ctx.token)
     if (subject && IdentityURNSpace.is(subject)) {
+      const identityNode = initIdentityNodeByName(subject, ctx.env.Identity)
+      const forwardIdentityURN =
+        await identityNode.class.getForwardIdentityURN()
+      const identityURN = forwardIdentityURN || subject
+
       return next({
         ctx: {
           ...ctx,
-          identityURN: subject,
+          identityURN,
         },
       })
     }

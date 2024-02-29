@@ -9,6 +9,8 @@ import { appRouter } from '../router'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 
+import { initIdentityNodeByName } from '@proofzero/platform.identity/src/nodes'
+
 export const PreAuthorizeMethodInput = z.object({
   identity: IdentityURNInput,
   responseType: z.string(),
@@ -42,9 +44,13 @@ export const preauthorizeMethod = async ({
 }): Promise<PreAuthorizeOutputParams> => {
   let preauthorized = false
 
-  const { identity, clientId, scope: requestedScope } = input
+  const { clientId, scope: requestedScope } = input
 
-  const nss = `${IdentityURNSpace.decode(identity)}@${clientId}`
+  const identityNode = initIdentityNodeByName(input.identity, ctx.env.Identity)
+  const forwardIdentityURN = await identityNode.class.getForwardIdentityURN()
+  const identityURN = forwardIdentityURN || input.identity
+
+  const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const authorizationNode = initAuthorizationNodeByName(
     urn,

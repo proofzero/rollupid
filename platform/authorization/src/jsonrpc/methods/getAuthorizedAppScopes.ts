@@ -7,6 +7,8 @@ import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { appRouter } from '../router'
 import { getClaimValues } from '@proofzero/security/persona'
 
+import { initIdentityNodeByName } from '@proofzero/platform.identity/src/nodes'
+
 export const GetAuthorizedAppScopesMethodInput = z.object({
   identityURN: inputValidators.IdentityURNInput,
   clientId: z.string().min(1),
@@ -47,7 +49,14 @@ export const getAuthorizedAppScopesMethod = async ({
   input: GetAuthorizedAppScopesMethodParams
   ctx: Context
 }): Promise<GetAuthorizedAppScopesMethodResult> => {
-  const { identityURN, clientId } = input
+  const { clientId } = input
+
+  const identityNode = initIdentityNodeByName(
+    input.identityURN,
+    ctx.env.Identity
+  )
+  const forwardIdentityURN = await identityNode.class.getForwardIdentityURN()
+  const identityURN = forwardIdentityURN || input.identityURN
 
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
