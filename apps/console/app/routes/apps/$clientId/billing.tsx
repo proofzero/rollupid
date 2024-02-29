@@ -69,6 +69,9 @@ import _ from 'lodash'
 import { FaCheck, FaTimes } from 'react-icons/fa'
 import { Menu, Transition } from '@headlessui/react'
 import { ConfirmCancelModal } from './storage.ostrich'
+import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
+import { useHydrated } from 'remix-utils'
+
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -339,7 +342,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         ) {
           // lots of stripe type casting since by default many
           // props are strings (not expanded versions)
-          ;({ status, client_secret, payment_method } = (
+          ; ({ status, client_secret, payment_method } = (
             sub.latest_invoice as Stripe.Invoice
           ).payment_intent as Stripe.PaymentIntent)
         }
@@ -718,7 +721,7 @@ const EntitlementsCardButton = ({
   const upgrade = isUpgrade(entitlement.planType, currentPlan)
   const op =
     entitlement.planType === ServicePlanType.FREE ||
-    getAvailableEntitlements(entitlement) > 0
+      getAvailableEntitlements(entitlement) > 0
       ? 'update'
       : 'purchase'
 
@@ -851,6 +854,9 @@ export default () => {
     }
   }, [fetcher])
 
+  const hydrated = useHydrated()
+  const featureFlags = useFeatureFlags(hydrated)
+
   return (
     <>
       {isCancelModalOpen && (
@@ -884,255 +890,258 @@ export default () => {
 
       <Toaster position="top-right" reverseOrder={false} />
 
-      <section className="mb-4 flex flex-col gap-4">
-        <Text size="lg" weight="semibold">
-          Usage based Services
-        </Text>
-        <table className="min-w-full table-auto border">
-          <thead className="bg-gray-50">
-            <tr className="rounded-tl-lg">
-              <th className="px-6 py-3 text-left">
-                <Text
-                  size="xs"
-                  weight="medium"
-                  className="uppercase text-gray-500"
-                >
-                  Applies to service
-                </Text>
-              </th>
-              <th className="px-6 py-3 text-left">
-                <Text
-                  size="xs"
-                  weight="medium"
-                  className="uppercase text-gray-500"
-                >
-                  Unit package
-                </Text>
-              </th>
-              <th className="px-6 py-3 text-left">
-                <Text
-                  size="xs"
-                  weight="medium"
-                  className="uppercase text-gray-500"
-                >
-                  Service status
-                </Text>
-              </th>
-              <th className="px-6 py-3 text-left">
-                <Text
-                  size="xs"
-                  weight="medium"
-                  className="uppercase text-gray-500"
-                >
-                  Usage
-                </Text>
-              </th>
-              <th className="px-6 py-3 text-left">
-                <Text
-                  size="xs"
-                  weight="medium"
-                  className="uppercase text-gray-500"
-                >
-                  Auto top-up
-                </Text>
-              </th>
-              <th className="px-6 py-3 text-right">
-                <Text
-                  size="xs"
-                  weight="medium"
-                  className="uppercase text-gray-500"
-                >
-                  Action
-                </Text>
-              </th>
-            </tr>
-          </thead>
+      {featureFlags['app_storage'] &&
+        (
 
-          {appDetails.externalAppDataPackageDefinition &&
-            appExternalStorageUsage && (
-              <tbody className="bg-white">
-                <tr>
-                  <td className="px-6 py-3">
-                    <div className=" flex items-center gap-2">
-                      <div className="bg-gray-100 rounded-full p-2">
-                        <TbDatabaseImport className="w-4 h-4 text-gray-600" />
-                      </div>
+          <section className="mb-4 flex flex-col gap-4">
+            <Text size="lg" weight="semibold">
+              Usage based Services
+            </Text>
+            <table className="min-w-full table-auto border">
+              <thead className="bg-gray-50">
+                <tr className="rounded-tl-lg">
+                  <th className="px-6 py-3 text-left">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Applies to service
+                    </Text>
+                  </th>
+                  <th className="px-6 py-3 text-left">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Unit package
+                    </Text>
+                  </th>
+                  <th className="px-6 py-3 text-left">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Service status
+                    </Text>
+                  </th>
+                  <th className="px-6 py-3 text-left">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Usage
+                    </Text>
+                  </th>
+                  <th className="px-6 py-3 text-left">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Auto top-up
+                    </Text>
+                  </th>
+                  <th className="px-6 py-3 text-right">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Action
+                    </Text>
+                  </th>
+                </tr>
+              </thead>
 
-                      <Text size="sm" className="text-gray-500">
-                        App data storage
-                      </Text>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <Text size="sm" className="text-gray-500">
-                      {`${
-                        ExternalAppDataPackages[
-                          appDetails.externalAppDataPackageDefinition
-                            .packageDetails.packageType
-                        ].title
-                      } Package`}
-                    </Text>
-                  </td>
-                  <td className="px-6 py-3">
-                    <Text size="sm" className="text-gray-500">
-                      {_.upperFirst(
-                        appDetails.externalAppDataPackageDefinition.status
-                      )}
-                    </Text>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex flex-col">
-                      <Text size="xs" className="text-gray-500">
-                        {`Writes: ${appExternalStorageUsage.writeUsage}/${appExternalStorageUsage.writeAvailable}`}
-                      </Text>
-                      <Text size="xs" className="text-gray-500">
-                        {`Reads: ${appExternalStorageUsage.readUsage}/${appExternalStorageUsage.readAvailable}`}
-                      </Text>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <Text size="sm" className="text-gray-500">
-                      {appDetails.externalAppDataPackageDefinition.autoTopUp ? (
-                        <FaCheck className="text-green-500" />
-                      ) : (
-                        <FaTimes className="text-red-500" />
-                      )}
-                    </Text>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-end">
-                      <Menu>
-                        <Menu.Button>
-                          <div
-                            className="w-8 h-8 flex justify-center items-center cursor-pointer
-          hover:bg-gray-100 hover:rounded-[6px]"
-                          >
-                            <HiDotsVertical className="text-lg text-gray-400" />
+              {appDetails.externalAppDataPackageDefinition &&
+                appExternalStorageUsage && (
+                  <tbody className="bg-white">
+                    <tr>
+                      <td className="px-6 py-3">
+                        <div className=" flex items-center gap-2">
+                          <div className="bg-gray-100 rounded-full p-2">
+                            <TbDatabaseImport className="w-4 h-4 text-gray-600" />
                           </div>
-                        </Menu.Button>
 
-                        <Transition
-                          as={Fragment}
-                          enter="transition ease-out duration-100"
-                          enterFrom="transform opacity-0 scale-95"
-                          enterTo="transform opacity-100 scale-100"
-                          leave="transition ease-in duration-75"
-                          leaveFrom="transform opacity-100 scale-100"
-                          leaveTo="transform opacity-0 scale-95"
-                        >
-                          <Menu.Items
-                            className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100
+                          <Text size="sm" className="text-gray-500">
+                            App data storage
+                          </Text>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <Text size="sm" className="text-gray-500">
+                          {`${ExternalAppDataPackages[
+                            appDetails.externalAppDataPackageDefinition
+                              .packageDetails.packageType
+                          ].title
+                            } Package`}
+                        </Text>
+                      </td>
+                      <td className="px-6 py-3">
+                        <Text size="sm" className="text-gray-500">
+                          {_.upperFirst(
+                            appDetails.externalAppDataPackageDefinition.status
+                          )}
+                        </Text>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex flex-col">
+                          <Text size="xs" className="text-gray-500">
+                            {`Writes: ${appExternalStorageUsage.writeUsage}/${appExternalStorageUsage.writeAvailable}`}
+                          </Text>
+                          <Text size="xs" className="text-gray-500">
+                            {`Reads: ${appExternalStorageUsage.readUsage}/${appExternalStorageUsage.readAvailable}`}
+                          </Text>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <Text size="sm" className="text-gray-500">
+                          {appDetails.externalAppDataPackageDefinition.autoTopUp ? (
+                            <FaCheck className="text-green-500" />
+                          ) : (
+                            <FaTimes className="text-red-500" />
+                          )}
+                        </Text>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-end">
+                          <Menu>
+                            <Menu.Button>
+                              <div
+                                className="w-8 h-8 flex justify-center items-center cursor-pointer
+          hover:bg-gray-100 hover:rounded-[6px]"
+                              >
+                                <HiDotsVertical className="text-lg text-gray-400" />
+                              </div>
+                            </Menu.Button>
+
+                            <Transition
+                              as={Fragment}
+                              enter="transition ease-out duration-100"
+                              enterFrom="transform opacity-0 scale-95"
+                              enterTo="transform opacity-100 scale-100"
+                              leave="transition ease-in duration-75"
+                              leaveFrom="transform opacity-100 scale-100"
+                              leaveTo="transform opacity-0 scale-95"
+                            >
+                              <Menu.Items
+                                className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100
           rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y
            divide-gray-100"
-                          >
-                            <div className="p-1 ">
-                              <div
-                                onClick={() => {
-                                  setIsSubscriptionModalOpen(true)
-                                }}
-                                className="cursor-pointer"
                               >
-                                <Menu.Item
-                                  as="div"
-                                  className="py-2 px-4 flex items-center space-x-3 cursor-pointer
-                  hover:rounded-[6px] hover:bg-gray-100"
-                                >
-                                  <HiOutlinePencilAlt className="text-xl font-normal text-gray-400" />
-                                  <Text
-                                    size="sm"
-                                    weight="normal"
-                                    className="text-gray-700"
+                                <div className="p-1 ">
+                                  <div
+                                    onClick={() => {
+                                      setIsSubscriptionModalOpen(true)
+                                    }}
+                                    className="cursor-pointer"
                                   >
-                                    Edit Package
-                                  </Text>
-                                </Menu.Item>
-                              </div>
-                            </div>
+                                    <Menu.Item
+                                      as="div"
+                                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                  hover:rounded-[6px] hover:bg-gray-100"
+                                    >
+                                      <HiOutlinePencilAlt className="text-xl font-normal text-gray-400" />
+                                      <Text
+                                        size="sm"
+                                        weight="normal"
+                                        className="text-gray-700"
+                                      >
+                                        Edit Package
+                                      </Text>
+                                    </Menu.Item>
+                                  </div>
+                                </div>
 
-                            <div className="p-1">
-                              <Menu.Item
-                                as="div"
-                                className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                                <div className="p-1">
+                                  <Menu.Item
+                                    as="div"
+                                    className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                 hover:rounded-[6px] hover:bg-gray-100 "
-                                onClick={() => {
-                                  setIsCancelModalOpen(true)
-                                }}
-                              >
-                                <HiOutlineTrash className="text-xl font-normal text-red-500" />
+                                    onClick={() => {
+                                      setIsCancelModalOpen(true)
+                                    }}
+                                  >
+                                    <HiOutlineTrash className="text-xl font-normal text-red-500" />
 
-                                <Text
-                                  size="sm"
-                                  weight="normal"
-                                  className="text-red-500"
-                                >
-                                  Cancel Service
-                                </Text>
-                              </Menu.Item>
-                            </div>
-                          </Menu.Items>
-                        </Transition>
-                      </Menu>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            )}
-          {!appExternalStorageUsage && (
-            <tbody className="bg-white">
-              <tr>
-                <td className="px-6 py-3">
-                  <div className=" flex items-center gap-2">
-                    <div className="bg-gray-100 rounded-full p-2">
-                      <TbDatabaseImport className="w-4 h-4 text-gray-600" />
-                    </div>
+                                    <Text
+                                      size="sm"
+                                      weight="normal"
+                                      className="text-red-500"
+                                    >
+                                      Cancel Service
+                                    </Text>
+                                  </Menu.Item>
+                                </div>
+                              </Menu.Items>
+                            </Transition>
+                          </Menu>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                )}
+              {!appExternalStorageUsage && (
+                <tbody className="bg-white">
+                  <tr>
+                    <td className="px-6 py-3">
+                      <div className=" flex items-center gap-2">
+                        <div className="bg-gray-100 rounded-full p-2">
+                          <TbDatabaseImport className="w-4 h-4 text-gray-600" />
+                        </div>
 
-                    <Text size="sm" className="text-gray-500">
-                      App data storage
-                    </Text>
-                  </div>
-                </td>
-                <td className="px-6 py-3">
-                  <Text size="sm" className="text-gray-500">
-                    -
-                  </Text>
-                </td>
-                <td className="px-6 py-3">
-                  <Text size="sm" className="text-gray-500">
-                    Inactive
-                  </Text>
-                </td>
-                <td className="px-6 py-3">
-                  <Text size="sm" className="text-gray-500">
-                    -
-                  </Text>
-                </td>
-                <td className="px-6 py-3">
-                  <Text size="sm" className="text-gray-500">
-                    -
-                  </Text>
-                </td>
-                <td className="px-6 py-3">
-                  <div className="flex justify-end">
-                    <Button
-                      btnType="secondary-alt"
-                      btnSize="xs"
-                      className="flex flex-row items-center gap-3"
-                      type="submit"
-                      onClick={() => {
-                        setIsSubscriptionModalOpen(true)
-                      }}
-                    >
-                      <HiOutlineShoppingCart className="w-3.5 h-3.5" />
-                      <Text size="sm">Purchase Package</Text>
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          )}
-        </table>
-      </section>
+                        <Text size="sm" className="text-gray-500">
+                          App data storage
+                        </Text>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <Text size="sm" className="text-gray-500">
+                        -
+                      </Text>
+                    </td>
+                    <td className="px-6 py-3">
+                      <Text size="sm" className="text-gray-500">
+                        Inactive
+                      </Text>
+                    </td>
+                    <td className="px-6 py-3">
+                      <Text size="sm" className="text-gray-500">
+                        -
+                      </Text>
+                    </td>
+                    <td className="px-6 py-3">
+                      <Text size="sm" className="text-gray-500">
+                        -
+                      </Text>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-end">
+                        <Button
+                          btnType="secondary-alt"
+                          btnSize="xs"
+                          className="flex flex-row items-center gap-3"
+                          type="submit"
+                          onClick={() => {
+                            setIsSubscriptionModalOpen(true)
+                          }}
+                        >
+                          <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                          <Text size="sm">Purchase Package</Text>
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              )}
+            </table>
+          </section>
 
+        )}
       <section className="flex flex-col gap-4">
         <Text size="lg" weight="semibold">
           Plan based Services

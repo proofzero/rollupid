@@ -40,6 +40,8 @@ import { AppLoaderData } from '~/root'
 import { GroupSeatingCard } from '~/components/Billing/seating'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 import plans from '@proofzero/utils/billing/plans'
+import AppDataStorageUsageTable from '~/components/AppDataStorageUsageTable/AppDataStorageUsageTable'
+import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
 
 export const loader = billingLoader
 export const action = billingAction
@@ -128,7 +130,7 @@ export default () => {
   )
 
   const hydrated = useHydrated()
-
+  const featureFlags = useFeatureFlags(hydrated)
   const group = groups.find((g) => g.URN === groupURN)
 
   return (
@@ -390,6 +392,23 @@ export default () => {
         )}
       </section>
 
+      {featureFlags['app_storage'] &&
+        (
+          <section className="mt-10">
+            <header className="flex flex-col lg:flex-row justify-between lg:items-center relative mb-6">
+              <Text size="lg" weight="semibold" className="text-gray-900">
+                Usage based Services
+              </Text>
+            </header>
+
+            <AppDataStorageUsageTable
+              apps={apps.filter(
+                (a) => Boolean(a.groupID) && Boolean(a.externalAppDataPackage)
+              )}
+            />
+          </section>
+        )}
+
       <section className="mt-10">
         <article>
           <header className="flex flex-col lg:flex-row justify-between lg:items-center relative mb-6">
@@ -448,9 +467,8 @@ export default () => {
                     {invoices.map((invoice, idx) => (
                       <tr
                         key={idx}
-                        className={`${
-                          idx === invoices.length - 1 ? '' : 'border-b'
-                        } border-gray-200`}
+                        className={`${idx === invoices.length - 1 ? '' : 'border-b'
+                          } border-gray-200`}
                       >
                         <td className="px-6 py-3">
                           {hydrated && (
@@ -469,16 +487,16 @@ export default () => {
 
                               {(invoice.status === 'open' ||
                                 invoice.status === 'uncollectible') && (
-                                <div
-                                  className="rounded-xl bg-yellow-200 flex
+                                  <div
+                                    className="rounded-xl bg-yellow-200 flex
                                 flex-row items-center space-x-1 p-1"
-                                >
-                                  <IoWarningOutline className="text-black w-4 h-4" />
-                                  <Text size="xs" className="text-black">
-                                    Payment Error
-                                  </Text>
-                                </div>
-                              )}
+                                  >
+                                    <IoWarningOutline className="text-black w-4 h-4" />
+                                    <Text size="xs" className="text-black">
+                                      Payment Error
+                                    </Text>
+                                  </div>
+                                )}
                             </div>
                           )}
                         </td>
@@ -521,36 +539,36 @@ export default () => {
                           )}
                           {(invoice.status === 'open' ||
                             invoice.status === 'uncollectible') && (
-                            <div className="flex flex-row space-x-2">
-                              <a
-                                href={invoice.url}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                <Text size="xs" className="text-indigo-500">
-                                  Update Payment
-                                </Text>
-                              </a>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  submit(
-                                    {
-                                      invoice_id: invoice.id,
-                                    },
-                                    {
-                                      method: 'post',
-                                      action: 'billing/cancel',
-                                    }
-                                  )
-                                }}
-                              >
-                                <Text size="xs" className="text-red-500">
-                                  Cancel Payment
-                                </Text>
-                              </button>
-                            </div>
-                          )}
+                              <div className="flex flex-row space-x-2">
+                                <a
+                                  href={invoice.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <Text size="xs" className="text-indigo-500">
+                                    Update Payment
+                                  </Text>
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    submit(
+                                      {
+                                        invoice_id: invoice.id,
+                                      },
+                                      {
+                                        method: 'post',
+                                        action: 'billing/cancel',
+                                      }
+                                    )
+                                  }}
+                                >
+                                  <Text size="xs" className="text-red-500">
+                                    Cancel Payment
+                                  </Text>
+                                </button>
+                              </div>
+                            )}
                         </td>
                       </tr>
                     ))}

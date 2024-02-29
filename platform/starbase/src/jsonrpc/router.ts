@@ -160,6 +160,9 @@ import {
 } from './methods/externalAppDataUsageReset'
 import {
   getAppExternalDataUsage,
+  getAppExternalDataUsageBatch,
+  GetAppExternalDataUsageBatchInputSchema,
+  GetAppExternalDataUsageBatchOutputSchema,
   GetAppExternalDataUsageInputSchema,
   GetAppExternalDataUsageOutputSchema,
 } from './methods/getAppExternalDataUsage'
@@ -470,6 +473,15 @@ export const appRouter = t.router({
     .input(GetAppExternalDataUsageInputSchema)
     .output(GetAppExternalDataUsageOutputSchema)
     .query(getAppExternalDataUsage),
+  getAppExternalDataUsageBatch: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(GetAppExternalDataUsageBatchInputSchema)
+    .output(GetAppExternalDataUsageBatchOutputSchema)
+    .query(getAppExternalDataUsageBatch),
 })
 
 export type StarbaseRouter = typeof appRouter
