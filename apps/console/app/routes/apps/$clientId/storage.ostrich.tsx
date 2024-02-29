@@ -58,6 +58,7 @@ import {
   packageTypeToTopUpPriceID,
 } from '@proofzero/utils/external-app-data'
 import ExternalAppDataPackages from '@proofzero/utils/externalAppDataPackages'
+import { HiExclamationTriangle } from 'react-icons/hi2'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -381,6 +382,42 @@ export default () => {
             </Text>
           </section>
         )}
+
+        {appDetails.externalAppDataPackageDefinition &&
+          appDetails.externalAppDataPackageDefinition.status ===
+            ExternalAppDataPackageStatus.Enabled &&
+          !appDetails.externalAppDataPackageDefinition.autoTopUp &&
+          appExternalStorageUsage &&
+          (appExternalStorageUsage.readUsage >=
+            Math.floor(0.9 * appExternalStorageUsage.readAvailable) ||
+            appExternalStorageUsage.writeUsage >=
+              Math.floor(0.9 * appExternalStorageUsage.writeAvailable)) && (
+            <div className="flex flex-row rounded p-4 gap-2 bg-orange-50 items-center">
+              <HiExclamationTriangle className="h-5 w-5 text-orange-400" />
+
+              <div className="flex-1">
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-left text-orange-600 max-w-[695px]"
+                >
+                  Number of Reads / Writes available dropped below 10% in your
+                  Data Unit Package. Upgrade Package or enable auto-top up to
+                  ensure your services run as expected.
+                </Text>
+              </div>
+
+              <button
+                onClick={() => {
+                  setIsSubscriptionModalOpen(true)
+                }}
+              >
+                <Text size="sm" weight="medium" className="text-orange-600">
+                  Edit package →
+                </Text>
+              </button>
+            </div>
+          )}
 
         <section className="flex-1 bg-white border rounded-lg px-4 pt-3 pb-6">
           <section className="flex flex-row justify-between items-center">
