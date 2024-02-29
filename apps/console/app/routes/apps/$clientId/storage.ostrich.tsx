@@ -103,7 +103,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const { clientId } = params
     if (!clientId) {
       throw new InternalServerError({
-        message: 'Client id not found',
+        message: 'Client ID not found',
       })
     }
 
