@@ -8,7 +8,12 @@ import {
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  LoaderFunction,
+  json,
+  redirect,
+} from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import {
@@ -98,7 +103,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const { clientId } = params
     if (!clientId) {
       throw new InternalServerError({
-        message: 'Client id not found',
+        message: 'Client ID not found',
       })
     }
 
@@ -135,7 +140,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         const newPackageType = fd.get('package') as ExternalAppDataPackageType
         const autoTopUp = fd.get('top-up') !== '0'
 
-        const { readUsage, writeUsage, readTopUp, writeTopUp } =
+        const externalDataUsage =
           await coreClient.starbase.getAppExternalDataUsage.query({
             clientId: params.clientId as string,
           })
@@ -173,25 +178,29 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           autoTopUp,
         })
 
-        const forceTopUp =
-          (readUsage &&
-            readUsage >
-              ExternalAppDataPackages[newPackageType].reads + readTopUp) ||
-          (writeUsage &&
-            writeUsage >
-              ExternalAppDataPackages[newPackageType].writes + writeTopUp)
-        if (appDetails.externalAppDataPackageDefinition && forceTopUp) {
-          await createInvoice(
-            env.SECRET_STRIPE_API_KEY,
-            spd.customerID,
-            sub.id,
-            packageTypeToTopUpPriceID(
-              env,
-              appDetails.externalAppDataPackageDefinition.packageDetails
-                .packageType
-            ),
-            true
-          )
+        if (externalDataUsage) {
+          const { readUsage, writeUsage, readTopUp, writeTopUp } =
+            externalDataUsage
+          const forceTopUp =
+            (readUsage &&
+              readUsage >
+                ExternalAppDataPackages[newPackageType].reads + readTopUp) ||
+            (writeUsage &&
+              writeUsage >
+                ExternalAppDataPackages[newPackageType].writes + writeTopUp)
+          if (appDetails.externalAppDataPackageDefinition && forceTopUp) {
+            await createInvoice(
+              env.SECRET_STRIPE_API_KEY,
+              spd.customerID,
+              sub.id,
+              packageTypeToTopUpPriceID(
+                env,
+                appDetails.externalAppDataPackageDefinition.packageDetails
+                  .packageType
+              ),
+              true
+            )
+          }
         }
 
         break
@@ -219,6 +228,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         })
     }
 
+    if (fd.get('redirect_to_app_billing')) {
+      return redirect(`/apps/${clientId}/billing`)
+    }
+
     return null
   }
 )
@@ -226,9 +239,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 export const ConfirmCancelModal = ({
   isOpen,
   setIsOpen,
+  clientID,
+  redirectToAppBilling = false,
 }: {
   isOpen: boolean
   setIsOpen: (val: boolean) => void
+  clientID: string
+  redirectToAppBilling?: boolean
 }) => {
   const [confirmationText, setConfirmationText] = useState('')
   const transition = useTransition()
@@ -258,6 +275,7 @@ export const ConfirmCancelModal = ({
           </div>
 
           <Form
+            action={`/apps/${clientID}/storage/ostrich`}
             method="post"
             onSubmit={() => {
               setConfirmationText('')
@@ -265,6 +283,14 @@ export const ConfirmCancelModal = ({
             }}
           >
             <input type="hidden" name="op" value="disable" />
+            {redirectToAppBilling && (
+              <input
+                type="hidden"
+                name="redirect_to_app_billing"
+                value="true"
+              />
+            )}
+
             <section className="mb-4">
               <Text size="sm" weight="normal" className="text-gray-500 my-3">
                 Are you sure you want to stop{' '}
@@ -339,6 +365,7 @@ export default () => {
         <ConfirmCancelModal
           isOpen={isCancelModalOpen}
           setIsOpen={setIsCancelModalOpen}
+          clientID={appDetails.clientId!}
         />
       )}
       {isSubscriptionModalOpen && (
