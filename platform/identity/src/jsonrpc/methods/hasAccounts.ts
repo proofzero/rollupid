@@ -1,6 +1,8 @@
 import * as set from 'ts-set-utils'
 import { z } from 'zod'
 
+import { UnauthorizedError } from '@proofzero/errors'
+
 import { router } from '@proofzero/platform.core'
 import { inputValidators } from '@proofzero/platform-middleware'
 
@@ -39,9 +41,8 @@ export const hasAccountsMethod = async ({
   input: HasAccountsInput
   ctx: Context
 }): Promise<HasAccountsOutput> => {
-  if (input.identity !== ctx.identityURN) {
-    throw Error('Invalid identity input')
-  }
+  if (ctx.identityURN !== input.identity) throw new UnauthorizedError()
+
   // Return the list of edges between the identity node and any
   // account nodes. Don't filter the accounts by type, we want them
   // all (the total number is normally going to be small).
