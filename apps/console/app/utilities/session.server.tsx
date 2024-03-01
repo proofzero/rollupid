@@ -12,8 +12,15 @@ import {
   Session,
 } from '@remix-run/cloudflare'
 
-import { decryptSession } from '@proofzero/utils/session'
+import createCoreClient from '@proofzero/platform-clients/core'
+import {
+  generateTraceContextHeaders,
+  generateTraceSpan,
+} from '@proofzero/platform-middleware/trace'
 
+import { IdentityURNSpace } from '@proofzero/urns/identity'
+import { decryptSession } from '@proofzero/utils/session'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import {
   checkToken,
   ExpiredTokenError,
@@ -63,7 +70,19 @@ export async function requireJWT(request: Request, env: Env) {
   const jwt = await getUserSession(request, env)
 
   try {
-    checkToken(jwt)
+    const { sub: subject } = checkToken(jwt)
+    if (!subject) throw InvalidTokenError
+
+    const coreClient = createCoreClient(env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(generateTraceSpan()),
+    })
+
+    if (
+      !IdentityURNSpace.is(subject) ||
+      !(await coreClient.identity.isValid.query())
+    )
+      throw InvalidTokenError
     return jwt
   } catch (error) {
     switch (error) {
