@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 
+import { checkToken } from '@proofzero/utils/token'
+
 import type { AccountList } from '../../types'
 import type { IdentityURN } from '@proofzero/urns/identity'
 
@@ -19,6 +21,11 @@ export const isValidMethod = async ({
 }: {
   ctx: Context
 }): Promise<IsValidOutput> => {
+  if (ctx.token) {
+    const { sub: subject } = checkToken(ctx.token)
+    if (subject !== ctx.identityURN) return false
+  }
+
   //Relies on injectIdentityNode middleware
   const profile = ctx.identityNode?.class.getProfile()
   const accounts = ctx.identityNode?.class.getAccounts()
