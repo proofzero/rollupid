@@ -6562,7 +6562,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@proofzero/apps@workspace:apps"
   dependencies:
-    graphql: 16.6.0
+    graphql: 16.8.1
     npm-run-all: 4.1.5
     typescript: 5.0.4
   languageName: unknown
@@ -7004,7 +7004,7 @@ __metadata:
     "@graphql-codegen/client-preset": 1.1.1
     "@graphql-codegen/typescript-graphql-request": 4.5.7
     "@graphql-codegen/typescript-resolvers": 2.7.5
-    graphql: 16.6.0
+    graphql: 16.8.1
     npm-run-all: 4.1.5
     typescript: 5.0.4
   languageName: unknown
@@ -24689,13 +24689,6 @@ __metadata:
   peerDependencies:
     graphql: ^15.2.0 || ^16.0.0
   checksum: 7a1e6cd6d40d5b011c472217a0ec860c72c38656a03b209da1d4b0cc8eb7fab1b5576f88fe5d0657f5b935fb1dd588154c21878c932132095ad63c7ae3d55a21
-  languageName: node
-  linkType: hard
-
-"graphql@npm:16.6.0":
-  version: 16.6.0
-  resolution: "graphql@npm:16.6.0"
-  checksum: bf1d9e3c1938ce3c1a81e909bd3ead1ae4707c577f91cff1ca2eca474bfbc7873d5d7b942e1e9777ff5a8304421dba57a4b76d7a29eb19de8711cb70e3c2415e
   languageName: node
   linkType: hard
 
