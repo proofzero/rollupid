@@ -27,6 +27,6 @@
     "graphql": "16.8.1",
     "graphql-type-json": "0.3.2",
     "graphql-yoga": "3.9.1",
-    "jose": "4.14.4"
+    "jose": "4.15.5"
   }
 }
