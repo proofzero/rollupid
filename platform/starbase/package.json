@@ -36,7 +36,7 @@
     "@proofzero/utils": "workspace:*",
     "@trpc/server": "10.8.1",
     "do-proxy": "1.3.3",
-    "jose": "4.11.0",
+    "jose": "4.15.5",
     "lodash": "4.17.21",
     "multiformats": "10.0.2",
     "tiny-invariant": "1.3.1",
