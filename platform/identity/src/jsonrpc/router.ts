@@ -102,6 +102,12 @@ import {
   patchProfileFieldsMethod,
 } from './methods/patchProfileFields'
 import { resetProfileFieldsMethod } from './methods/resetProfileFields'
+import { mergeMethod, MergeInput, MergeOutput } from './methods/merge'
+import {
+  mergePreviewMethod,
+  MergePreviewInput,
+  MergePreviewOutput,
+} from './methods/merge-preview'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -111,7 +117,10 @@ export const injectIdentityNode = t.middleware(async ({ ctx, next }) => {
   if (!identityURN)
     throw new UnauthorizedError({ message: 'No identityURN in context' })
 
-  const identityNode = initIdentityNodeByName(identityURN, ctx.env.Identity)
+  let identityNode = initIdentityNodeByName(identityURN, ctx.env.Identity)
+  const forwardIdentityURN = await identityNode.class.getForwardIdentityURN()
+  if (forwardIdentityURN)
+    identityNode = initIdentityNodeByName(forwardIdentityURN, ctx.env.Identity)
 
   return next({
     ctx: {
@@ -306,4 +315,24 @@ export const appRouter = t.router({
     .use(RequireIdentity)
     .use(injectIdentityNode)
     .mutation(resetProfileFieldsMethod),
+  merge: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireIdentity)
+    .use(injectIdentityNode)
+    .input(MergeInput)
+    .output(MergeOutput)
+    .mutation(mergeMethod),
+  mergePreview: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireIdentity)
+    .use(injectIdentityNode)
+    .input(MergePreviewInput)
+    .output(MergePreviewOutput)
+    .query(mergePreviewMethod),
 })

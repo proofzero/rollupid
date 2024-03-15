@@ -306,6 +306,8 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     issuer,
   })
 
+  console.log(JSON.stringify({ accessToken, refreshToken, idToken }, null, 2))
+
   return { accessToken, refreshToken, idToken }
 }
 

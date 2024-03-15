@@ -7,7 +7,10 @@ import { router } from '@proofzero/platform.core'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
 import { Context } from '../../../context'
-import { initIdentityGroupNodeByName } from '../../../nodes'
+import {
+  initIdentityNodeByName,
+  initIdentityGroupNodeByName,
+} from '../../../nodes'
 
 export const HasIdentityGroupPermissionsInputSchema = z.object({
   identityURN: IdentityURNInput,
@@ -34,10 +37,17 @@ export const hasIdentityGroupPermissions = async ({
 }): Promise<HasIdentityGroupPermissionsOutput> => {
   const caller = router.createCaller(ctx)
 
+  const identityNode = initIdentityNodeByName(
+    input.identityURN,
+    ctx.env.Identity
+  )
+  const forwardIdentityURN = await identityNode.class.getForwardIdentityURN()
+  const identityURN = forwardIdentityURN || input.identityURN
+
   const { edges } = await caller.edges.getEdges({
     query: {
       src: {
-        baseUrn: input.identityURN,
+        baseUrn: identityURN,
       },
       tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
       dst: {
@@ -50,7 +60,7 @@ export const hasIdentityGroupPermissions = async ({
     input.identityGroupURN,
     ctx.env.IdentityGroup
   )
-  const { error } = await DO.class.validateAdmin(input.identityURN)
+  const { error } = await DO.class.validateAdmin(identityURN)
 
   return {
     read: edges.length > 0,

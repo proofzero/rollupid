@@ -45,6 +45,8 @@ export const getAuthorizedAppsMethod = async ({
   if (!ctx.identityURN)
     throw new UnauthorizedError({ message: 'identity not found' })
 
+  if (ctx.identityURN !== input.identity) throw new UnauthorizedError()
+
   const caller = router.createCaller(ctx)
   const edgesResult = await caller.edges.getEdges({
     query: {

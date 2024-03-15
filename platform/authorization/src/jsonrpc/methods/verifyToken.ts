@@ -7,6 +7,8 @@ import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { getErrorCause } from '@proofzero/utils/errors'
 
+import { initIdentityNodeByName } from '@proofzero/platform.identity/src/nodes'
+
 import { Context } from '../../context'
 import { getJWKS } from '../../jwk'
 import { initAuthorizationNodeByName } from '../../nodes'
@@ -58,7 +60,11 @@ export const verifyTokenMethod: VerifyTokenMethod = async ({ ctx, input }) => {
   if (clientId && clientId != payload.aud[0]) throw MismatchClientIdError
   if (!payload.sub) throw MissingSubjectError
 
-  const identityURN = payload.sub
+  let identityURN = payload.sub
+  const identityNode = initIdentityNodeByName(identityURN, ctx.env.Identity)
+  const forwardIdentityURN = await identityNode.class.getForwardIdentityURN()
+  if (forwardIdentityURN) identityURN = forwardIdentityURN
+
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)

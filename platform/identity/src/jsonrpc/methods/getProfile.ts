@@ -30,7 +30,11 @@ export const getProfileMethod = async ({
   input: GetProfileParams
   ctx: Context
 }): Promise<GetProfileOutputParams> => {
-  const node = initIdentityNodeByName(input.identity, ctx.env.Identity)
+  let node = initIdentityNodeByName(input.identity, ctx.env.Identity)
+  const forwardIdentityURN = await node.class.getForwardIdentityURN()
+  if (forwardIdentityURN)
+    node = initIdentityNodeByName(forwardIdentityURN, ctx.env.Identity)
+
   const caller = appRouter.createCaller(ctx)
 
   const [profile, accounts] = await Promise.all([

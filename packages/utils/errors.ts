@@ -11,6 +11,7 @@ import {
   UnauthorizedError,
   ForbiddenError,
   NotFoundError,
+  ConflictError,
   RollupError,
   ERROR_CODES,
   HTTP_STATUS_CODES,
@@ -68,6 +69,7 @@ export const ROLLUP_ERROR_CLASS_BY_CODE = {
   [ERROR_CODES.UNAUTHORIZED]: UnauthorizedError,
   [ERROR_CODES.FORBIDDEN]: ForbiddenError,
   [ERROR_CODES.NOT_FOUND]: NotFoundError,
+  [ERROR_CODES.CONFLICT]: ConflictError,
 }
 
 export const getErrorCause = (error: unknown): RollupError | Error => {

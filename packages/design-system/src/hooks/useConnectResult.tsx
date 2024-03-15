@@ -41,6 +41,8 @@ export default (
               { duration: 2000 }
             )
             break
+          case 'ACCOUNT_LINKED_ERROR':
+            break
           case 'CANCEL':
             toast(
               ToastType.Warning,

@@ -81,6 +81,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectResult =
       new URL(request.url).searchParams.get('rollup_result') ?? undefined
 
+    if (connectResult === 'ACCOUNT_LINKED_ERROR') {
+      throw redirect('/merge-identity')
+    }
+
     //Request parameter pre-checks
     if (!clientId)
       throw new BadRequestError({ message: 'client_id is required' })
@@ -238,7 +242,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       const responseType = ResponseType.Code
       const preauthorizeRes =
         await coreClient.authorization.preauthorize.mutate({
-          identity: identityURN,
+          identityURN,
           responseType,
           clientId,
           redirectUri,

@@ -7,6 +7,7 @@ import { RollupError, ERROR_CODES } from '@proofzero/errors'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { AccountURN } from '@proofzero/urns/account'
 
+import { initIdentityNodeByName } from '@proofzero/platform.identity/src/nodes'
 import { GetEdgesMethodOutput } from '@proofzero/platform.edges/src/jsonrpc/methods/getEdges'
 
 import type { Context } from '../../context'
@@ -28,11 +29,19 @@ export const deleteAccountNodeMethod = async ({
   input: DeleteAccountNodeParams
   ctx: Context
 }) => {
-  const { identityURN, forceDelete } = input
+  const { forceDelete } = input
 
-  if (!IdentityURNSpace.is(identityURN)) throw new Error('Invalid identity URN')
+  if (!IdentityURNSpace.is(input.identityURN))
+    throw new Error('Invalid identity URN')
   if (!ctx.accountURN) throw new Error('missing account URN')
   if (!ctx.account) throw new Error('missing account node')
+
+  const identityNode = initIdentityNodeByName(
+    input.identityURN,
+    ctx.env.Identity
+  )
+  const forwardIdentityURN = await identityNode.class.getForwardIdentityURN()
+  const identityURN = forwardIdentityURN || input.identityURN
 
   const caller = router.createCaller(ctx)
 

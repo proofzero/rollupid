@@ -45,6 +45,9 @@ export const getStripePaymentData = async ({
   let ownerNode
   if (IdentityURNSpace.is(input.URN)) {
     ownerNode = initIdentityNodeByName(input.URN, ctx.env.Identity)
+    const forwardIdentityURN = await ownerNode.class.getForwardIdentityURN()
+    if (forwardIdentityURN)
+      ownerNode = initIdentityNodeByName(forwardIdentityURN, ctx.env.Identity)
   } else if (IdentityGroupURNSpace.is(input.URN)) {
     ownerNode = initIdentityGroupNodeByName(input.URN, ctx.env.IdentityGroup)
   } else {
@@ -76,6 +79,9 @@ export const setStripePaymentData = async ({
   let ownerNode
   if (IdentityURNSpace.is(input.URN)) {
     ownerNode = initIdentityNodeByName(input.URN, ctx.env.Identity)
+    const forwardIdentityURN = await ownerNode.class.getForwardIdentityURN()
+    if (forwardIdentityURN)
+      ownerNode = initIdentityNodeByName(forwardIdentityURN, ctx.env.Identity)
   } else if (IdentityGroupURNSpace.is(input.URN)) {
     ownerNode = initIdentityGroupNodeByName(input.URN, ctx.env.IdentityGroup)
   } else {

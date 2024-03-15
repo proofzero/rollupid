@@ -17,6 +17,10 @@ import {
 import { IdentityURN } from '@proofzero/urns/identity'
 import { DOProxy } from 'do-proxy'
 import { NodeMethodReturnValue } from '@proofzero/types/node'
+
+import { Environment } from '@proofzero/platform.core'
+
+import { initIdentityNodeByName } from '.'
 import { IDENTITY_GROUP_OPTIONS } from '../constants'
 
 export type InviteMemberInput = {
@@ -36,10 +40,12 @@ export type ClearInvitationInput = {
 
 export default class IdentityGroup extends DOProxy {
   declare state: DurableObjectState
+  declare env: Environment
 
-  constructor(state: DurableObjectState) {
-    super(state)
+  constructor(state: DurableObjectState, env: Environment) {
+    super(state, env)
     this.state = state
+    this.env = env
   }
 
   async getServicePlans(): Promise<ServicePlans | undefined> {
@@ -189,11 +195,16 @@ export default class IdentityGroup extends DOProxy {
   }
 
   async getOrderedMembers(): Promise<IdentityURN[]> {
-    const orderedMembers = await this.state.storage.get<IdentityURN[]>(
-      'orderedMembers'
-    )
+    const orderedMembers =
+      (await this.state.storage.get<IdentityURN[]>('orderedMembers')) || []
 
-    return orderedMembers || []
+    return Promise.all(
+      orderedMembers.map(async (urn) => {
+        const node = initIdentityNodeByName(urn, this.env.Identity)
+        const forwardURN = await node.class.getForwardIdentityURN()
+        return forwardURN || urn
+      })
+    )
   }
 
   async setOrderedMembers(members: IdentityURN[]): Promise<void> {

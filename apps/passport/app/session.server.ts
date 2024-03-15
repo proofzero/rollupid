@@ -19,8 +19,8 @@ import { encryptSession, decryptSession } from '@proofzero/utils/session'
 import { getCoreClient } from './platform.server'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { InternalServerError, UnauthorizedError } from '@proofzero/errors'
-import { IdentityURNSpace } from '@proofzero/urns/identity'
-import type { IdentityURN } from '@proofzero/urns/identity'
+import { type AccountURN } from '@proofzero/urns/account'
+import { type IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
 
 import { FLASH_MESSAGE, FLASH_MESSAGE_KEY } from './utils/flashMessage.server'
 import { getCookieDomain } from './utils/cookie'
@@ -28,6 +28,58 @@ import { getCookieDomain } from './utils/cookie'
 export const InvalidSessionIdentityError = new UnauthorizedError({
   message: 'Session identity is not valid',
 })
+
+// IDENTITY MERGE STATE
+
+export const getIdentityMergeState = async (request: Request, env: Env) => {
+  const storage = getIdentityMergeStateStorage(request, env)
+  const session = await storage.getSession(request.headers.get('Cookie'))
+  return {
+    account: session.get('account'),
+    source: session.get('source'),
+    target: session.get('target'),
+  }
+}
+
+export const createIdentityMergeState = async (
+  request: Request,
+  env: Env,
+  account: AccountURN,
+  source: IdentityURN,
+  target: IdentityURN
+) => {
+  const storage = getIdentityMergeStateStorage(request, env)
+  const session = await storage.getSession()
+  session.set('account', account)
+  session.set('source', source)
+  session.set('target', target)
+  return storage.commitSession(session)
+}
+
+export const destroyIdentityMergeState = async (request: Request, env: Env) => {
+  const storage = getIdentityMergeStateStorage(request, env)
+  const session = await getIdentityMergeStateSession(request, env)
+  return storage.destroySession(session)
+}
+
+const getIdentityMergeStateSession = (request: Request, env: Env) => {
+  const storage = getIdentityMergeStateStorage(request, env)
+  return storage.getSession(request.headers.get('Cookie'))
+}
+
+const getIdentityMergeStateStorage = (request: Request, env: Env) => {
+  return createCookieSessionStorage({
+    cookie: {
+      name: '_rollup_identity_merge',
+      domain: getCookieDomain(request, env),
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV == 'production',
+      httpOnly: true,
+      secrets: [env.SECRET_SESSION_SALT],
+    },
+  })
+}
 
 // FLASH SESSION
 
