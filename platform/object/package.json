@@ -1,7 +1,9 @@
 {
   "name": "@proofzero/platform.object",
   "version": "0.0.0",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "build": "wrangler publish --dry-run --outdir=dist",
     "check": "run-s format:check lint:check types:check",

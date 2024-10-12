@@ -1,8 +1,10 @@
 {
   "name": "@proofzero/platform.authorization",
   "version": "0.0.0",
+  "author": "Proof Zero Inc. <admin@rollup.id> (https://rollup.id)",
   "main": "src/index.ts",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "check": "run-s format:check lint:check types:check",
     "format": "run-s format:src",
