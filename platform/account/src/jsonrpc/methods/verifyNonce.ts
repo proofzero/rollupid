@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Hex } from '../validators/wallet'
 
 import { router } from '@proofzero/platform.core'
 
@@ -7,7 +8,7 @@ import { CryptoAccount, type AccountNode } from '../../nodes'
 
 export const VerifyNonceInput = z.object({
   nonce: z.string(),
-  signature: z.string().startsWith('0x'),
+  signature: Hex,
   jwt: z.string().optional(),
   forceAccountCreation: z.boolean().optional(),
 })
@@ -31,7 +32,7 @@ export const verifyNonceMethod = async ({
 
   const nodeClient = new CryptoAccount(ctx.account as AccountNode)
 
-  await nodeClient.verifyNonce(nonce, signature as '0x${string}')
+  await nodeClient.verifyNonce(nonce, signature)
 
   const caller = router.createCaller(ctx)
   const { existing } = await caller.account.resolveIdentity({
