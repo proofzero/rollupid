@@ -120,4 +120,4 @@ Remember to thoroughly test your code and update any relevant documentation or t
 
 ## Community
 
-Join us on [Discord](https://discord.gg/rollupid) and [Twitter](https://twitter.com/rollupid) to discuss RollupID and learn more about the project.
+Join us on [Discord](https://discord.gg/rollupid) and [X (formerly Twitter)](https://x.com/rollupid) to discuss RollupID and learn more about the project.
