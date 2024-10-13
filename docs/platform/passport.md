@@ -23,7 +23,7 @@ Passport's authentication flow currently supports the following authentication m
 - Connect with Passkeys (aka. WebAuthn)
 - Connect with Google
 - Connect with Apple
-- Connect with Twitter
+- Connect with X (formerly Twitter)
 - Connect with Github
 - Connect with Microsoft
 - Connect with Discord
